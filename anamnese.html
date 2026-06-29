@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Anamnese — MeuPsi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --lila-50:  #F5F0FB;
+  --lila-100: #E8DCFA;
+  --lila-300: #C4A8F0;
+  --lila-500: #9B6FD8;
+  --lila-700: #6B3FA8;
+  --lila-900: #3B1E62;
+  --verde-400: #4CAF7D;
+  --verde-500: #3A9E6A;
+  --verde-600: #2D8055;
+  --verde-50:  #EBF7F1;
+  --cream:    #FDFBF8;
+  --gray-100: #F0EDE8;
+  --gray-300: #C8C4BC;
+  --gray-500: #8A8680;
+  --gray-800: #2E2C29;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--cream); color: var(--gray-800); font-size: 16px; line-height: 1.6; }
+a { text-decoration: none; color: inherit; }
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(253,251,248,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--lila-100);
+  padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px;
+}
+.nav-logo { font-family: var(--font-display); font-size: 22px; font-weight: 400; font-style: italic; color: var(--lila-700); }
+.nav-logo span { color: var(--verde-500); font-style: normal; }
+.nav-back { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--gray-500); cursor: pointer; transition: color 0.2s; }
+.nav-back:hover { color: var(--lila-700); }
+
+/* HERO */
+.hero {
+  background: linear-gradient(160deg, var(--lila-900) 0%, var(--lila-700) 100%);
+  padding: 3rem 2rem 2rem;
+  text-align: center; color: #fff;
+}
+.hero h1 { font-family: var(--font-display); font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 300; margin-bottom: 0.5rem; }
+.hero p { font-size: 15px; opacity: 0.8; max-width: 500px; margin: 0 auto; }
+
+/* PROGRESS */
+.progress-wrap {
+  background: var(--lila-900);
+  padding: 1.5rem 2rem 2rem;
+}
+.steps-bar {
+  max-width: 680px; margin: 0 auto;
+  display: flex; align-items: center;
+}
+.step-item { display: flex; align-items: center; flex: 1; }
+.step-circle {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 500; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.4);
+  background: transparent;
+  transition: all 0.3s;
+}
+.step-circle.ativo { border-color: #fff; background: rgba(255,255,255,0.15); color: #fff; }
+.step-circle.feito { border-color: var(--verde-400); background: var(--verde-400); color: #fff; }
+.step-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-left: 8px; white-space: nowrap; }
+.step-label.ativo { color: #fff; font-weight: 500; }
+.step-label.feito { color: var(--verde-400); }
+.step-line { flex: 1; height: 2px; background: rgba(255,255,255,0.15); margin: 0 8px; }
+.step-line.feito { background: var(--verde-400); }
+
+/* PAGE */
+.page { max-width: 680px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
+
+/* CARD */
+.card {
+  background: #fff;
+  border: 1px solid var(--lila-100);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+.card-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem; font-weight: 300;
+  color: var(--lila-900);
+  margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 10px;
+}
+.card-title-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--lila-50);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* FORM */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+label { font-size: 13px; font-weight: 500; color: var(--gray-800); }
+.form-control {
+  border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.9rem;
+  font-size: 14px; font-family: inherit;
+  background: #fff; color: var(--gray-800);
+  transition: border-color 0.2s;
+}
+.form-control:focus { outline: none; border-color: var(--lila-500); }
+textarea.form-control { resize: vertical; min-height: 90px; }
+select.form-control { cursor: pointer; }
+.hint { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+
+/* CHIPS SELECIONÁVEIS */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.chip {
+  padding: 6px 14px; border-radius: var(--radius-pill);
+  border: 1.5px solid var(--gray-300);
+  font-size: 13px; color: var(--gray-800);
+  cursor: pointer; transition: all 0.15s;
+  user-select: none;
+}
+.chip:hover { border-color: var(--lila-300); }
+.chip.sel { border-color: var(--lila-500); background: var(--lila-50); color: var(--lila-700); font-weight: 500; }
+
+/* RADIO CARDS */
+.radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.radio-card {
+  border: 2px solid var(--gray-100);
+  border-radius: var(--radius-md);
+  padding: 1rem; cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.radio-card:hover { border-color: var(--lila-300); }
+.radio-card.sel { border-color: var(--lila-500); background: var(--lila-50); }
+.radio-card input { margin-top: 2px; accent-color: var(--lila-500); flex-shrink: 0; }
+.radio-card-text strong { font-size: 14px; }
+.radio-card-text span { display: block; font-size: 12px; color: var(--gray-500); }
+
+/* ESCALA */
+.escala { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.escala-btn {
+  width: 38px; height: 38px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--gray-300);
+  background: #fff; font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s; font-family: inherit;
+}
+.escala-btn:hover { border-color: var(--lila-300); }
+.escala-btn.sel { border-color: var(--lila-500); background: var(--lila-500); color: #fff; }
+.escala-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--gray-500); margin-top: 4px; }
+
+/* CONDICIONAL */
+.condicional { display: none; margin-top: 1rem; padding: 1rem; background: var(--lila-50); border-radius: var(--radius-md); border-left: 3px solid var(--lila-300); }
+.condicional.visivel { display: block; }
+
+/* NAVEGAÇÃO */
+.nav-btns {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 2rem;
+}
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--lila-700); color: #fff;
+  padding: 0.75rem 2rem; border-radius: var(--radius-pill);
+  font-size: 15px; font-weight: 500; font-family: inherit;
+  border: none; cursor: pointer; transition: background 0.2s;
+}
+.btn-primary:hover { background: var(--lila-900); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: transparent; color: var(--gray-500);
+  padding: 0.75rem 1.5rem; border-radius: var(--radius-pill);
+  font-size: 14px; font-weight: 500; font-family: inherit;
+  border: 1px solid var(--gray-300); cursor: pointer; transition: all 0.2s;
+}
+.btn-secondary:hover { color: var(--lila-700); border-color: var(--lila-300); }
+
+/* RESUMO */
+.resumo-bloco {
+  background: var(--lila-50);
+  border: 1px solid var(--lila-100);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+}
+.resumo-bloco h3 { font-size: 13px; font-weight: 500; color: var(--lila-700); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.resumo-linha { font-size: 14px; color: var(--gray-800); margin-bottom: 4px; }
+.resumo-linha strong { font-weight: 500; }
+.tag-resumo { display: inline-block; padding: 3px 10px; border-radius: var(--radius-pill); background: var(--lila-100); color: var(--lila-700); font-size: 12px; margin: 2px; }
+
+/* SUCESSO */
+.sucesso-page { text-align: center; padding: 3rem 1rem; }
+.sucesso-icon { font-size: 64px; margin-bottom: 1rem; }
+.sucesso-page h2 { font-family: var(--font-display); font-size: 1.8rem; font-weight: 300; color: var(--lila-700); margin-bottom: 0.5rem; }
+.sucesso-page p { color: var(--gray-500); font-size: 15px; }
+
+/* STEP VISIBILITY */
+.step-panel { display: none; }
+.step-panel.ativo { display: block; }
+
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .radio-grid { grid-template-columns: 1fr; }
+  .step-label { display: none; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">Meu<span>Psi</span></a>
+  <a class="nav-back" href="dashboard-psicologo.html">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Voltar ao dashboard
+  </a>
+</nav>
+
+<div class="hero">
+  <h1>Anamnese do paciente</h1>
+  <p>Preencha as informações clínicas para iniciar o acompanhamento.</p>
+</div>
+
+<div class="progress-wrap">
+  <div class="steps-bar" id="stepsBar">
+    <!-- gerado por JS -->
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ETAPA 1: IDENTIFICAÇÃO -->
+  <div class="step-panel ativo" id="etapa1">
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">
+          <svg width="18" height="18" fill="none" stroke="var(--lila-700)" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        </div>
+        Identificação
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nome completo *</label>
+          <input class="form-control" id="nome" type="text" placeholder="Nome do paciente" />
+        </div>
+        <div class="form-group">
+          <label>Data de nascimento *</label>
+          <input class="form-control" id="nascimento" type="date" />
+        </div>
+        <div class="form-group">
+          <label>Gênero</label>
+          <select class="form-control" id="genero">
+            <option value="">Prefiro não informar</option>
+            <option>Feminino</option>
+            <option>Masculino</option>
+            <option>Não-binário</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Estado civil</label>
+          <select class="form-control" id="estadoCivil">
+            <option value="">—</option>
+            <option>Solteiro(a)</option>
+            <option>Casado(a) / União estável</option>
+            <option>Divorciado(a)</option>
+            <option>Viúvo(a)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Telefone / WhatsApp</label>
+          <input class="form-control" id="telefone" type="tel" placeholder="(11) 99999-9999" />
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input class="form-control" id="email" type="email" placeholder="paciente@email.com" />
+        </div>
+        <div class="form-group">
+          <label>Profissão / Ocupação</label>
+          <input class="form-control" id="profissao" type="text" placeholder="Ex: Professora, estudante..." />
+        </div>
+        <div class="form-group">
+          <label>Escolaridade</label>
+          <select class="form-control" id="escolaridade">
+            <option value="">—</option>
+            <option>Ensino fundamental</option>
+            <option>Ensino médio</option>
+            <option>Ensino superior</option>
+            <option>Pós-graduação</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <div></div>
+      <button class="btn-primary" onclick="avancar(2)">
+        Próximo <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ETAPA 2: QUEIXA PRINCIPAL -->
+  <div class="step-panel" id="etapa2">
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">
+          <svg width="18" height="18" fill="none" stroke="var(--lila-700)" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        </div>
+        Queixa principal e demanda
+      </div>
+
+      <div class="form-group full" style="margin-bottom:1.5rem;">
+        <label>O que trouxe o paciente à terapia? *</label>
+        <textarea class="form-control" id="queixa" placeholder="Descreva com as palavras do próprio paciente, se possível..."></textarea>
+      </div>
+
+      <div class="form-group full" style="margin-bottom:1.5rem;">
+        <label>Há quanto tempo apresenta essa queixa?</label>
+        <div class="radio-grid">
+          <label class="radio-card" onclick="selRadio(this,'tempoQueixa')">
+            <input type="radio" name="tempoQueixa" value="menos-1-mes" />
+            <div class="radio-card-text"><strong>Menos de 1 mês</strong></div>
+          </label>
+          <label class="radio-card" onclick="selRadio(this,'tempoQueixa')">
+            <input type="radio" name="tempoQueixa" value="1-6-meses" />
+            <div class="radio-card-text"><strong>1 a 6 meses</strong></div>
+          </label>
+          <label class="radio-card" onclick="selRadio(this,'tempoQueixa')">
+            <input type="radio" name="tempoQueixa" value="6-meses-2-anos" />
+            <div class="radio-card-text"><strong>6 meses a 2 anos</strong></div>
+          </label>
+          <label class="radio-card" onclick="selRadio(this,'tempoQueixa')">
+            <input type="radio" name="tempoQueixa" value="mais-2-anos" />
+            <div class="radio-card-text"><strong>Mais de 2 anos</strong></div>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group full" style="margin-bottom:1.5rem;">
+        <label>Áreas de vida impactadas</label>
+        <p class="hint">Selecione todas que se aplicam</p>
+        <div class="chips" id="chips-areas">
+          <span class="chip" onclick="toggleChip(this)">Trabalho / Carreira</span>
+          <span class="chip" onclick="toggleChip(this)">Relacionamentos</span>
+          <span class="chip" onclick="toggleChip(this)">Família de origem</span>
+          <span class="chip" onclick="toggleChip(this)">Sono</span>
+          <span class="chip" onclick="toggleChip(this)">Alimentação</span>
+          <span class="chip" onclick="toggleChip(this)">Saúde física</span>
+          <span class="chip" onclick="toggleChip(this)">Autoestima</span>
+          <span class="chip" onclick="toggleChip(this)">Sexualidade</span>
+          <span class="chip" onclick="toggleChip(this)">Finanças</span>
+          <span class="chip" onclick="toggleChip(this)">Espiritualidade</span>
+        </div>
+      </div>
+
+      <div class="form-group full">
+        <label>O paciente já fez terapia antes?</label>
+        <div class="radio-grid" style="grid-template-columns:1fr 1fr 1fr;">
+          <label class="radio-card" onclick="selRadio(this,'terapiaAntes');toggleCondicional('condTerapia', this.querySelector('input').value === 'sim')">
+            <input type="radio" name="terapiaAntes" value="sim" />
+            <div class="radio-card-text"><strong>Sim</strong></div>
+          </label>
+          <label class="radio-card" onclick="selRadio(this,'terapiaAntes');toggleCondicional('condTerapia', false)">
+            <input type="radio" name="terapiaAntes" value="nao" />
+            <div class="radio-card-text"><strong>Não</strong></div>
+          </label>
+          <label class="radio-card" onclick="selRadio(this,'terapiaAntes');toggleCondicional('condTerapia', false)">
+            <input type="radio" name="terapiaAntes" value="nao-sei" />
+            <div class="radio-card-text"><strong>Não sei</strong></div>
+          </label>
+        </div>
+        <div class="condicional" id="condTerapia">
+          <label style="font-size:13px;">Detalhes sobre a(s) terapia(s) anterior(es)</label>
+          <textarea class="form-control" id="terapiaDetalhes" style="margin-top:6px;" placeholder="Abordagem, duração, motivo da interrupção..." rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn-secondary" onclick="voltar(1)">← Voltar</button>
+      <button class="btn-primary" onclick="avancar(3)">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 3: SAÚDE MENTAL E FÍSICA -->
+  <div class="step-panel" id="etapa3">
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">
+          <svg width="18" height="18" fill="none" stroke="var(--lila-700)" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </div>
+        Saúde mental e física
+      </div>
+
+      <div class="form-group full" style="margin-bottom:1.5rem;">
+        <label>Diagnósticos psiquiátricos ou psicológicos prévios</label>
+        <div class="chips" id="chips-diag">
+          <span class="chip" onclick="toggleChip(this)">Depressão</span>
+          <span class="chip" onclick="toggleChip(this)">Ansiedade / TAG</span>
+          <span class="chip" onclick="toggleChip(this)">Síndrome do pânico</span>
+          <span class="chip" onclick="toggleChip(this)">TDAH</span>
+          <span class="chip" onclick="toggleChip(this)">TEA</span>
+          <span class="chip" onclick="toggleChip(this)">TOC</span>
+          <span class="chip" onclick="toggleChip(this)">TEPT</span>
+          <span class="chip" onclick="toggleChip(this)">Bipolaridade</span>
+          <span class="chip" onclick="toggleChip(this)">Borderline (TPB)</span>
+          <span class="chip" onclick="toggleChip(this)">Outros</span>
+          <span class="chip" onclick="toggleChip(this)">Nenhum</span>
+        </div>
+        <textarea class="form-control" id="diagOutros" style="margin-top:10px;" placeholder="Especifique se necessário..." rows="2"></textarea>
+      </div>
+
+      <div class="form-group full" style="margin-bottom:1.5rem;">
+        <label>Faz uso de medicação psiquiátrica?</label>
+        <div class="radio-grid" style="grid-template-columns:1fr 1fr 1fr;">
+          <label class="radio-card" onclick="selRadio(this,'medicacao');toggleCondicional('condMed', true)">
+            <input type="radio" name="medicacao" value="sim" />
+            <div class="radio-card-text"><strong>Sim</strong></div>
+          </label>
+          <label class="radio-card" onclick="selRadio(this,'medicacao');toggleCondicional('condMed', false)">
+            <input type="radio" name="medicacao" value="nao" />
+            <div class="radio-card-text"><strong>Não</strong></div>
+          </label>
+          <label class="radio-card" onclick="selRadio(this,'medicacao');toggleCondicional('condMed', false)">
+            <input type="radio" name="medicacao" value="ja-usou" />
+            <div class="radio-card-text"><strong>Já usou</strong></div>
+          </label>
+        </div>
+        <div class="condicional" id="condMed">
+          <label style="font-size:13px;">Qual(is) medicação(ões)?</label>
+          <textarea class="form-control" id="medicacaoDetalhe" style="margin-top:6px;" placeholder="Nome, dose, há quanto tempo..." rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group full" style="margin-bottom:1.5rem;">
+        <label>Como o paciente avalia sua saúde física geral?</label>
+        <div class="escala">
+          <button class="escala-btn" onclick="selEscala(this,'saudeFisica',1)">1</button>
+          <button class="escala-btn" onclick="selEscala(this,'saudeFisica',2)">2</button>
+          <button class="escala-btn" onclick="selEscala(this,'saudeFisica',3)">3</button>
+          <button class="escala-btn" onclick="selEscala(this,'saudeFisica',4)">4</button>
+          <button class="escala-btn" onclick="selEscala(this,'saudeFisica',5)">5</button>
+          <button class="escala-btn" onclick="selEscala(this,'saudeFisica',6)">6</button>
+          <button class="escala-btn" onclick="selEscala(this,'saudeFisica',7)">7</button>
+          <button class="escala-btn" onclick="selEscala(this,'saudeFisica',8)">8</button>
+          <button class="escala-btn" onclick="selEscala(this,'saudeFisica',9)">9</button>
+          <button class="escala-btn" onclick="selEscala(this,'saudeFisica',10)">10</button>
+        </div>
+        <div class="escala-labels"><span>Muito ruim</span><span>Excelente</span></div>
+      </div>
+
+      <div class="form-group full" style="margin-bottom:1.5rem;">
+        <label>Histórico de internações ou crises graves</label>
+        <div class="radio-grid" style="grid-template-columns:1fr 1fr;">
+          <label class="radio-card" onclick="selRadio(this,'internacao');toggleCondicional('condInternacao', true)">
+            <input type="radio" name="internacao" value="sim" />
+            <div class="radio-card-text"><strong>Sim</strong></div>
+          </label>
+          <label class="radio-card" onclick="selRadio(this,'internacao');toggleCondicional('condInternacao', false)">
+            <input type="radio" name="internacao" value="nao" />
+            <div class="radio-card-text"><strong>Não</strong></div>
+          </label>
+        </div>
+        <div class="condicional" id="condInternacao">
+          <textarea class="form-control" id="internacaoDetalhe" placeholder="Descreva brevemente..." rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group full">
+        <label>Uso de substâncias</label>
+        <div class="chips" id="chips-substancias">
+          <span class="chip" onclick="toggleChip(this)">Álcool</span>
+          <span class="chip" onclick="toggleChip(this)">Tabaco</span>
+          <span class="chip" onclick="toggleChip(this)">Cannabis</span>
+          <span class="chip" onclick="toggleChip(this)">Outras drogas</span>
+          <span class="chip" onclick="toggleChip(this)">Nenhuma</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn-secondary" onclick="voltar(2)">← Voltar</button>
+      <button class="btn-primary" onclick="avancar(4)">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 4: HISTÓRIA PESSOAL -->
+  <div class="step-panel" id="etapa4">
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">
+          <svg width="18" height="18" fill="none" stroke="var(--lila-700)" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        História pessoal e familiar
+      </div>
+
+      <div class="form-group full" style="margin-bottom:1.5rem;">
+        <label>Estrutura familiar atual</label>
+        <textarea class="form-control" id="familiaAtual" placeholder="Com quem mora, configuração familiar..." rows="2"></textarea>
+      </div>
+
+      <div class="form-group full" style="margin-bottom:1.5rem;">
+        <label>Histórico familiar de transtornos mentais</label>
+        <div class="chips" id="chips-histFam">
+          <span class="chip" onclick="toggleChip(this)">Depressão</span>
+          <span class="chip" onclick="toggleChip(this)">Ansiedade</span>
+          <span class="chip" onclick="toggleChip(this)">Alcoolismo / Dependência</span>
+          <span class="chip" onclick="toggleChip(this)">Bipolaridade</span>
+          <span class="chip" onclick="toggleChip(this)">Esquizofrenia</span>
+          <span class="chip" onclick="toggleChip(this)">Suicídio na família</span>
+          <span class="chip" onclick="toggleChip(this)">Nenhum conhecido</span>
+        </div>
+      </div>
+
+      <div class="form-group full" style="margin-bottom:1.5rem;">
+        <label>Eventos de vida significativos</label>
+        <p class="hint">Selecione os que o paciente relata como relevantes</p>
+        <div class="chips" id="chips-eventos">
+          <span class="chip" onclick="toggleChip(this)">Luto</span>
+          <span class="chip" onclick="toggleChip(this)">Separação / Divórcio</span>
+          <span class="chip" onclick="toggleChip(this)">Abuso físico ou sexual</span>
+          <span class="chip" onclick="toggleChip(this)">Violência doméstica</span>
+          <span class="chip" onclick="toggleChip(this)">Abandono</span>
+          <span class="chip" onclick="toggleChip(this)">Acidente grave</span>
+          <span class="chip" onclick="toggleChip(this)">Dificuldades econômicas</span>
+          <span class="chip" onclick="toggleChip(this)">Migração / Mudança de país</span>
+        </div>
+      </div>
+
+      <div class="form-group full">
+        <label>Observações gerais sobre história pessoal</label>
+        <textarea class="form-control" id="histObs" placeholder="Informações adicionais relevantes para a clínica..." rows="3"></textarea>
+      </div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn-secondary" onclick="voltar(3)">← Voltar</button>
+      <button class="btn-primary" onclick="avancar(5)">Próximo →</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 5: REVISÃO E RESUMO -->
+  <div class="step-panel" id="etapa5">
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">
+          <svg width="18" height="18" fill="none" stroke="var(--lila-700)" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        Revisão da anamnese
+      </div>
+      <p style="font-size:14px;color:var(--gray-500);margin-bottom:1.5rem;">Confirme os dados antes de salvar. Você poderá editar depois.</p>
+      <div id="resumoContent"><!-- gerado por JS --></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:1rem;">Observações clínicas iniciais</div>
+      <div class="form-group full">
+        <label>Impressões do primeiro contato (visíveis só para você)</label>
+        <textarea class="form-control" id="obsClinicas" placeholder="Hipóteses diagnósticas, aspectos relacionais, plano terapêutico inicial..." rows="4"></textarea>
+      </div>
+    </div>
+
+    <div id="feedbackSalvar" style="display:none;padding:0.75rem 1rem;border-radius:8px;font-size:14px;margin-bottom:1rem;"></div>
+
+    <div class="nav-btns">
+      <button class="btn-secondary" onclick="voltar(4)">← Voltar</button>
+      <button class="btn-primary" onclick="salvar()" id="btnSalvar">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Salvar anamnese
+      </button>
+    </div>
+  </div>
+
+  <!-- ETAPA 6: SUCESSO -->
+  <div class="step-panel" id="etapa6">
+    <div class="card sucesso-page">
+      <div class="sucesso-icon">✓</div>
+      <h2>Anamnese salva!</h2>
+      <p>O prontuário do paciente foi criado com sucesso.</p>
+      <div style="margin-top:2rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <a href="dashboard-psicologo.html" class="btn-primary">Ir ao dashboard</a>
+        <button class="btn-secondary" onclick="novaAnamnese()">Nova anamnese</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
+const db = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+const ETAPAS = ['Identificação','Queixa','Saúde','História','Revisão'];
+let etapaAtual = 1;
+const dados = {};
+
+// STEPS BAR
+function renderSteps() {
+  const bar = document.getElementById('stepsBar');
+  bar.innerHTML = ETAPAS.map((label, i) => {
+    const n = i + 1;
+    const feito = n < etapaAtual;
+    const ativo = n === etapaAtual;
+    const circleClass = feito ? 'feito' : ativo ? 'ativo' : '';
+    const labelClass = feito ? 'feito' : ativo ? 'ativo' : '';
+    const lineClass = feito ? 'feito' : '';
+    return `
+      <div class="step-item">
+        <div class="step-circle ${circleClass}">${feito ? '✓' : n}</div>
+        <span class="step-label ${labelClass}">${label}</span>
+        ${n < ETAPAS.length ? `<div class="step-line ${lineClass}"></div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+// CHIPS
+function toggleChip(el) { el.classList.toggle('sel'); }
+function getChips(containerId) {
+  return Array.from(document.querySelectorAll(`#${containerId} .chip.sel`)).map(c => c.textContent);
+}
+
+// RADIO CARDS
+function selRadio(card, name) {
+  document.querySelectorAll(`input[name="${name}"]`).forEach(r => r.closest('.radio-card').classList.remove('sel'));
+  card.classList.add('sel');
+  card.querySelector('input').checked = true;
+}
+function getRadio(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : null;
+}
+
+// CONDICIONAL
+function toggleCondicional(id, show) {
+  document.getElementById(id).classList.toggle('visivel', show);
+}
+
+// ESCALA
+const escalas = {};
+function selEscala(btn, key, val) {
+  btn.closest('.escala').querySelectorAll('.escala-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  escalas[key] = val;
+}
+
+// VALIDAÇÃO
+function validar(etapa) {
+  if (etapa === 1) {
+    if (!document.getElementById('nome').value.trim()) { alert('Por favor, informe o nome do paciente.'); return false; }
+    if (!document.getElementById('nascimento').value) { alert('Por favor, informe a data de nascimento.'); return false; }
+  }
+  if (etapa === 2) {
+    if (!document.getElementById('queixa').value.trim()) { alert('Por favor, descreva a queixa principal.'); return false; }
+  }
+  return true;
+}
+
+// COLETA DOS DADOS
+function coletarEtapa(etapa) {
+  if (etapa === 1) {
+    dados.nome       = document.getElementById('nome').value.trim();
+    dados.nascimento = document.getElementById('nascimento').value;
+    dados.genero     = document.getElementById('genero').value;
+    dados.estado_civil = document.getElementById('estadoCivil').value;
+    dados.telefone   = document.getElementById('telefone').value.trim();
+    dados.email      = document.getElementById('email').value.trim();
+    dados.profissao  = document.getElementById('profissao').value.trim();
+    dados.escolaridade = document.getElementById('escolaridade').value;
+  }
+  if (etapa === 2) {
+    dados.queixa         = document.getElementById('queixa').value.trim();
+    dados.tempo_queixa   = getRadio('tempoQueixa');
+    dados.areas_impacto  = getChips('chips-areas');
+    dados.terapia_antes  = getRadio('terapiaAntes');
+    dados.terapia_detalhes = document.getElementById('terapiaDetalhes').value.trim();
+  }
+  if (etapa === 3) {
+    dados.diagnosticos        = getChips('chips-diag');
+    dados.diag_outros         = document.getElementById('diagOutros').value.trim();
+    dados.medicacao           = getRadio('medicacao');
+    dados.medicacao_detalhe   = document.getElementById('medicacaoDetalhe').value.trim();
+    dados.saude_fisica        = escalas.saudeFisica || null;
+    dados.internacao          = getRadio('internacao');
+    dados.internacao_detalhe  = document.getElementById('internacaoDetalhe').value.trim();
+    dados.substancias         = getChips('chips-substancias');
+  }
+  if (etapa === 4) {
+    dados.familia_atual   = document.getElementById('familiaAtual').value.trim();
+    dados.hist_familiar   = getChips('chips-histFam');
+    dados.eventos_vida    = getChips('chips-eventos');
+    dados.hist_obs        = document.getElementById('histObs').value.trim();
+  }
+}
+
+function avancar(prox) {
+  if (!validar(etapaAtual)) return;
+  coletarEtapa(etapaAtual);
+  if (prox === 5) gerarResumo();
+  mostrarEtapa(prox);
+}
+function voltar(prev) { mostrarEtapa(prev); }
+
+function mostrarEtapa(n) {
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('ativo'));
+  document.getElementById('etapa' + n).classList.add('ativo');
+  etapaAtual = n;
+  renderSteps();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// RESUMO
+function gerarResumo() {
+  const r = document.getElementById('resumoContent');
+  const li = (label, val) => val ? `<div class="resumo-linha"><strong>${label}:</strong> ${val}</div>` : '';
+  const tags = arr => arr && arr.length ? arr.map(t => `<span class="tag-resumo">${t}</span>`).join('') : '<span style="color:var(--gray-500);font-size:13px;">—</span>';
+
+  r.innerHTML = `
+    <div class="resumo-bloco">
+      <h3>Identificação</h3>
+      ${li('Nome', dados.nome)}
+      ${li('Nascimento', dados.nascimento ? new Date(dados.nascimento + 'T12:00').toLocaleDateString('pt-BR') : '')}
+      ${li('Gênero', dados.genero)} ${li('Estado civil', dados.estado_civil)}
+      ${li('Profissão', dados.profissao)} ${li('E-mail', dados.email)}
+    </div>
+    <div class="resumo-bloco">
+      <h3>Queixa principal</h3>
+      ${li('Queixa', dados.queixa)}
+      ${li('Tempo', dados.tempo_queixa)} ${li('Terapia anterior', dados.terapia_antes)}
+      <div class="resumo-linha"><strong>Áreas:</strong> ${tags(dados.areas_impacto)}</div>
+    </div>
+    <div class="resumo-bloco">
+      <h3>Saúde</h3>
+      <div class="resumo-linha"><strong>Diagnósticos:</strong> ${tags(dados.diagnosticos)}</div>
+      ${li('Medicação', dados.medicacao)}
+      ${li('Saúde física (1-10)', dados.saude_fisica)}
+      <div class="resumo-linha"><strong>Substâncias:</strong> ${tags(dados.substancias)}</div>
+    </div>
+    <div class="resumo-bloco">
+      <h3>História</h3>
+      ${li('Família atual', dados.familia_atual)}
+      <div class="resumo-linha"><strong>Hist. familiar:</strong> ${tags(dados.hist_familiar)}</div>
+      <div class="resumo-linha"><strong>Eventos:</strong> ${tags(dados.eventos_vida)}</div>
+    </div>
+  `;
+}
+
+// SALVAR NO SUPABASE
+async function salvar() {
+  const btn = document.getElementById('btnSalvar');
+  const fb  = document.getElementById('feedbackSalvar');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { location.href = 'cadastro.html'; return; }
+
+  const { data: psi } = await db.from('psicologos').select('id').eq('user_id', user.id).single();
+
+  dados.obs_clinicas = document.getElementById('obsClinicas').value.trim();
+
+  const payload = {
+    psicologo_id:       psi?.id || null,
+    nome:               dados.nome,
+    data_nascimento:    dados.nascimento || null,
+    genero:             dados.genero || null,
+    estado_civil:       dados.estado_civil || null,
+    telefone:           dados.telefone || null,
+    email:              dados.email || null,
+    profissao:          dados.profissao || null,
+    escolaridade:       dados.escolaridade || null,
+    queixa_principal:   dados.queixa || null,
+    tempo_queixa:       dados.tempo_queixa || null,
+    areas_impacto:      dados.areas_impacto || [],
+    terapia_anterior:   dados.terapia_antes || null,
+    terapia_detalhes:   dados.terapia_detalhes || null,
+    diagnosticos:       dados.diagnosticos || [],
+    diagnosticos_obs:   dados.diag_outros || null,
+    medicacao:          dados.medicacao || null,
+    medicacao_detalhe:  dados.medicacao_detalhe || null,
+    saude_fisica_nota:  dados.saude_fisica || null,
+    internacao:         dados.internacao || null,
+    internacao_detalhe: dados.internacao_detalhe || null,
+    substancias:        dados.substancias || [],
+    familia_atual:      dados.familia_atual || null,
+    historico_familiar: dados.hist_familiar || [],
+    eventos_vida:       dados.eventos_vida || [],
+    historia_obs:       dados.hist_obs || null,
+    obs_clinicas:       dados.obs_clinicas || null,
+    criado_em:          new Date().toISOString(),
+  };
+
+  const { error } = await db.from('pacientes').insert(payload);
+
+  btn.disabled = false; btn.textContent = 'Salvar anamnese';
+  fb.style.display = 'block';
+
+  if (error) {
+    fb.style.background = '#FEE2E2'; fb.style.color = '#991B1B';
+    fb.textContent = 'Erro ao salvar: ' + error.message;
+  } else {
+    mostrarEtapa(6);
+  }
+}
+
+function novaAnamnese() {
+  location.reload();
+}
+
+// INIT
+renderSteps();
+
+// verifica auth
+db.auth.getUser().then(({ data: { user } }) => {
+  if (!user) location.href = 'cadastro.html';
+});
+</script>
+</body>
+</html>
