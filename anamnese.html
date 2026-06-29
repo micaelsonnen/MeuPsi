@@ -805,7 +805,7 @@ async function salvar() {
     criado_em:          new Date().toISOString(),
   };
 
-  const { error } = await db.from('pacientes').insert(payload);
+  const { error } = await db.from('pacientes_meupsi').insert(payload);
 
   btn.disabled = false; btn.textContent = 'Salvar anamnese';
   fb.style.display = 'block';
