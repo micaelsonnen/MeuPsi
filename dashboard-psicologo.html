@@ -672,7 +672,7 @@ function preencherUI(d) {
 async function carregarStats() {
   if (!psicologo) return;
   // pacientes ativos
-  const { count: cp } = await db.from('pacientes')
+  const { count: cp } = await db.from('pacientes_meupsi')
     .select('*', { count: 'exact', head: true })
     .eq('psicologo_id', psicologo.id);
   document.getElementById('statPacientes').textContent = cp ?? '0';
@@ -695,7 +695,7 @@ async function carregarProximasSessoes() {
 
   const agora = new Date().toISOString();
   const { data, error } = await db.from('sessoes')
-    .select('*, pacientes(nome)')
+    .select('*, pacientes_meupsi(nome)')
     .eq('psicologo_id', psicologo.id)
     .gte('data_hora', agora)
     .order('data_hora', { ascending: true })
@@ -715,7 +715,7 @@ async function carregarProximasSessoes() {
       <div class="agenda-day-title">${dia}</div>
       <div class="sessao-item">
         <span class="sessao-hora">${hora}</span>
-        <span class="sessao-nome">${s.pacientes?.nome || 'Paciente'}</span>
+        <span class="sessao-nome">${s.pacientes_meupsi?.nome || 'Paciente'}</span>
         <span class="tag ${s.tipo === 'online' ? 'online' : 'presencial'}">${s.tipo || 'online'}</span>
       </div>
     </div>`;
@@ -729,7 +729,7 @@ async function carregarPacientes() {
   const container = document.getElementById('listaPacientes');
   if (!psicologo) { container.innerHTML = '<div class="loading">Sem dados.</div>'; return; }
 
-  const { data, error } = await db.from('pacientes')
+  const { data, error } = await db.from('pacientes_meupsi')
     .select('*')
     .eq('psicologo_id', psicologo.id)
     .order('nome');
