@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Andreia Vieira — MeuPsi</title>
+<meta name="description" content="Psicóloga especialista em ansiedade e trauma. Atendimento online." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --rosa-50:  #FDF0F4;
+  --rosa-100: #F5E2EA;
+  --rosa-200: #EBC5D4;
+  --malva:    #B87FA0;
+  --lila-50:  #F3EEFA;
+  --lila-100: #E8DCFA;
+  --lila-300: #C4A8F0;
+  --lila-500: #9B6FD8;
+  --lila-700: #6B3FA8;
+  --lila-900: #3B1E62;
+  --verde-400: #5AB593;
+  --verde-500: #4AA382;
+  --verde-600: #38876A;
+  --verde-50:  #E8F6F1;
+  --cream:    #F5E8ED;
+  --gray-100: #F0E0E8;
+  --gray-300: #C8B4BC;
+  --gray-500: #8A7080;
+  --gray-800: #2E2229;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--cream); color: var(--gray-800); font-size: 16px; line-height: 1.6; }
+a { text-decoration: none; color: inherit; }
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(245,232,237,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rosa-200);
+  padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px;
+}
+.nav-logo { font-family: var(--font-display); font-size: 22px; font-weight: 400; font-style: italic; color: var(--lila-700); }
+.nav-logo span { color: var(--verde-500); font-style: normal; }
+.nav-back { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--gray-500); cursor: pointer; transition: color 0.2s; }
+.nav-back:hover { color: var(--lila-700); }
+.btn { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-pill); font-family: var(--font-body); font-size: 14px; font-weight: 500; padding: 9px 20px; cursor: pointer; transition: all 0.18s; border: none; }
+.btn-primary { background: var(--verde-500); color: #fff; }
+.btn-primary:hover { background: var(--verde-600); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(74,163,130,0.25); }
+.btn-ghost { background: transparent; color: var(--gray-800); border: 1.5px solid var(--rosa-200); }
+.btn-ghost:hover { border-color: var(--lila-300); color: var(--lila-700); }
+.btn-lila { background: var(--lila-500); color: #fff; }
+.btn-lila:hover { background: var(--lila-700); }
+
+/* LAYOUT */
+.page { max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+.grid { display: grid; grid-template-columns: 300px 1fr; gap: 2rem; align-items: start; }
+
+/* SIDEBAR */
+.sidebar { display: flex; flex-direction: column; gap: 16px; }
+.card {
+  background: var(--rosa-50); border: 1.5px solid var(--rosa-200);
+  border-radius: var(--radius-md); padding: 1.5rem;
+}
+.profile-card { text-align: center; }
+.avatar-wrap { position: relative; display: inline-block; margin-bottom: 1rem; }
+.avatar {
+  width: 96px; height: 96px; border-radius: 50%;
+  background: var(--rosa-200); color: var(--lila-700);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 32px; font-weight: 300;
+  margin: 0 auto; overflow: hidden;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.badge-online {
+  position: absolute; bottom: 4px; right: 4px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--verde-500); border: 2.5px solid var(--rosa-50);
+}
+.profile-name {
+  font-family: var(--font-display); font-size: 20px;
+  font-weight: 300; color: var(--lila-900); margin-bottom: 2px;
+}
+.profile-crp { font-size: 12px; color: var(--malva); margin-bottom: 8px; }
+.profile-abordagem { font-size: 14px; color: var(--gray-500); margin-bottom: 1.25rem; }
+.profile-tags { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 1.25rem; }
+.tag {
+  font-size: 11px; padding: 3px 10px; border-radius: var(--radius-pill);
+  background: var(--verde-50); color: var(--verde-600);
+  border: 1px solid rgba(90,181,147,0.25);
+}
+.tag-lila {
+  font-size: 11px; padding: 3px 10px; border-radius: var(--radius-pill);
+  background: var(--lila-50); color: var(--lila-700);
+  border: 1px solid var(--lila-100);
+}
+.profile-actions { display: flex; flex-direction: column; gap: 8px; }
+.btn-wpp {
+  width: 100%; padding: 11px;
+  background: var(--verde-500); color: #fff;
+  border: none; border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: background 0.18s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-wpp:hover { background: var(--verde-600); }
+.btn-agendar {
+  width: 100%; padding: 11px;
+  background: var(--lila-500); color: #fff;
+  border: none; border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: background 0.18s;
+}
+.btn-agendar:hover { background: var(--lila-700); }
+
+/* INFO CARD */
+.info-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--rosa-100); }
+.info-row:last-child { border-bottom: none; padding-bottom: 0; }
+.info-icon { color: var(--lila-300); flex-shrink: 0; }
+.info-label { font-size: 11px; color: var(--malva); margin-bottom: 1px; }
+.info-value { font-size: 14px; color: var(--gray-800); font-weight: 500; }
+
+/* MAIN */
+.main { display: flex; flex-direction: column; gap: 20px; }
+.card-title {
+  font-family: var(--font-display); font-size: 17px;
+  font-weight: 300; color: var(--lila-900); margin-bottom: 1rem;
+}
+.bio { font-size: 15px; color: var(--gray-500); line-height: 1.8; }
+.bio p + p { margin-top: 1rem; }
+
+/* ESPECIALIDADES */
+.esp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.esp-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; color: var(--gray-500); padding: 8px;
+  background: var(--rosa-100); border-radius: var(--radius-sm);
+}
+.esp-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--lila-300); flex-shrink: 0; }
+
+/* FORMAÇÃO */
+.formacao-list { display: flex; flex-direction: column; gap: 12px; }
+.formacao-item { display: flex; gap: 12px; }
+.formacao-icon {
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
+  background: var(--rosa-100); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: var(--lila-500);
+}
+.formacao-titulo { font-size: 14px; font-weight: 500; color: var(--gray-800); }
+.formacao-inst { font-size: 13px; color: var(--gray-500); }
+.formacao-ano { font-size: 12px; color: var(--malva); }
+
+/* AGENDAMENTO */
+.agenda-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.agenda-mes { font-size: 15px; font-weight: 500; }
+.agenda-nav { display: flex; gap: 6px; }
+.agenda-nav button {
+  width: 30px; height: 30px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--rosa-200); background: transparent;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--gray-500); transition: all 0.18s;
+}
+.agenda-nav button:hover { border-color: var(--lila-300); color: var(--lila-700); }
+.dias-semana {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  text-align: center; margin-bottom: 6px;
+}
+.dia-label { font-size: 11px; color: var(--malva); padding: 4px 0; }
+.calendario {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+  margin-bottom: 1.25rem;
+}
+.dia {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm); font-size: 13px; cursor: pointer;
+  transition: all 0.15s; color: var(--gray-800);
+}
+.dia:hover:not(.inativo):not(.selecionado) { background: var(--rosa-100); color: var(--lila-700); }
+.dia.inativo { color: var(--rosa-200); cursor: default; }
+.dia.disponivel { font-weight: 500; }
+.dia.selecionado { background: var(--lila-500); color: #fff; font-weight: 500; }
+.dia.hoje { border: 1.5px solid var(--lila-300); }
+.horarios { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; }
+.horario {
+  font-size: 13px; padding: 7px 14px;
+  border: 1.5px solid var(--rosa-200); border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.15s; color: var(--gray-500); background: var(--rosa-50);
+}
+.horario:hover { border-color: var(--lila-300); color: var(--lila-700); background: var(--rosa-100); }
+.horario.selecionado { background: var(--lila-500); color: #fff; border-color: var(--lila-500); }
+.horario.ocupado { color: var(--rosa-200); cursor: default; text-decoration: line-through; }
+
+/* DEPOIMENTOS */
+.dep-list { display: flex; flex-direction: column; gap: 14px; }
+.dep-item {
+  background: var(--rosa-100); border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem; border-left: 3px solid var(--malva);
+}
+.dep-texto { font-size: 14px; color: var(--gray-500); line-height: 1.7; margin-bottom: 8px; }
+.dep-autor { font-size: 12px; color: var(--malva); }
+.estrelas { color: var(--lila-300); font-size: 13px; margin-bottom: 4px; }
+
+/* VALOR */
+.valor-badge {
+  display: inline-flex; align-items: baseline; gap: 4px;
+  font-family: var(--font-display); color: var(--lila-900);
+}
+.valor-badge .cifrao { font-size: 14px; }
+.valor-badge .numero { font-size: 28px; font-weight: 300; }
+.valor-badge .periodo { font-size: 13px; color: var(--gray-500); }
+
+@media (max-width: 720px) {
+  .grid { grid-template-columns: 1fr; }
+  .esp-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  nav { padding: 0 1rem; }
+  .page { padding: 1.5rem 1rem 3rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Meu<span>Psi</span></a>
+  <a href="index.html" class="nav-back">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+    Voltar para busca
+  </a>
+</nav>
+
+<div class="page">
+  <div class="grid">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <!-- Perfil -->
+      <div class="card profile-card">
+        <div class="avatar-wrap">
+          <div class="avatar">AV</div>
+          <div class="badge-online" title="Aceita novos pacientes"></div>
+        </div>
+        <p class="profile-name">Andreia Vieira</p>
+        <p class="profile-crp">CRP 21/06454</p>
+        <p class="profile-abordagem">Psicanálise Winnicottiana</p>
+        <div class="profile-tags">
+          <span class="tag">Ansiedade</span>
+          <span class="tag">Trauma</span>
+          <span class="tag">Luto</span>
+          <span class="tag-lila">Online</span>
+          <span class="tag-lila">Presencial</span>
+        </div>
+        <div class="profile-actions">
+          <button class="btn-wpp">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.864L.063 23.641l5.941-1.559C7.637 23.015 9.756 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.98 0-3.842-.575-5.418-1.57l-.385-.229-3.995 1.048 1.067-3.9-.252-.4A9.933 9.933 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+            Chamar no WhatsApp
+          </button>
+          <button class="btn-agendar">Agendar sessão</button>
+        </div>
+      </div>
+
+      <!-- Infos -->
+      <div class="card">
+        <div class="info-row">
+          <div class="info-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div>
+            <p class="info-label">Localização</p>
+            <p class="info-value">Belo Horizonte, MG</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          </div>
+          <div>
+            <p class="info-label">Disponibilidade</p>
+            <p class="info-value">Seg, Qua e Sex</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div>
+            <p class="info-label">Duração da sessão</p>
+            <p class="info-value">50 minutos</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 6v6l3 3"/></svg>
+          </div>
+          <div>
+            <p class="info-label">Valor</p>
+            <div class="valor-badge">
+              <span class="cifrao">R$</span>
+              <span class="numero">180</span>
+              <span class="periodo">/sessão</span>
+            </div>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>
+          </div>
+          <div>
+            <p class="info-label">Atendimento</p>
+            <p class="info-value">Online e Presencial</p>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- Bio -->
+      <div class="card">
+        <h2 class="card-title">Sobre mim</h2>
+        <div class="bio">
+          <p>Sou psicóloga clínica com 12 anos de experiência, especializada na abordagem Winnicottiana. Acredito que cada pessoa carrega em si a capacidade de se transformar — meu papel é criar um espaço seguro e acolhedor para que esse processo aconteça.</p>
+          <p>Atendo adultos com foco em ansiedade, trauma, luto e questões de identidade. Minha prática é orientada pelo cuidado genuíno com o ser humano, onde o ritmo de cada pessoa é sempre respeitado.</p>
+        </div>
+      </div>
+
+      <!-- Especialidades -->
+      <div class="card">
+        <h2 class="card-title">Especialidades</h2>
+        <div class="esp-grid">
+          <div class="esp-item"><div class="esp-dot"></div>Ansiedade e ataques de pânico</div>
+          <div class="esp-item"><div class="esp-dot"></div>Trauma e TEPT</div>
+          <div class="esp-item"><div class="esp-dot"></div>Luto e perdas</div>
+          <div class="esp-item"><div class="esp-dot"></div>Depressão</div>
+          <div class="esp-item"><div class="esp-dot"></div>Questões de identidade</div>
+          <div class="esp-item"><div class="esp-dot"></div>Relacionamentos</div>
+          <div class="esp-item"><div class="esp-dot"></div>Autoestima</div>
+          <div class="esp-item"><div class="esp-dot"></div>Transtornos de humor</div>
+        </div>
+      </div>
+
+      <!-- Formação -->
+      <div class="card">
+        <h2 class="card-title">Formação</h2>
+        <div class="formacao-list">
+          <div class="formacao-item">
+            <div class="formacao-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </div>
+            <div>
+              <p class="formacao-titulo">Graduação em Psicologia</p>
+              <p class="formacao-inst">Universidade Federal de Minas Gerais</p>
+              <p class="formacao-ano">2010 – 2015</p>
+            </div>
+          </div>
+          <div class="formacao-item">
+            <div class="formacao-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </div>
+            <div>
+              <p class="formacao-titulo">Especialização em Psicanálise Winnicottiana</p>
+              <p class="formacao-inst">Instituto Sedes Sapientiae — São Paulo</p>
+              <p class="formacao-ano">2016 – 2018</p>
+            </div>
+          </div>
+          <div class="formacao-item">
+            <div class="formacao-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            </div>
+            <div>
+              <p class="formacao-titulo">Formação em Trauma e EMDR</p>
+              <p class="formacao-inst">Instituto EMDR Brasil</p>
+              <p class="formacao-ano">2020</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agendamento -->
+      <div class="card">
+        <h2 class="card-title">Agendar sessão</h2>
+        <div class="agenda-header">
+          <span class="agenda-mes">Julho 2026</span>
+          <div class="agenda-nav">
+            <button>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="dias-semana">
+          <span class="dia-label">Dom</span>
+          <span class="dia-label">Seg</span>
+          <span class="dia-label">Ter</span>
+          <span class="dia-label">Qua</span>
+          <span class="dia-label">Qui</span>
+          <span class="dia-label">Sex</span>
+          <span class="dia-label">Sáb</span>
+        </div>
+        <div class="calendario">
+          <div class="dia inativo"></div>
+          <div class="dia disponivel" onclick="selecionarDia(this)">7</div>
+          <div class="dia inativo">8</div>
+          <div class="dia disponivel" onclick="selecionarDia(this)">9</div>
+          <div class="dia inativo">10</div>
+          <div class="dia disponivel" onclick="selecionarDia(this)">11</div>
+          <div class="dia inativo">12</div>
+          <div class="dia inativo">13</div>
+          <div class="dia disponivel" onclick="selecionarDia(this)">14</div>
+          <div class="dia inativo">15</div>
+          <div class="dia disponivel hoje" onclick="selecionarDia(this)">16</div>
+          <div class="dia inativo">17</div>
+          <div class="dia disponivel" onclick="selecionarDia(this)">18</div>
+          <div class="dia inativo">19</div>
+          <div class="dia inativo">20</div>
+          <div class="dia disponivel" onclick="selecionarDia(this)">21</div>
+          <div class="dia inativo">22</div>
+          <div class="dia disponivel" onclick="selecionarDia(this)">23</div>
+          <div class="dia inativo">24</div>
+          <div class="dia disponivel" onclick="selecionarDia(this)">25</div>
+          <div class="dia inativo">26</div>
+        </div>
+        <p style="font-size:13px; color:var(--malva); margin-bottom:0.75rem;">Horários disponíveis — Seg 14 de julho</p>
+        <div class="horarios">
+          <div class="horario ocupado">08:00</div>
+          <div class="horario" onclick="selecionarHorario(this)">09:00</div>
+          <div class="horario ocupado">10:00</div>
+          <div class="horario" onclick="selecionarHorario(this)">11:00</div>
+          <div class="horario" onclick="selecionarHorario(this)">14:00</div>
+          <div class="horario ocupado">15:00</div>
+          <div class="horario" onclick="selecionarHorario(this)">16:00</div>
+          <div class="horario" onclick="selecionarHorario(this)">17:00</div>
+        </div>
+        <button class="btn btn-lila" style="width:100%; justify-content:center; padding:12px;">Confirmar agendamento</button>
+      </div>
+
+      <!-- Depoimentos -->
+      <div class="card">
+        <h2 class="card-title">O que pacientes dizem</h2>
+        <div class="dep-list">
+          <div class="dep-item">
+            <div class="estrelas">★★★★★</div>
+            <p class="dep-texto">A Andreia tem um jeito muito acolhedor de conduzir as sessões. Me sinto segura para falar de coisas que nunca falei pra ninguém. Em 6 meses já percebi mudanças reais na minha vida.</p>
+            <p class="dep-autor">Paciente anônima · 6 meses de acompanhamento</p>
+          </div>
+          <div class="dep-item">
+            <div class="estrelas">★★★★★</div>
+            <p class="dep-texto">Cheguei num momento de muita ansiedade e com medo de não conseguir ajuda. A abordagem dela foi transformadora. Recomendo de coração.</p>
+            <p class="dep-autor">Paciente anônimo · 1 ano de acompanhamento</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+function selecionarDia(el) {
+  document.querySelectorAll('.dia.selecionado').forEach(d => d.classList.remove('selecionado'));
+  el.classList.add('selecionado');
+}
+function selecionarHorario(el) {
+  document.querySelectorAll('.horario.selecionado').forEach(h => h.classList.remove('selecionado'));
+  el.classList.add('selecionado');
+}
+</script>
+</body>
+</html>

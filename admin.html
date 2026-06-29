@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin — MeuPsi</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --rosa-50:  #FDF0F4;
+  --rosa-100: #F5E2EA;
+  --rosa-200: #EBC5D4;
+  --malva:    #B87FA0;
+  --lila-300: #C4A8F0;
+  --lila-500: #9B6FD8;
+  --lila-700: #6B3FA8;
+  --lila-900: #3B1E62;
+  --verde-400: #5AB593;
+  --verde-500: #4AA382;
+  --verde-600: #38876A;
+  --verde-50:  #E8F6F1;
+  --vermelho:  #E05252;
+  --vermelho-50: #FEF2F2;
+  --amarelo:   #D97706;
+  --amarelo-50: #FFFBEB;
+  --cream:    #F5E8ED;
+  --gray-100: #F0E0E8;
+  --gray-300: #C8B4BC;
+  --gray-500: #8A7080;
+  --gray-800: #2E2229;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-pill: 999px;
+  --sidebar: 240px;
+}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Fraunces:ital,wght@0,300;1,300&display=swap');
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); background: var(--cream); color: var(--gray-800); font-size: 15px; }
+a { text-decoration: none; color: inherit; }
+
+/* LOGIN */
+.login-wrap {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(160deg, var(--lila-900) 0%, var(--malva) 100%);
+}
+.login-card {
+  background: var(--rosa-50); border-radius: var(--radius-md); padding: 2.5rem 2rem;
+  width: 100%; max-width: 380px; text-align: center;
+}
+.login-logo { font-family: var(--font-display); font-size: 26px; font-style: italic; color: var(--lila-700); margin-bottom: 0.25rem; }
+.login-sub { font-size: 13px; color: var(--gray-500); margin-bottom: 2rem; }
+.login-card label { display: block; text-align: left; font-size: 13px; font-weight: 500; margin-bottom: 5px; }
+.login-card input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--rosa-200); border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 14px; background: #fff; outline: none; margin-bottom: 1rem; transition: border-color 0.18s; }
+.login-card input:focus { border-color: var(--lila-500); }
+.login-erro { font-size: 13px; color: var(--vermelho); margin-bottom: 1rem; display: none; }
+
+/* LAYOUT */
+.app { display: none; min-height: 100vh; }
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar);
+  background: var(--lila-900); color: #fff; display: flex; flex-direction: column;
+  z-index: 50;
+}
+.sidebar-logo { padding: 1.5rem 1.25rem; font-family: var(--font-display); font-size: 20px; font-style: italic; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.sidebar-logo span { color: var(--lila-300); font-style: normal; font-size: 11px; display: block; margin-top: 2px; }
+.sidebar-nav { flex: 1; padding: 1rem 0; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 1.25rem; font-size: 14px; color: var(--lila-300);
+  cursor: pointer; transition: all 0.18s; border-left: 3px solid transparent;
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.nav-item.ativo { background: rgba(255,255,255,0.08); color: #fff; border-left-color: var(--lila-300); }
+.sidebar-footer { padding: 1rem 1.25rem; border-top: 1px solid rgba(255,255,255,0.08); }
+.btn-logout { width: 100%; padding: 9px; background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: var(--radius-sm); color: var(--lila-300); font-size: 13px; cursor: pointer; transition: all 0.18s; }
+.btn-logout:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.main { margin-left: var(--sidebar); padding: 2rem; min-height: 100vh; }
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.75rem; }
+.page-title { font-family: var(--font-display); font-size: 22px; font-weight: 300; color: var(--lila-900); }
+.page-sub { font-size: 13px; color: var(--gray-500); margin-top: 2px; }
+
+/* CARDS STATS */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 2rem; }
+.stat-card { background: var(--rosa-50); border-radius: var(--radius-md); padding: 1.25rem; border: 1.5px solid var(--rosa-200); }
+.stat-label { font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.stat-num { font-family: var(--font-display); font-size: 2rem; font-weight: 300; color: var(--lila-900); line-height: 1; }
+.stat-desc { font-size: 12px; color: var(--malva); margin-top: 4px; }
+
+/* BOTÕES */
+.btn { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-pill); font-family: var(--font-body); font-size: 13px; font-weight: 500; padding: 9px 18px; cursor: pointer; transition: all 0.18s; border: none; }
+.btn-primary { background: var(--verde-500); color: #fff; }
+.btn-primary:hover { background: var(--verde-600); }
+.btn-lila { background: var(--lila-500); color: #fff; }
+.btn-lila:hover { background: var(--lila-700); }
+.btn-ghost { background: transparent; border: 1.5px solid var(--rosa-200); color: var(--gray-800); }
+.btn-ghost:hover { border-color: var(--lila-300); color: var(--lila-700); }
+.btn-danger { background: var(--vermelho-50); color: var(--vermelho); border: 1.5px solid rgba(224,82,82,0.2); }
+.btn-danger:hover { background: var(--vermelho); color: #fff; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+
+/* TABELA */
+.card { background: var(--rosa-50); border-radius: var(--radius-md); border: 1.5px solid var(--rosa-200); overflow: hidden; }
+.card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--rosa-100); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.card-header h3 { font-size: 15px; font-weight: 500; }
+.search-input { padding: 8px 14px; border: 1.5px solid var(--rosa-200); border-radius: var(--radius-pill); font-family: var(--font-body); font-size: 13px; background: #fff; outline: none; width: 220px; transition: border-color 0.18s; }
+.search-input:focus { border-color: var(--lila-300); }
+table { width: 100%; border-collapse: collapse; }
+th { font-size: 11px; font-weight: 500; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 16px; text-align: left; background: var(--rosa-100); border-bottom: 1px solid var(--rosa-200); }
+td { padding: 12px 16px; border-bottom: 1px solid var(--rosa-100); font-size: 13px; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--rosa-100); }
+.psi-mini { display: flex; align-items: center; gap: 10px; }
+.avatar-sm { width: 36px; height: 36px; border-radius: 50%; background: var(--rosa-200); color: var(--lila-700); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; overflow: hidden; }
+.avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+.psi-mini-nome { font-weight: 500; font-size: 13px; }
+.psi-mini-crp { font-size: 11px; color: var(--malva); }
+.badge { font-size: 11px; padding: 3px 10px; border-radius: var(--radius-pill); font-weight: 500; }
+.badge-aprovado { background: var(--verde-50); color: var(--verde-600); }
+.badge-pendente { background: var(--amarelo-50); color: var(--amarelo); }
+.badge-suspenso { background: var(--vermelho-50); color: var(--vermelho); }
+.acoes { display: flex; gap: 6px; }
+.empty-state { text-align: center; padding: 3rem; color: var(--malva); }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(59,30,98,0.35); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1rem; }
+.modal-overlay.aberto { display: flex; }
+.modal { background: var(--rosa-50); border-radius: var(--radius-md); width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; }
+.modal-header { padding: 1.5rem; border-bottom: 1px solid var(--rosa-200); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--rosa-50); z-index: 1; }
+.modal-title { font-family: var(--font-display); font-size: 18px; font-weight: 300; color: var(--lila-900); }
+.modal-close { width: 32px; height: 32px; border: none; background: var(--rosa-100); border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; color: var(--gray-500); }
+.modal-close:hover { background: var(--rosa-200); }
+.modal-body { padding: 1.5rem; }
+.modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--rosa-200); display: flex; justify-content: flex-end; gap: 8px; position: sticky; bottom: 0; background: var(--rosa-50); }
+.modal-footer-left { margin-right: auto; }
+
+/* FOTO UPLOAD */
+.foto-upload-area {
+  display: flex; align-items: center; gap: 1.25rem;
+  padding: 1rem; background: var(--rosa-100); border-radius: var(--radius-md);
+  border: 1.5px dashed var(--rosa-200); margin-bottom: 1rem; cursor: pointer;
+  transition: border-color 0.18s;
+}
+.foto-upload-area:hover { border-color: var(--lila-300); }
+.foto-preview {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--rosa-200); color: var(--lila-700);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-family: var(--font-display);
+  flex-shrink: 0; overflow: hidden;
+}
+.foto-preview img { width: 100%; height: 100%; object-fit: cover; }
+.foto-upload-info p { font-size: 13px; font-weight: 500; color: var(--lila-700); }
+.foto-upload-info span { font-size: 11px; color: var(--gray-500); }
+#inputFoto { display: none; }
+
+/* FORM */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.form-row.full { grid-template-columns: 1fr; }
+.field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 1rem; }
+.field:last-child { margin-bottom: 0; }
+label { font-size: 12px; font-weight: 500; color: var(--gray-800); }
+input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="url"], select, textarea {
+  width: 100%; padding: 9px 12px; border: 1.5px solid var(--rosa-200); border-radius: var(--radius-sm);
+  font-family: var(--font-body); font-size: 13px; color: var(--gray-800); background: #fff; outline: none; transition: border-color 0.18s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--lila-500); box-shadow: 0 0 0 3px rgba(155,111,216,0.08); }
+textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23C8B4BC' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px; }
+.field-section { font-size: 11px; font-weight: 500; color: var(--malva); text-transform: uppercase; letter-spacing: 0.08em; margin: 1.5rem 0 1rem; padding-bottom: 6px; border-bottom: 1px solid var(--rosa-200); }
+.tags-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag-check { display: none; }
+.tag-check + label { font-size: 12px; padding: 5px 12px; border-radius: var(--radius-pill); border: 1.5px solid var(--rosa-200); background: #fff; color: var(--gray-500); cursor: pointer; transition: all 0.15s; font-weight: 400; }
+.tag-check:checked + label { border-color: var(--lila-300); background: var(--rosa-100); color: var(--lila-700); }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
+.toggle-info p { font-size: 13px; font-weight: 500; }
+.toggle-info span { font-size: 11px; color: var(--malva); }
+.toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; inset: 0; background: var(--rosa-200); border-radius: var(--radius-pill); cursor: pointer; transition: background 0.2s; }
+.toggle-slider::before { content: ''; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: transform 0.2s; }
+.toggle input:checked + .toggle-slider { background: var(--verde-500); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+/* TOAST */
+.toast { position: fixed; bottom: 2rem; right: 2rem; padding: 12px 20px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; z-index: 999; transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast-ok { background: var(--verde-500); color: #fff; }
+.toast-erro { background: var(--vermelho); color: #fff; }
+
+/* PÁGINAS */
+.pagina { display: none; }
+.pagina.ativa { display: block; }
+
+/* LOADING */
+.skeleton { background: linear-gradient(90deg, var(--rosa-100) 25%, var(--rosa-200) 50%, var(--rosa-100) 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 4px; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="telaLogin">
+  <div class="login-card">
+    <p class="login-logo">MeuPsi</p>
+    <p class="login-sub">Painel administrativo</p>
+    <div class="field">
+      <label for="loginEmail">E-mail</label>
+      <input type="email" id="loginEmail" placeholder="admin@meupsi.com.br" />
+    </div>
+    <div class="field">
+      <label for="loginSenha">Senha</label>
+      <input type="password" id="loginSenha" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()" />
+    </div>
+    <p class="login-erro" id="loginErro">E-mail ou senha incorretos.</p>
+    <button class="btn btn-lila" style="width:100%;justify-content:center;padding:11px;" onclick="fazerLogin()">Entrar</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="telaApp">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      MeuPsi
+      <span>Painel Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item ativo" onclick="irPara('dashboard')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item" onclick="irPara('psicologos')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+        Psicólogos
+      </div>
+      <div class="nav-item" onclick="irPara('pendentes')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        Pendentes
+        <span id="badgePendentes" style="margin-left:auto;background:var(--amarelo);color:#fff;font-size:10px;padding:2px 7px;border-radius:999px;display:none"></span>
+      </div>
+      <div class="nav-item" onclick="irPara('agendamentos')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Agendamentos
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="pagina ativa" id="pagDashboard">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-sub">Visão geral do MeuPsi</p>
+        </div>
+        <button class="btn btn-lila" onclick="abrirModalNovo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Novo psicólogo
+        </button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <p class="stat-label">Total de psicólogos</p>
+          <p class="stat-num" id="statTotal">—</p>
+          <p class="stat-desc">cadastrados</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Aprovados</p>
+          <p class="stat-num" id="statAprovados" style="color:var(--verde-500)">—</p>
+          <p class="stat-desc">ativos na plataforma</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Pendentes</p>
+          <p class="stat-num" id="statPendentes" style="color:var(--amarelo)">—</p>
+          <p class="stat-desc">aguardando aprovação</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Agendamentos</p>
+          <p class="stat-num" id="statAgendamentos">—</p>
+          <p class="stat-desc">total</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PSICÓLOGOS -->
+    <div class="pagina" id="pagPsicologos">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Psicólogos</h1>
+          <p class="page-sub">Todos os cadastros</p>
+        </div>
+        <button class="btn btn-lila" onclick="abrirModalNovo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          Novo psicólogo
+        </button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>Lista completa</h3>
+          <input type="text" class="search-input" placeholder="Buscar por nome ou CRP…" oninput="filtrarTabela(this.value)" />
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Psicólogo</th>
+                <th>Abordagem</th>
+                <th>Cidade</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaPsi">
+              <tr><td colspan="6" class="empty-state">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PENDENTES -->
+    <div class="pagina" id="pagPendentes">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Pendentes</h1>
+          <p class="page-sub">Aguardando verificação de CRP</p>
+        </div>
+      </div>
+      <div class="card">
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Psicólogo</th>
+                <th>CRP</th>
+                <th>Cidade</th>
+                <th>Cadastro</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaPendentes">
+              <tr><td colspan="5" class="empty-state">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- AGENDAMENTOS -->
+    <div class="pagina" id="pagAgendamentos">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Agendamentos</h1>
+          <p class="page-sub">Todos os agendamentos da plataforma</p>
+        </div>
+      </div>
+      <div class="card">
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Paciente</th>
+                <th>Psicólogo</th>
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Modalidade</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaAgendamentos">
+              <tr><td colspan="6" class="empty-state">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL PSICÓLOGO -->
+<div class="modal-overlay" id="modalPsi">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitulo">Novo psicólogo</h2>
+      <button class="modal-close" onclick="fecharModal()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- UPLOAD DE FOTO -->
+      <p class="field-section" style="margin-top:0">Foto de perfil</p>
+      <div class="foto-upload-area" onclick="document.getElementById('inputFoto').click()">
+        <div class="foto-preview" id="fotoPreview">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+        </div>
+        <div class="foto-upload-info">
+          <p>Clique para selecionar uma foto</p>
+          <span>JPG ou PNG · até 2 MB</span>
+        </div>
+      </div>
+      <input type="file" id="inputFoto" accept="image/jpeg,image/png,image/webp" onchange="previsualizarFoto(this)" />
+
+      <p class="field-section">Dados pessoais</p>
+      <div class="form-row">
+        <div class="field">
+          <label>Nome completo *</label>
+          <input type="text" id="fNome" placeholder="Andreia Vieira" />
+        </div>
+        <div class="field">
+          <label>CRP *</label>
+          <input type="text" id="fCrp" placeholder="21/06454" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>E-mail *</label>
+          <input type="email" id="fEmail" placeholder="andreia@email.com" />
+        </div>
+        <div class="field">
+          <label>WhatsApp</label>
+          <input type="tel" id="fTelefone" placeholder="(31) 99999-0000" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Cidade</label>
+          <input type="text" id="fCidade" placeholder="Belo Horizonte" />
+        </div>
+        <div class="field">
+          <label>Estado</label>
+          <select id="fEstado">
+            <option value="">Selecione…</option>
+            <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+            <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+            <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+            <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+            <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+            <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+            <option>SP</option><option>SE</option><option>TO</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="field-section">Perfil profissional</p>
+      <div class="field">
+        <label>Abordagem</label>
+        <select id="fAbordagem">
+          <option value="">Selecione…</option>
+          <option>Psicanálise</option>
+          <option>Psicanálise Winnicottiana</option>
+          <option>Terapia Cognitivo-Comportamental (TCC)</option>
+          <option>Psicologia Humanista</option>
+          <option>Gestalt-terapia</option>
+          <option>Análise do Comportamento</option>
+          <option>Psicodrama</option>
+          <option>EMDR</option>
+          <option>ACT — Terapia de Aceitação e Compromisso</option>
+          <option>Outra</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Especialidades</label>
+        <div class="tags-wrap" style="margin-top:4px">
+          <input type="checkbox" class="tag-check" id="te1"><label for="te1">Ansiedade</label>
+          <input type="checkbox" class="tag-check" id="te2"><label for="te2">Depressão</label>
+          <input type="checkbox" class="tag-check" id="te3"><label for="te3">Trauma e TEPT</label>
+          <input type="checkbox" class="tag-check" id="te4"><label for="te4">Luto</label>
+          <input type="checkbox" class="tag-check" id="te5"><label for="te5">Relacionamentos</label>
+          <input type="checkbox" class="tag-check" id="te6"><label for="te6">Autoestima</label>
+          <input type="checkbox" class="tag-check" id="te7"><label for="te7">Burnout</label>
+          <input type="checkbox" class="tag-check" id="te8"><label for="te8">Transtornos alimentares</label>
+          <input type="checkbox" class="tag-check" id="te9"><label for="te9">Dependência química</label>
+          <input type="checkbox" class="tag-check" id="te10"><label for="te10">TDAH</label>
+          <input type="checkbox" class="tag-check" id="te11"><label for="te11">Infância e adolescência</label>
+          <input type="checkbox" class="tag-check" id="te12"><label for="te12">LGBTQIA+</label>
+          <input type="checkbox" class="tag-check" id="te13"><label for="te13">Psicologia do Esporte</label>
+          <input type="checkbox" class="tag-check" id="te14"><label for="te14">Saúde da mulher</label>
+          <input type="checkbox" class="tag-check" id="te15"><label for="te15">Obesidade e Bariátrica</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Apresentação / Bio</label>
+        <textarea id="fBio" placeholder="Escreva sobre a psicóloga em primeira pessoa…"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Formação</label>
+          <input type="text" id="fFormacao" placeholder="Graduação em Psicologia — UFMG (2015)" />
+        </div>
+        <div class="field">
+          <label>Site / Instagram</label>
+          <input type="url" id="fSite" placeholder="https://instagram.com/…" />
+        </div>
+      </div>
+
+      <p class="field-section">Atendimento</p>
+      <div class="toggle-row">
+        <div class="toggle-info"><p>Online</p><span>Videochamada</span></div>
+        <label class="toggle"><input type="checkbox" id="fOnline" checked /><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info"><p>Presencial</p><span>Consultório físico</span></div>
+        <label class="toggle"><input type="checkbox" id="fPresencial" /><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info"><p>Aceita novos pacientes</p><span>Aparece como disponível</span></div>
+        <label class="toggle"><input type="checkbox" id="fAceita" checked /><span class="toggle-slider"></span></label>
+      </div>
+      <div class="form-row" style="margin-top:1rem">
+        <div class="field">
+          <label>Valor por sessão (R$)</label>
+          <input type="number" id="fValor" placeholder="180" min="0" />
+        </div>
+        <div class="field">
+          <label>Duração (minutos)</label>
+          <select id="fDuracao">
+            <option>45</option>
+            <option selected>50</option>
+            <option>60</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="field-section">Status</p>
+      <div class="field">
+        <label>Status do cadastro</label>
+        <select id="fStatus">
+          <option value="aprovado">Aprovado — aparece na plataforma</option>
+          <option value="pendente">Pendente — aguardando verificação</option>
+          <option value="suspenso">Suspenso — oculto da plataforma</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="modal-footer-left">
+        <button class="btn btn-danger" id="btnDeletar" onclick="deletarPsicologo()" style="display:none">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          Deletar
+        </button>
+      </div>
+      <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
+      <button class="btn btn-lila" onclick="salvarPsicologo()" id="btnSalvar">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────
+const SUPABASE_URL = 'https://zyfqynjfnnhpsbkwajup.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_1bUv_1N-cIWv7Icthh4fdQ_nH8rdJuz'
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+// ── ESTADO ──────────────────────────────────────────────────
+let psicologos = []
+let editandoId = null
+let fotoArquivo = null
+
+// ── INIT ────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await sb.auth.getSession()
+  if (session) mostrarApp()
+})
+
+// ── AUTH ────────────────────────────────────────────────────
+async function fazerLogin() {
+  const email = document.getElementById('loginEmail').value.trim()
+  const senha = document.getElementById('loginSenha').value
+  const erro = document.getElementById('loginErro')
+  erro.style.display = 'none'
+  const { error } = await sb.auth.signInWithPassword({ email, password: senha })
+  if (error) { erro.style.display = 'block'; return }
+  mostrarApp()
+}
+
+async function fazerLogout() {
+  await sb.auth.signOut()
+  document.getElementById('telaApp').style.display = 'none'
+  document.getElementById('telaLogin').style.display = 'flex'
+}
+
+function mostrarApp() {
+  document.getElementById('telaLogin').style.display = 'none'
+  document.getElementById('telaApp').style.display = 'flex'
+  carregarTudo()
+}
+
+// ── NAVEGAÇÃO ───────────────────────────────────────────────
+function irPara(pag) {
+  document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'))
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('ativo'))
+  document.getElementById('pag' + pag.charAt(0).toUpperCase() + pag.slice(1)).classList.add('ativa')
+  event.currentTarget.classList.add('ativo')
+  if (pag === 'psicologos') renderTabela(psicologos)
+  if (pag === 'pendentes') renderPendentes()
+  if (pag === 'agendamentos') carregarAgendamentos()
+}
+
+// ── DADOS ───────────────────────────────────────────────────
+async function carregarTudo() {
+  const { data: todos } = await sb.from('psicologos').select('id, status')
+  psicologos = (await sb.from('psicologos').select('*').order('created_at', { ascending: false })).data || []
+  const aprovados = todos?.filter(p => p.status === 'aprovado').length || 0
+  const pendentes = todos?.filter(p => p.status === 'pendente').length || 0
+  const { count: agends } = await sb.from('agendamentos').select('id', { count: 'exact', head: true })
+  document.getElementById('statTotal').textContent = todos?.length || 0
+  document.getElementById('statAprovados').textContent = aprovados
+  document.getElementById('statPendentes').textContent = pendentes
+  document.getElementById('statAgendamentos').textContent = agends || 0
+  if (pendentes > 0) {
+    const badge = document.getElementById('badgePendentes')
+    badge.textContent = pendentes
+    badge.style.display = 'inline'
+  }
+  renderTabela(psicologos)
+}
+
+// ── TABELA PSICÓLOGOS ───────────────────────────────────────
+function renderTabela(lista) {
+  const tbody = document.getElementById('tabelaPsi')
+  if (!lista.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Nenhum psicólogo cadastrado</td></tr>'
+    return
+  }
+  tbody.innerHTML = lista.map(p => `
+    <tr>
+      <td>
+        <div class="psi-mini">
+          <div class="avatar-sm">
+            ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nome}" />` : iniciais(p.nome)}
+          </div>
+          <div>
+            <p class="psi-mini-nome">${p.nome}</p>
+            <p class="psi-mini-crp">CRP ${p.crp}</p>
+          </div>
+        </div>
+      </td>
+      <td>${p.abordagem || '—'}</td>
+      <td>${p.cidade ? `${p.cidade} / ${p.estado}` : '—'}</td>
+      <td>${p.valor_sessao ? `R$ ${Number(p.valor_sessao).toFixed(0)}` : '—'}</td>
+      <td><span class="badge badge-${p.status}">${p.status}</span></td>
+      <td>
+        <div class="acoes">
+          <button class="btn btn-ghost btn-sm" onclick="abrirModalEditar('${p.id}')">Editar</button>
+          ${p.status !== 'aprovado'
+            ? `<button class="btn btn-primary btn-sm" onclick="mudarStatus('${p.id}','aprovado')">Aprovar</button>`
+            : ``
+          }
+        </div>
+      </td>
+    </tr>`).join('')
+}
+
+function filtrarTabela(busca) {
+  const filtrado = psicologos.filter(p =>
+    p.nome.toLowerCase().includes(busca.toLowerCase()) ||
+    p.crp.includes(busca)
+  )
+  renderTabela(filtrado)
+}
+
+// ── PENDENTES ───────────────────────────────────────────────
+function renderPendentes() {
+  const pendentes = psicologos.filter(p => p.status === 'pendente')
+  const tbody = document.getElementById('tabelaPendentes')
+  if (!pendentes.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum cadastro pendente 🎉</td></tr>'
+    return
+  }
+  tbody.innerHTML = pendentes.map(p => `
+    <tr>
+      <td>
+        <div class="psi-mini">
+          <div class="avatar-sm">${iniciais(p.nome)}</div>
+          <div>
+            <p class="psi-mini-nome">${p.nome}</p>
+            <p class="psi-mini-crp">${p.email}</p>
+          </div>
+        </div>
+      </td>
+      <td><strong>${p.crp}</strong></td>
+      <td>${p.cidade ? `${p.cidade} / ${p.estado}` : '—'}</td>
+      <td>${new Date(p.created_at).toLocaleDateString('pt-BR')}</td>
+      <td>
+        <div class="acoes">
+          <button class="btn btn-primary btn-sm" onclick="mudarStatus('${p.id}','aprovado')">Aprovar</button>
+          <button class="btn btn-ghost btn-sm" onclick="abrirModalEditar('${p.id}')">Ver</button>
+        </div>
+      </td>
+    </tr>`).join('')
+}
+
+// ── AGENDAMENTOS ────────────────────────────────────────────
+async function carregarAgendamentos() {
+  const { data } = await sb
+    .from('agendamentos')
+    .select('*, psicologo:psicologos(nome)')
+    .order('data', { ascending: false })
+    .limit(50)
+  const tbody = document.getElementById('tabelaAgendamentos')
+  if (!data?.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Nenhum agendamento ainda</td></tr>'
+    return
+  }
+  tbody.innerHTML = data.map(a => `
+    <tr>
+      <td>
+        <p style="font-weight:500">${a.paciente_nome}</p>
+        <p style="font-size:11px;color:var(--malva)">${a.paciente_email}</p>
+      </td>
+      <td>${a.psicologo?.nome || '—'}</td>
+      <td>${new Date(a.data + 'T12:00:00').toLocaleDateString('pt-BR')}</td>
+      <td>${a.horario?.slice(0,5)}</td>
+      <td>${a.modalidade}</td>
+      <td><span class="badge badge-${a.status}">${a.status}</span></td>
+    </tr>`).join('')
+}
+
+// ── STATUS ──────────────────────────────────────────────────
+async function mudarStatus(id, novoStatus) {
+  const { error } = await sb.from('psicologos').update({ status: novoStatus }).eq('id', id)
+  if (error) return toast('Erro ao atualizar status', 'erro')
+  toast(`Psicólogo ${novoStatus === 'aprovado' ? 'aprovado' : 'atualizado'} com sucesso!`)
+  await carregarTudo()
+  renderPendentes()
+}
+
+// ── FOTO ────────────────────────────────────────────────────
+function previsualizarFoto(input) {
+  const arquivo = input.files[0]
+  if (!arquivo) return
+  if (arquivo.size > 2 * 1024 * 1024) {
+    toast('Imagem maior que 2 MB', 'erro')
+    return
+  }
+  fotoArquivo = arquivo
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const preview = document.getElementById('fotoPreview')
+    preview.innerHTML = `<img src="${e.target.result}" alt="Preview" />`
+  }
+  reader.readAsDataURL(arquivo)
+}
+
+async function uploadFoto(id) {
+  if (!fotoArquivo) return null
+  const ext = fotoArquivo.name.split('.').pop()
+  const path = `psicologos/${id}.${ext}`
+  const { error } = await sb.storage.from('fotos').upload(path, fotoArquivo, { upsert: true })
+  if (error) { console.error(error); return null }
+  const { data } = sb.storage.from('fotos').getPublicUrl(path)
+  return data.publicUrl
+}
+
+// ── MODAL ───────────────────────────────────────────────────
+function abrirModalNovo() {
+  editandoId = null
+  fotoArquivo = null
+  document.getElementById('modalTitulo').textContent = 'Novo psicólogo'
+  document.getElementById('btnDeletar').style.display = 'none'
+  limparForm()
+  document.getElementById('modalPsi').classList.add('aberto')
+}
+
+function abrirModalEditar(id) {
+  const p = psicologos.find(x => x.id === id)
+  if (!p) return
+  editandoId = id
+  fotoArquivo = null
+  document.getElementById('modalTitulo').textContent = 'Editar psicólogo'
+  document.getElementById('btnDeletar').style.display = 'inline-flex'
+  preencherForm(p)
+  document.getElementById('modalPsi').classList.add('aberto')
+}
+
+function fecharModal() {
+  document.getElementById('modalPsi').classList.remove('aberto')
+  editandoId = null
+  fotoArquivo = null
+}
+
+function limparForm() {
+  const ids = ['fNome','fCrp','fEmail','fTelefone','fCidade','fBio','fFormacao','fSite','fValor']
+  ids.forEach(id => document.getElementById(id).value = '')
+  document.getElementById('fEstado').value = ''
+  document.getElementById('fAbordagem').value = ''
+  document.getElementById('fDuracao').value = '50'
+  document.getElementById('fStatus').value = 'aprovado'
+  document.getElementById('fOnline').checked = true
+  document.getElementById('fPresencial').checked = false
+  document.getElementById('fAceita').checked = true
+  document.querySelectorAll('.tag-check').forEach(c => c.checked = false)
+  document.getElementById('inputFoto').value = ''
+  document.getElementById('fotoPreview').innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>`
+}
+
+function preencherForm(p) {
+  document.getElementById('fNome').value = p.nome || ''
+  document.getElementById('fCrp').value = p.crp || ''
+  document.getElementById('fEmail').value = p.email || ''
+  document.getElementById('fTelefone').value = p.telefone || ''
+  document.getElementById('fCidade').value = p.cidade || ''
+  document.getElementById('fEstado').value = p.estado || ''
+  document.getElementById('fAbordagem').value = p.abordagem || ''
+  document.getElementById('fBio').value = p.bio || ''
+  document.getElementById('fFormacao').value = p.formacao || ''
+  document.getElementById('fSite').value = p.site || ''
+  document.getElementById('fValor').value = p.valor_sessao || ''
+  document.getElementById('fDuracao').value = p.duracao_sessao || '50'
+  document.getElementById('fStatus').value = p.status || 'pendente'
+  document.getElementById('fOnline').checked = p.modalidade_online ?? true
+  document.getElementById('fPresencial').checked = p.modalidade_presencial ?? false
+  document.getElementById('fAceita').checked = p.aceita_pacientes ?? true
+  document.querySelectorAll('.tag-check').forEach(c => c.checked = false)
+  const labels = ['Ansiedade','Depressão','Trauma e TEPT','Luto','Relacionamentos','Autoestima','Burnout','Transtornos alimentares','Dependência química','TDAH','Infância e adolescência','LGBTQIA+','Psicologia do Esporte','Saúde da mulher','Obesidade e Bariátrica']
+  ;(p.especialidades || []).forEach(esp => {
+    const idx = labels.indexOf(esp)
+    if (idx >= 0) document.getElementById(`te${idx+1}`).checked = true
+  })
+  // foto
+  const preview = document.getElementById('fotoPreview')
+  if (p.foto_url) {
+    preview.innerHTML = `<img src="${p.foto_url}" alt="${p.nome}" />`
+  } else {
+    preview.innerHTML = `<span style="font-family:var(--font-display);font-size:20px">${iniciais(p.nome)}</span>`
+  }
+}
+
+async function salvarPsicologo() {
+  const btnSalvar = document.getElementById('btnSalvar')
+  btnSalvar.textContent = 'Salvando…'
+  btnSalvar.disabled = true
+
+  const labels = ['Ansiedade','Depressão','Trauma e TEPT','Luto','Relacionamentos','Autoestima','Burnout','Transtornos alimentares','Dependência química','TDAH','Infância e adolescência','LGBTQIA+','Psicologia do Esporte','Saúde da mulher','Obesidade e Bariátrica']
+  const especialidades = labels.filter((_, i) => document.getElementById(`te${i+1}`).checked)
+
+  const dados = {
+    nome: document.getElementById('fNome').value.trim(),
+    crp: document.getElementById('fCrp').value.trim(),
+    email: document.getElementById('fEmail').value.trim(),
+    telefone: document.getElementById('fTelefone').value.trim(),
+    cidade: document.getElementById('fCidade').value.trim(),
+    estado: document.getElementById('fEstado').value,
+    abordagem: document.getElementById('fAbordagem').value,
+    especialidades,
+    bio: document.getElementById('fBio').value.trim(),
+    formacao: document.getElementById('fFormacao').value.trim(),
+    site: document.getElementById('fSite').value.trim(),
+    valor_sessao: Number(document.getElementById('fValor').value) || null,
+    duracao_sessao: Number(document.getElementById('fDuracao').value),
+    status: document.getElementById('fStatus').value,
+    modalidade_online: document.getElementById('fOnline').checked,
+    modalidade_presencial: document.getElementById('fPresencial').checked,
+    aceita_pacientes: document.getElementById('fAceita').checked,
+  }
+
+  if (!dados.nome || !dados.crp || !dados.email) {
+    toast('Nome, CRP e e-mail são obrigatórios', 'erro')
+    btnSalvar.textContent = 'Salvar'
+    btnSalvar.disabled = false
+    return
+  }
+
+  let error, idFinal = editandoId
+
+  if (editandoId) {
+    ;({ error } = await sb.from('psicologos').update(dados).eq('id', editandoId))
+  } else {
+    const { data: novo, error: errIns } = await sb.from('psicologos').insert([dados]).select().single()
+    error = errIns
+    if (novo) idFinal = novo.id
+  }
+
+  // upload de foto se houver
+  if (!error && fotoArquivo && idFinal) {
+    const fotoUrl = await uploadFoto(idFinal)
+    if (fotoUrl) {
+      await sb.from('psicologos').update({ foto_url: fotoUrl }).eq('id', idFinal)
+    }
+  }
+
+  btnSalvar.textContent = 'Salvar'
+  btnSalvar.disabled = false
+
+  if (error) { toast('Erro: ' + (error.message || 'tente novamente'), 'erro'); return }
+  toast(editandoId ? 'Psicólogo atualizado!' : 'Psicólogo cadastrado!')
+  fecharModal()
+  await carregarTudo()
+}
+
+async function deletarPsicologo() {
+  if (!editandoId) return
+  const p = psicologos.find(x => x.id === editandoId)
+  const confirma = confirm(`Tem certeza que deseja deletar ${p?.nome || 'este psicólogo'}? Esta ação não pode ser desfeita.`)
+  if (!confirma) return
+  const { error } = await sb.from('psicologos').delete().eq('id', editandoId)
+  if (error) { toast('Erro ao deletar: ' + error.message, 'erro'); return }
+  toast('Psicólogo removido.')
+  fecharModal()
+  await carregarTudo()
+}
+
+// ── HELPERS ─────────────────────────────────────────────────
+function iniciais(nome) {
+  return nome.split(' ').slice(0,2).map(n => n[0]).join('')
+}
+
+function toast(msg, tipo = 'ok') {
+  const el = document.getElementById('toast')
+  el.textContent = msg
+  el.className = `toast toast-${tipo} show`
+  setTimeout(() => el.classList.remove('show'), 3000)
+}
+</script>
+</body>
+</html>

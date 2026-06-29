@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- SEO dinâmico preenchido por JS -->
+<title>MeuPsi Blog</title>
+<meta name="description" content="" id="metaDesc" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="" id="linkCanonical" />
+
+<!-- Open Graph dinâmico -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="" id="ogTitle" />
+<meta property="og:description" content="" id="ogDesc" />
+<meta property="og:url" content="" id="ogUrl" />
+<meta property="og:image" content="" id="ogImage" />
+<meta property="og:site_name" content="MeuPsi" />
+<meta property="og:locale" content="pt_BR" />
+<meta property="article:published_time" content="" id="ogPublished" />
+<meta property="article:author" content="" id="ogAuthor" />
+<meta property="article:section" content="" id="ogSection" />
+
+<!-- Schema.org Article (preenchido por JS) -->
+<script id="schemaScript" type="application/ld+json">{}</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --cream: #FDF6F8;
+  --rose-50: #FAF0F4;
+  --rose-100: #F5E2EA;
+  --rose-200: #ECC8D8;
+  --mauve-300: #D4ABBE;
+  --mauve-500: #B87FA0;
+  --lila-300: #C9ADE0;
+  --lila-500: #9B6FD8;
+  --lila-700: #6B3FA8;
+  --lila-900: #3B1E62;
+  --verde-500: #5AB593;
+  --verde-600: #3F9B7A;
+  --verde-50: #EBF7F2;
+  --gray-300: #BFB2BA;
+  --gray-500: #7A6872;
+  --gray-800: #2E2228;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-pill: 999px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--cream); color: var(--gray-800); font-size: 16px; line-height: 1.6; }
+img { max-width: 100%; display: block; }
+a { text-decoration: none; color: inherit; }
+
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(253,246,248,0.93); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rose-100);
+  padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px;
+}
+.nav-logo { font-family: var(--font-display); font-size: 22px; font-weight: 400; font-style: italic; color: var(--lila-700); }
+.nav-logo span { color: var(--verde-500); font-style: normal; }
+.nav-links { display: flex; align-items: center; gap: 1.75rem; }
+.nav-links a { font-size: 14px; color: var(--gray-500); transition: color 0.2s; }
+.nav-links a:hover { color: var(--lila-700); }
+.btn { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-pill); font-family: var(--font-body); font-size: 14px; font-weight: 500; padding: 9px 20px; cursor: pointer; transition: all 0.18s; border: none; }
+.btn-ghost { background: transparent; color: var(--gray-800); border: 1.5px solid var(--mauve-300); }
+.btn-ghost:hover { border-color: var(--lila-300); color: var(--lila-700); }
+.btn-primary { background: var(--verde-500); color: #fff; }
+.btn-primary:hover { background: var(--verde-600); }
+
+/* BREADCRUMB */
+.breadcrumb { padding: 1rem 2rem; font-size: 13px; color: var(--mauve-300); max-width: 780px; margin: 0 auto; }
+.breadcrumb a { color: var(--mauve-300); transition: color 0.2s; }
+.breadcrumb a:hover { color: var(--lila-700); }
+.breadcrumb span { margin: 0 6px; }
+
+/* HERO POST */
+.post-hero { padding: 2.5rem 2rem 0; max-width: 780px; margin: 0 auto; }
+.post-cat-badge { display: inline-flex; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mauve-500); background: var(--rose-50); border: 1px solid var(--rose-100); padding: 4px 12px; border-radius: var(--radius-pill); margin-bottom: 1.25rem; }
+.post-hero h1 { font-family: var(--font-display); font-size: clamp(1.7rem, 4vw, 2.6rem); font-weight: 300; color: var(--lila-900); line-height: 1.2; margin-bottom: 1rem; }
+.post-subtitulo { font-size: 18px; color: var(--gray-500); font-weight: 300; line-height: 1.5; margin-bottom: 2rem; }
+.post-meta-bar { display: flex; align-items: center; gap: 12px; padding: 1rem 0; border-top: 1px solid var(--rose-100); border-bottom: 1px solid var(--rose-100); margin-bottom: 2rem; flex-wrap: wrap; }
+.autor-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--rose-200); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: var(--lila-700); overflow: hidden; flex-shrink: 0; }
+.autor-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.autor-info { display: flex; flex-direction: column; gap: 1px; }
+.autor-nome { font-size: 14px; font-weight: 500; color: var(--gray-800); }
+.autor-data { font-size: 12px; color: var(--mauve-300); }
+.meta-sep { color: var(--rose-200); margin: 0 4px; }
+.tempo-leitura { font-size: 13px; color: var(--mauve-300); }
+.share-btn { margin-left: auto; }
+.share-row { display: flex; gap: 8px; }
+.share-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--rose-200); color: var(--gray-500); cursor: pointer; transition: all 0.18s; background: transparent; }
+.share-icon:hover { border-color: var(--lila-300); color: var(--lila-700); }
+
+/* CAPA */
+.post-capa-img { max-width: 780px; margin: 0 auto 2.5rem; border-radius: var(--radius-md); overflow: hidden; }
+.post-capa-img img { width: 100%; max-height: 420px; object-fit: cover; }
+
+/* CONTEÚDO */
+.post-content {
+  max-width: 680px; margin: 0 auto; padding: 0 2rem 4rem;
+}
+.post-content h2 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 300; color: var(--lila-900); margin: 2.5rem 0 1rem; }
+.post-content h3 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 300; color: var(--lila-700); margin: 2rem 0 0.75rem; }
+.post-content p { margin-bottom: 1.25rem; color: var(--gray-800); line-height: 1.8; }
+.post-content ul, .post-content ol { margin: 0 0 1.25rem 1.5rem; color: var(--gray-800); line-height: 1.8; }
+.post-content li { margin-bottom: 0.4rem; }
+.post-content blockquote { border-left: 3px solid var(--lila-300); padding: 1rem 1.5rem; margin: 2rem 0; background: var(--rose-50); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-style: italic; color: var(--lila-700); }
+.post-content strong { font-weight: 500; color: var(--lila-900); }
+.post-content a { color: var(--lila-500); text-decoration: underline; }
+.post-content img { border-radius: var(--radius-sm); margin: 1.5rem 0; }
+.post-content hr { border: none; border-top: 1px solid var(--rose-100); margin: 2.5rem 0; }
+
+/* CTA FINAL */
+.post-cta { max-width: 680px; margin: 0 auto 4rem; padding: 0 2rem; }
+.post-cta-inner { background: var(--lila-900); border-radius: var(--radius-md); padding: 2.5rem; text-align: center; color: #fff; }
+.post-cta-inner h3 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 300; margin-bottom: 0.75rem; }
+.post-cta-inner p { color: var(--lila-300); font-size: 14px; margin-bottom: 1.5rem; }
+
+/* POSTS RELACIONADOS */
+.relacionados { background: var(--rose-50); padding: 3rem 2rem; }
+.relacionados .container { max-width: 780px; margin: 0 auto; }
+.section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mauve-500); margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 300; color: var(--lila-900); margin-bottom: 1.5rem; }
+.rel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.rel-card { background: var(--cream); border: 1.5px solid var(--rose-200); border-radius: var(--radius-md); overflow: hidden; cursor: pointer; transition: box-shadow 0.2s, transform 0.2s; }
+.rel-card:hover { box-shadow: 0 6px 20px rgba(155,111,216,0.1); transform: translateY(-2px); }
+.rel-thumb { height: 110px; background: var(--rose-100); display: flex; align-items: center; justify-content: center; }
+.rel-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.rel-body { padding: 1rem; }
+.rel-cat { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mauve-500); margin-bottom: 4px; }
+.rel-titulo { font-size: 14px; font-weight: 500; color: var(--lila-900); line-height: 1.4; }
+
+/* LOADING */
+.loading { display: flex; align-items: center; justify-content: center; min-height: 60vh; color: var(--mauve-300); }
+.skeleton { background: linear-gradient(90deg, var(--rose-100) 25%, var(--rose-50) 50%, var(--rose-100) 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: var(--radius-sm); }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+footer { background: var(--lila-900); color: var(--lila-300); padding: 3rem 2rem 2rem; }
+.footer-inner { max-width: 1080px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between; padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.footer-logo { font-family: var(--font-display); font-size: 20px; font-style: italic; color: #fff; margin-bottom: 0.5rem; }
+.footer-desc { font-size: 13px; max-width: 220px; line-height: 1.6; }
+.footer-col h4 { font-size: 12px; font-weight: 500; color: #fff; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem; }
+.footer-col a { display: block; font-size: 14px; color: var(--lila-300); margin-bottom: 0.5rem; transition: color 0.2s; }
+.footer-col a:hover { color: #fff; }
+.footer-copy { max-width: 1080px; margin: 1.5rem auto 0; font-size: 12px; color: var(--lila-500); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+
+@media (max-width: 640px) {
+  nav { padding: 0 1rem; }
+  .nav-links a, .nav-links .btn-ghost { display: none; }
+  .post-hero, .post-content, .post-cta, .breadcrumb { padding-left: 1rem; padding-right: 1rem; }
+  .share-btn { margin-left: 0; width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Meu<span>Psi</span></a>
+  <div class="nav-links">
+    <a href="index.html#psicologos">Psicólogos</a>
+    <a href="blog.html">Blog</a>
+    <a href="cadastro.html">Para psicólogos</a>
+    <button class="btn btn-ghost">Entrar</button>
+    <button class="btn btn-primary" onclick="window.location.href='index.html#psicologos'">Encontrar psicólogo</button>
+  </div>
+</nav>
+
+<div id="app">
+  <div class="loading">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--mauve-300)" stroke-width="1.5" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+  </div>
+</div>
+<style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <p class="footer-logo">MeuPsi</p>
+      <p class="footer-desc">Conectando pessoas a psicólogos verificados de forma simples, segura e acolhedora.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Plataforma</h4>
+      <a href="index.html#psicologos">Encontrar psicólogo</a>
+      <a href="blog.html">Blog</a>
+    </div>
+    <div class="footer-col">
+      <h4>Para psicólogos</h4>
+      <a href="cadastro.html">Cadastrar perfil</a>
+    </div>
+  </div>
+  <div class="footer-copy">
+    <span>© 2026 MeuPsi · Todos os direitos reservados</span>
+    <span>Feito com cuidado 💜</span>
+  </div>
+</footer>
+
+<script>
+const SUPABASE_URL = 'https://zyfqynjfnnhpsbkwajup.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_1bUv_1N-cIWv7Icthh4fdQ_nH8rdJuz'
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+const BASE_URL = 'https://micaeltatuagem.github.io/meupsi'
+
+function tempoLeitura(html) {
+  const txt = html.replace(/<[^>]+>/g, '')
+  return Math.max(1, Math.round(txt.split(/\s+/).filter(Boolean).length / 200)) + ' min'
+}
+
+function formatarData(iso) {
+  return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+}
+
+function iniciais(nome) {
+  return (nome || 'MP').split(' ').slice(0,2).map(n => n[0]).join('').toUpperCase()
+}
+
+function injetarSEO(post) {
+  const url = `${BASE_URL}/blog-post.html?slug=${post.slug}`
+  document.title = `${post.titulo} — MeuPsi Blog`
+  document.getElementById('metaDesc').content = post.resumo || post.titulo
+  document.getElementById('linkCanonical').href = url
+  document.getElementById('ogTitle').content = post.titulo
+  document.getElementById('ogDesc').content = post.resumo || ''
+  document.getElementById('ogUrl').content = url
+  document.getElementById('ogImage').content = post.capa_url || ''
+  document.getElementById('ogPublished').content = post.publicado_em || ''
+  document.getElementById('ogAuthor').content = post.autor_nome || 'Equipe MeuPsi'
+  document.getElementById('ogSection').content = post.categoria || ''
+
+  // Schema.org Article
+  document.getElementById('schemaScript').textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": post.titulo,
+    "description": post.resumo || '',
+    "image": post.capa_url || '',
+    "datePublished": post.publicado_em || '',
+    "dateModified": post.updated_at || post.publicado_em || '',
+    "author": { "@type": "Person", "name": post.autor_nome || 'Equipe MeuPsi' },
+    "publisher": {
+      "@type": "Organization",
+      "name": "MeuPsi",
+      "url": BASE_URL,
+      "logo": { "@type": "ImageObject", "url": `${BASE_URL}/logo.png` }
+    },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": url },
+    "articleSection": post.categoria || '',
+    "keywords": (post.tags || []).join(', ')
+  })
+}
+
+function compartilhar(rede) {
+  const url = encodeURIComponent(window.location.href)
+  const titulo = encodeURIComponent(document.title)
+  const links = {
+    whatsapp: `https://wa.me/?text=${titulo}%20${url}`,
+    twitter: `https://twitter.com/intent/tweet?text=${titulo}&url=${url}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+    copiar: null
+  }
+  if (rede === 'copiar') {
+    navigator.clipboard.writeText(window.location.href).then(() => alert('Link copiado!'))
+    return
+  }
+  window.open(links[rede], '_blank')
+}
+
+async function carregarRelacionados(categoria, slugAtual) {
+  const { data } = await sb.from('posts')
+    .select('slug, titulo, categoria, capa_url')
+    .eq('status', 'publicado')
+    .eq('categoria', categoria)
+    .neq('slug', slugAtual)
+    .limit(3)
+  return data || []
+}
+
+async function init() {
+  const slug = new URLSearchParams(window.location.search).get('slug')
+  const app = document.getElementById('app')
+
+  if (!slug) {
+    app.innerHTML = `<div style="text-align:center;padding:6rem 2rem;color:var(--gray-500)"><p>Post não encontrado.</p><br><a href="blog.html" style="color:var(--lila-500)">← Voltar ao blog</a></div>`
+    return
+  }
+
+  const { data: post, error } = await sb.from('posts')
+    .select('*')
+    .eq('slug', slug)
+    .eq('status', 'publicado')
+    .single()
+
+  if (error || !post) {
+    app.innerHTML = `<div style="text-align:center;padding:6rem 2rem;color:var(--gray-500)"><p>Artigo não encontrado ou ainda não publicado.</p><br><a href="blog.html" style="color:var(--lila-500)">← Voltar ao blog</a></div>`
+    return
+  }
+
+  injetarSEO(post)
+
+  const tempo = tempoLeitura(post.conteudo || '')
+  const data = post.publicado_em ? formatarData(post.publicado_em) : ''
+  const avatarHTML = post.autor_foto
+    ? `<img src="${post.autor_foto}" alt="${post.autor_nome}" />`
+    : iniciais(post.autor_nome)
+
+  app.innerHTML = `
+    <nav aria-label="Breadcrumb">
+      <div class="breadcrumb">
+        <a href="index.html">Início</a>
+        <span>›</span>
+        <a href="blog.html">Blog</a>
+        <span>›</span>
+        ${post.categoria ? `<a href="blog.html">${post.categoria}</a><span>›</span>` : ''}
+        <span style="color:var(--gray-500)">${post.titulo}</span>
+      </div>
+    </nav>
+
+    <article>
+      <div class="post-hero">
+        ${post.categoria ? `<span class="post-cat-badge">${post.categoria}</span>` : ''}
+        <h1>${post.titulo}</h1>
+        ${post.subtitulo ? `<p class="post-subtitulo">${post.subtitulo}</p>` : ''}
+        <div class="post-meta-bar">
+          <div class="autor-avatar">${avatarHTML}</div>
+          <div class="autor-info">
+            <span class="autor-nome">${post.autor_nome || 'Equipe MeuPsi'}</span>
+            <span class="autor-data">${data}${data ? ' · ' : ''}${tempo} de leitura</span>
+          </div>
+          <div class="share-btn">
+            <div class="share-row">
+              <button class="share-icon" onclick="compartilhar('whatsapp')" title="WhatsApp">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.558 4.126 1.531 5.869L0 24l6.335-1.524A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.667-.518-5.184-1.42l-.372-.22-3.76.904.956-3.668-.242-.379A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+              </button>
+              <button class="share-icon" onclick="compartilhar('twitter')" title="Twitter / X">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </button>
+              <button class="share-icon" onclick="compartilhar('linkedin')" title="LinkedIn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              </button>
+              <button class="share-icon" onclick="compartilhar('copiar')" title="Copiar link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      ${post.capa_url ? `
+      <div class="post-capa-img" style="padding:0 2rem">
+        <img src="${post.capa_url}" alt="${post.titulo}" />
+      </div>` : ''}
+
+      <div class="post-content" id="postContent">
+        ${post.conteudo || '<p>Conteúdo em breve.</p>'}
+      </div>
+    </article>
+
+    <div class="post-cta">
+      <div class="post-cta-inner">
+        <h3>Pronto para cuidar da sua saúde mental?</h3>
+        <p>Encontre um psicólogo verificado que combina com a sua história.</p>
+        <a href="index.html#psicologos" class="btn btn-primary" style="font-size:15px;padding:12px 28px">Encontrar psicólogo</a>
+      </div>
+    </div>
+
+    <div class="relacionados" id="relacionados"></div>
+  `
+
+  // Relacionados
+  if (post.categoria) {
+    const rels = await carregarRelacionados(post.categoria, post.slug)
+    const relDiv = document.getElementById('relacionados')
+    if (rels.length) {
+      relDiv.innerHTML = `
+        <div class="container">
+          <p class="section-label">Continue lendo</p>
+          <h2 class="section-title">Artigos relacionados</h2>
+          <div class="rel-grid">
+            ${rels.map(r => `
+              <div class="rel-card" onclick="window.location.href='blog-post.html?slug=${r.slug}'">
+                <div class="rel-thumb">
+                  ${r.capa_url
+                    ? `<img src="${r.capa_url}" alt="${r.titulo}" loading="lazy" />`
+                    : `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--mauve-300)" stroke-width="1"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`
+                  }
+                </div>
+                <div class="rel-body">
+                  ${r.categoria ? `<p class="rel-cat">${r.categoria}</p>` : ''}
+                  <p class="rel-titulo">${r.titulo}</p>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>`
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init)
+</script>
+</body>
+</html>

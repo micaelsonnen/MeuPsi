@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastre-se como psicólogo — MeuPsi</title>
+  <meta name="description" content="Cadastre seu perfil no MeuPsi e conecte-se a novos pacientes." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --lila-50:  #F5F0FB;
+      --lila-100: #E8DCFA;
+      --lila-300: #C4A8F0;
+      --lila-500: #9B6FD8;
+      --lila-700: #6B3FA8;
+      --lila-900: #3B1E62;
+      --verde-400: #4CAF7D;
+      --verde-500: #3A9E6A;
+      --verde-600: #2D8055;
+      --verde-50:  #EBF7F1;
+      --cream:    #FDFBF8;
+      --gray-100: #F0EDE8;
+      --gray-300: #C8C4BC;
+      --gray-500: #8A8680;
+      --gray-800: #2E2C29;
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body:    'DM Sans', system-ui, sans-serif;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-pill: 999px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); background: var(--cream); color: var(--gray-800); font-size: 16px; line-height: 1.6; }
+    a { text-decoration: none; color: inherit; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(253,251,248,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--lila-100);
+      padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px;
+    }
+    .nav-logo { font-family: var(--font-display); font-size: 22px; font-weight: 400; font-style: italic; color: var(--lila-700); }
+    .nav-logo span { color: var(--verde-500); font-style: normal; }
+    .nav-back { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--gray-500); cursor: pointer; transition: color 0.2s; }
+    .nav-back:hover { color: var(--lila-700); }
+
+    /* HERO CADASTRO */
+    .hero-cadastro {
+      background: linear-gradient(160deg, var(--lila-900) 0%, var(--lila-700) 100%);
+      padding: 3.5rem 2rem;
+      text-align: center; color: #fff;
+    }
+    .hero-cadastro h1 {
+      font-family: var(--font-display); font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 300; margin-bottom: 0.75rem;
+    }
+    .hero-cadastro p { color: var(--lila-300); font-size: 16px; max-width: 480px; margin: 0 auto; font-weight: 300; }
+
+    /* STEPS PROGRESS */
+    .progress-wrap { background: #fff; border-bottom: 1px solid var(--lila-100); padding: 1.25rem 2rem; }
+    .progress-inner { max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 0; }
+    .step-item { display: flex; align-items: center; flex: 1; }
+    .step-circle {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 500; flex-shrink: 0;
+      border: 2px solid var(--gray-300); color: var(--gray-300); background: #fff;
+      transition: all 0.3s;
+    }
+    .step-circle.ativo { border-color: var(--lila-500); background: var(--lila-500); color: #fff; }
+    .step-circle.feito { border-color: var(--verde-500); background: var(--verde-500); color: #fff; }
+    .step-label { font-size: 12px; color: var(--gray-300); margin-left: 8px; white-space: nowrap; }
+    .step-label.ativo { color: var(--lila-700); font-weight: 500; }
+    .step-label.feito { color: var(--verde-600); }
+    .step-line { flex: 1; height: 2px; background: var(--gray-100); margin: 0 8px; }
+    .step-line.feito { background: var(--verde-500); }
+
+    /* LAYOUT */
+    .page { max-width: 760px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+
+    /* CARD FORM */
+    .form-card {
+      background: #fff; border: 1.5px solid var(--lila-100);
+      border-radius: var(--radius-md); padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .form-section-title {
+      font-family: var(--font-display); font-size: 18px;
+      font-weight: 300; color: var(--lila-900); margin-bottom: 0.25rem;
+    }
+    .form-section-sub { font-size: 13px; color: var(--gray-500); margin-bottom: 1.75rem; }
+
+    /* CAMPOS */
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .field-row.full { grid-template-columns: 1fr; }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+    .field:last-child { margin-bottom: 0; }
+    label { font-size: 13px; font-weight: 500; color: var(--gray-800); }
+    .label-opt { font-size: 11px; color: var(--gray-300); font-weight: 400; margin-left: 4px; }
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="url"],
+    select,
+    textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid var(--gray-300); border-radius: var(--radius-sm);
+      font-family: var(--font-body); font-size: 14px; color: var(--gray-800);
+      background: #fff; outline: none; transition: border-color 0.18s;
+      appearance: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--lila-500);
+      box-shadow: 0 0 0 3px rgba(155,111,216,0.08);
+    }
+    input::placeholder, textarea::placeholder { color: var(--gray-300); }
+    textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23C8C4BC' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      padding-right: 36px;
+    }
+    .field-hint { font-size: 12px; color: var(--gray-300); margin-top: 2px; }
+
+    /* UPLOAD FOTO */
+    .upload-area {
+      border: 2px dashed var(--lila-100); border-radius: var(--radius-md);
+      padding: 2rem; text-align: center; cursor: pointer;
+      transition: all 0.2s; background: var(--lila-50);
+    }
+    .upload-area:hover { border-color: var(--lila-300); background: var(--lila-50); }
+    .upload-icon { color: var(--lila-300); margin-bottom: 0.75rem; }
+    .upload-text { font-size: 14px; color: var(--gray-500); }
+    .upload-sub { font-size: 12px; color: var(--gray-300); margin-top: 4px; }
+
+    /* TAGS CHECKBOX */
+    .tags-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag-check { display: none; }
+    .tag-check + label {
+      font-size: 13px; padding: 7px 16px;
+      border-radius: var(--radius-pill);
+      border: 1.5px solid var(--gray-300);
+      background: #fff; color: var(--gray-500);
+      cursor: pointer; transition: all 0.18s;
+      font-weight: 400;
+    }
+    .tag-check:checked + label {
+      border-color: var(--lila-300);
+      background: var(--lila-50);
+      color: var(--lila-700);
+    }
+
+    /* TOGGLE */
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-info p { font-size: 14px; font-weight: 500; }
+    .toggle-info span { font-size: 12px; color: var(--gray-300); }
+    .toggle {
+      position: relative; width: 44px; height: 24px; flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0;
+      background: var(--gray-300); border-radius: var(--radius-pill);
+      cursor: pointer; transition: background 0.2s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; top: 3px; left: 3px;
+      transition: transform 0.2s;
+    }
+    .toggle input:checked + .toggle-slider { background: var(--verde-500); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* VALOR */
+    .valor-input-wrap { position: relative; }
+    .valor-prefix {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 14px; color: var(--gray-500); pointer-events: none;
+    }
+    .valor-input-wrap input { padding-left: 36px; }
+
+    /* BOTÕES NAV */
+    .form-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-pill); font-family: var(--font-body); font-size: 14px; font-weight: 500; padding: 11px 24px; cursor: pointer; transition: all 0.18s; border: none; }
+    .btn-primary { background: var(--verde-500); color: #fff; }
+    .btn-primary:hover { background: var(--verde-600); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(58,158,106,0.25); }
+    .btn-ghost { background: transparent; color: var(--gray-800); border: 1.5px solid var(--gray-300); }
+    .btn-ghost:hover { border-color: var(--lila-300); color: var(--lila-700); }
+    .btn-lila { background: var(--lila-500); color: #fff; }
+    .btn-lila:hover { background: var(--lila-700); }
+
+    /* BENEFÍCIOS LATERAIS */
+    .beneficios {
+      background: var(--lila-50); border: 1.5px solid var(--lila-100);
+      border-radius: var(--radius-md); padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .beneficios h3 { font-size: 14px; font-weight: 500; color: var(--lila-900); margin-bottom: 1rem; }
+    .beneficio-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+    .beneficio-item:last-child { margin-bottom: 0; }
+    .beneficio-icon { color: var(--verde-500); flex-shrink: 0; margin-top: 1px; }
+    .beneficio-text { font-size: 13px; color: var(--gray-500); line-height: 1.5; }
+
+    /* STEPS CONTENT */
+    .step-content { display: none; }
+    .step-content.ativo { display: block; }
+
+    /* SUCESSO */
+    .sucesso {
+      text-align: center; padding: 3rem 2rem;
+      background: #fff; border: 1.5px solid var(--lila-100);
+      border-radius: var(--radius-md);
+    }
+    .sucesso-icon {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: var(--verde-50); display: flex; align-items: center;
+      justify-content: center; margin: 0 auto 1.5rem; color: var(--verde-500);
+    }
+    .sucesso h2 { font-family: var(--font-display); font-size: 24px; font-weight: 300; color: var(--lila-900); margin-bottom: 0.75rem; }
+    .sucesso p { font-size: 15px; color: var(--gray-500); max-width: 380px; margin: 0 auto 2rem; }
+
+    @media (max-width: 600px) {
+      .field-row { grid-template-columns: 1fr; }
+      nav { padding: 0 1rem; }
+      .page { padding: 1.5rem 1rem 3rem; }
+      .step-label { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Meu<span>Psi</span></a>
+  <a href="index.html" class="nav-back">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+    Voltar para o início
+  </a>
+</nav>
+
+<div class="hero-cadastro">
+  <h1>Cadastre seu perfil</h1>
+  <p>Faça parte da rede MeuPsi e conecte-se a pacientes que precisam do seu cuidado.</p>
+</div>
+
+<!-- PROGRESSO -->
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <div class="step-item">
+      <div class="step-circle ativo" id="c1">1</div>
+      <span class="step-label ativo" id="l1">Dados pessoais</span>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-item">
+      <div class="step-circle" id="c2">2</div>
+      <span class="step-label" id="l2">Perfil profissional</span>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-item">
+      <div class="step-circle" id="c3">3</div>
+      <span class="step-label" id="l3">Disponibilidade</span>
+    </div>
+    <div class="step-line" id="line3"></div>
+    <div class="step-item">
+      <div class="step-circle" id="c4">4</div>
+      <span class="step-label" id="l4">Revisão</span>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- BENEFÍCIOS -->
+  <div class="beneficios">
+    <h3>Por que estar no MeuPsi?</h3>
+    <div class="beneficio-item">
+      <div class="beneficio-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+      </div>
+      <p class="beneficio-text">Perfil verificado com CRP — transmite confiança aos pacientes</p>
+    </div>
+    <div class="beneficio-item">
+      <div class="beneficio-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+      </div>
+      <p class="beneficio-text">Agenda online integrada — sem WhatsApp pra frente e pra trás</p>
+    </div>
+    <div class="beneficio-item">
+      <div class="beneficio-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+      </div>
+      <p class="beneficio-text">Visibilidade orgânica para novos pacientes na sua cidade</p>
+    </div>
+    <div class="beneficio-item">
+      <div class="beneficio-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+      </div>
+      <p class="beneficio-text">Cadastro 100% gratuito para começar</p>
+    </div>
+  </div>
+
+  <!-- STEP 1: DADOS PESSOAIS -->
+  <div class="step-content ativo" id="step1">
+    <div class="form-card">
+      <h2 class="form-section-title">Dados pessoais</h2>
+      <p class="form-section-sub">Informações básicas sobre você. Seu CRP será verificado pela equipe MeuPsi.</p>
+
+      <div style="margin-bottom:1.5rem;">
+        <label style="display:block; margin-bottom:8px;">Foto de perfil <span class="label-opt">(opcional)</span></label>
+        <div class="upload-area" onclick="document.getElementById('foto').click()">
+          <div class="upload-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+          </div>
+          <p class="upload-text">Clique para enviar sua foto</p>
+          <p class="upload-sub">JPG ou PNG · Máx. 5MB</p>
+          <input type="file" id="foto" accept="image/*" style="display:none" />
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="nome">Nome completo</label>
+          <input type="text" id="nome" placeholder="Andreia Vieira" />
+        </div>
+        <div class="field">
+          <label for="crp">CRP</label>
+          <input type="text" id="crp" placeholder="21/06454" />
+          <span class="field-hint">Será verificado pela nossa equipe</span>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" placeholder="andreia@email.com" />
+        </div>
+        <div class="field">
+          <label for="tel">WhatsApp</label>
+          <input type="tel" id="tel" placeholder="(31) 99999-0000" />
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="cidade">Cidade</label>
+          <input type="text" id="cidade" placeholder="Belo Horizonte" />
+        </div>
+        <div class="field">
+          <label for="estado">Estado</label>
+          <select id="estado">
+            <option value="">Selecione…</option>
+            <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+            <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+            <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+            <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+            <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+            <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+            <option>SP</option><option>SE</option><option>TO</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="senha">Senha de acesso</label>
+        <input type="text" id="senha" placeholder="Mínimo 8 caracteres" />
+      </div>
+    </div>
+
+    <div class="form-nav">
+      <span></span>
+      <button class="btn btn-primary" onclick="irPara(2)">
+        Continuar
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 2: PERFIL PROFISSIONAL -->
+  <div class="step-content" id="step2">
+    <div class="form-card">
+      <h2 class="form-section-title">Perfil profissional</h2>
+      <p class="form-section-sub">Essas informações aparecem no seu perfil público e ajudam pacientes a te encontrar.</p>
+
+      <div class="field">
+        <label for="abordagem">Abordagem principal</label>
+        <select id="abordagem">
+          <option value="">Selecione…</option>
+          <option>Psicanálise</option>
+          <option>Terapia Cognitivo-Comportamental (TCC)</option>
+          <option>Psicologia Humanista</option>
+          <option>Gestalt-terapia</option>
+          <option>Análise do Comportamento</option>
+          <option>Psicodrama</option>
+          <option>EMDR</option>
+          <option>ACT — Terapia de Aceitação e Compromisso</option>
+          <option>Outra</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Especialidades <span class="label-opt">(selecione quantas quiser)</span></label>
+        <div class="tags-wrap" style="margin-top:4px;">
+          <input type="checkbox" class="tag-check" id="e1"><label for="e1">Ansiedade</label>
+          <input type="checkbox" class="tag-check" id="e2"><label for="e2">Depressão</label>
+          <input type="checkbox" class="tag-check" id="e3"><label for="e3">Trauma e TEPT</label>
+          <input type="checkbox" class="tag-check" id="e4"><label for="e4">Luto</label>
+          <input type="checkbox" class="tag-check" id="e5"><label for="e5">Relacionamentos</label>
+          <input type="checkbox" class="tag-check" id="e6"><label for="e6">Autoestima</label>
+          <input type="checkbox" class="tag-check" id="e7"><label for="e7">Burnout</label>
+          <input type="checkbox" class="tag-check" id="e8"><label for="e8">Transtornos alimentares</label>
+          <input type="checkbox" class="tag-check" id="e9"><label for="e9">Dependência química</label>
+          <input type="checkbox" class="tag-check" id="e10"><label for="e10">TDAH</label>
+          <input type="checkbox" class="tag-check" id="e11"><label for="e11">Infância e adolescência</label>
+          <input type="checkbox" class="tag-check" id="e12"><label for="e12">LGBTQIA+</label>
+          <input type="checkbox" class="tag-check" id="e13"><label for="e13">Psicologia do Esporte</label>
+          <input type="checkbox" class="tag-check" id="e14"><label for="e14">Saúde da mulher</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="bio">Apresentação</label>
+        <textarea id="bio" placeholder="Conte um pouco sobre você, sua trajetória e como costuma conduzir os atendimentos. Essa é a primeira coisa que o paciente vai ler sobre você…"></textarea>
+        <span class="field-hint">Entre 100 e 500 caracteres. Escreva em primeira pessoa.</span>
+      </div>
+
+      <div class="field">
+        <label for="formacao">Formação</label>
+        <input type="text" id="formacao" placeholder="Ex: Graduação em Psicologia — UFMG (2015)" />
+        <span class="field-hint">Você pode adicionar mais itens depois no painel.</span>
+      </div>
+
+      <div class="field">
+        <label for="site">Site ou Instagram <span class="label-opt">(opcional)</span></label>
+        <input type="url" id="site" placeholder="https://instagram.com/seuusuario" />
+      </div>
+    </div>
+
+    <div class="form-nav">
+      <button class="btn btn-ghost" onclick="irPara(1)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        Voltar
+      </button>
+      <button class="btn btn-primary" onclick="irPara(3)">
+        Continuar
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 3: DISPONIBILIDADE -->
+  <div class="step-content" id="step3">
+    <div class="form-card">
+      <h2 class="form-section-title">Disponibilidade e atendimento</h2>
+      <p class="form-section-sub">Configure como e quando você atende. Você pode alterar isso a qualquer momento.</p>
+
+      <div class="field">
+        <label>Modalidade de atendimento</label>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <p>Online</p>
+            <span>Videochamada pelo MeuPsi ou plataforma própria</span>
+          </div>
+          <label class="toggle"><input type="checkbox" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <p>Presencial</p>
+            <span>Consultório físico na sua cidade</span>
+          </div>
+          <label class="toggle"><input type="checkbox" /><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Dias de atendimento</label>
+        <div class="tags-wrap" style="margin-top:4px;">
+          <input type="checkbox" class="tag-check" id="d1"><label for="d1">Segunda</label>
+          <input type="checkbox" class="tag-check" id="d2"><label for="d2">Terça</label>
+          <input type="checkbox" class="tag-check" id="d3"><label for="d3">Quarta</label>
+          <input type="checkbox" class="tag-check" id="d4"><label for="d4">Quinta</label>
+          <input type="checkbox" class="tag-check" id="d5"><label for="d5">Sexta</label>
+          <input type="checkbox" class="tag-check" id="d6"><label for="d6">Sábado</label>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="horario-inicio">Horário de início</label>
+          <select id="horario-inicio">
+            <option>07:00</option><option>08:00</option><option selected>09:00</option>
+            <option>10:00</option><option>11:00</option><option>12:00</option>
+            <option>13:00</option><option>14:00</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="horario-fim">Horário de término</label>
+          <select id="horario-fim">
+            <option>17:00</option><option selected>18:00</option><option>19:00</option>
+            <option>20:00</option><option>21:00</option><option>22:00</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="duracao">Duração da sessão</label>
+          <select id="duracao">
+            <option>45 minutos</option>
+            <option selected>50 minutos</option>
+            <option>60 minutos</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="valor">Valor por sessão</label>
+          <div class="valor-input-wrap">
+            <span class="valor-prefix">R$</span>
+            <input type="number" id="valor" placeholder="180" min="0" />
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Aceita novos pacientes?</label>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <p>Agenda aberta</p>
+            <span>Seu perfil aparece como disponível para novos pacientes</span>
+          </div>
+          <label class="toggle"><input type="checkbox" checked /><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-nav">
+      <button class="btn btn-ghost" onclick="irPara(2)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        Voltar
+      </button>
+      <button class="btn btn-primary" onclick="irPara(4)">
+        Revisar cadastro
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 4: REVISÃO -->
+  <div class="step-content" id="step4">
+    <div class="form-card">
+      <h2 class="form-section-title">Revise suas informações</h2>
+      <p class="form-section-sub">Confirme os dados antes de enviar. Tudo pode ser editado depois no seu painel.</p>
+
+      <div style="display:flex; flex-direction:column; gap:0;">
+        <div class="toggle-row" style="padding:14px 0;">
+          <div class="toggle-info"><p>Nome</p><span id="rev-nome">—</span></div>
+          <button class="btn btn-ghost" style="padding:6px 14px; font-size:12px;" onclick="irPara(1)">Editar</button>
+        </div>
+        <div class="toggle-row" style="padding:14px 0;">
+          <div class="toggle-info"><p>CRP</p><span id="rev-crp">—</span></div>
+          <button class="btn btn-ghost" style="padding:6px 14px; font-size:12px;" onclick="irPara(1)">Editar</button>
+        </div>
+        <div class="toggle-row" style="padding:14px 0;">
+          <div class="toggle-info"><p>E-mail</p><span id="rev-email">—</span></div>
+          <button class="btn btn-ghost" style="padding:6px 14px; font-size:12px;" onclick="irPara(1)">Editar</button>
+        </div>
+        <div class="toggle-row" style="padding:14px 0;">
+          <div class="toggle-info"><p>Abordagem</p><span id="rev-abordagem">—</span></div>
+          <button class="btn btn-ghost" style="padding:6px 14px; font-size:12px;" onclick="irPara(2)">Editar</button>
+        </div>
+        <div class="toggle-row" style="padding:14px 0;">
+          <div class="toggle-info"><p>Valor</p><span id="rev-valor">—</span></div>
+          <button class="btn btn-ghost" style="padding:6px 14px; font-size:12px;" onclick="irPara(3)">Editar</button>
+        </div>
+      </div>
+
+      <div style="margin-top:1.5rem; padding:1rem; background:var(--lila-50); border-radius:var(--radius-sm); font-size:13px; color:var(--gray-500); line-height:1.6;">
+        Ao cadastrar, você concorda com os <a href="#" style="color:var(--lila-700)">Termos de Uso</a> e a <a href="#" style="color:var(--lila-700)">Política de Privacidade</a> do MeuPsi. Seu CRP será verificado em até 48 horas.
+      </div>
+    </div>
+
+    <div class="form-nav">
+      <button class="btn btn-ghost" onclick="irPara(3)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        Voltar
+      </button>
+      <button class="btn btn-lila" onclick="enviarCadastro()" style="padding:12px 28px;">
+        Enviar cadastro
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- SUCESSO -->
+  <div class="step-content" id="step5">
+    <div class="sucesso">
+      <div class="sucesso-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+      </div>
+      <h2>Cadastro enviado!</h2>
+      <p>Recebemos suas informações. Nossa equipe vai verificar seu CRP e ativar seu perfil em até <strong>48 horas</strong>. Você receberá um e-mail quando estiver tudo pronto.</p>
+      <a href="index.html" class="btn btn-primary" style="margin:0 auto;">Voltar para o início</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let stepAtual = 1;
+
+  function irPara(n) {
+    // Atualiza revisão se for pro step 4
+    if (n === 4) {
+      document.getElementById('rev-nome').textContent = document.getElementById('nome').value || '—';
+      document.getElementById('rev-crp').textContent = document.getElementById('crp').value || '—';
+      document.getElementById('rev-email').textContent = document.getElementById('email').value || '—';
+      document.getElementById('rev-abordagem').textContent = document.getElementById('abordagem').value || '—';
+      const val = document.getElementById('valor').value;
+      document.getElementById('rev-valor').textContent = val ? `R$ ${val}` : '—';
+    }
+
+    // Esconde todos
+    document.querySelectorAll('.step-content').forEach(s => s.classList.remove('ativo'));
+    document.getElementById('step' + n).classList.add('ativo');
+
+    // Atualiza circles
+    for (let i = 1; i <= 4; i++) {
+      const c = document.getElementById('c' + i);
+      const l = document.getElementById('l' + i);
+      if (i < n) {
+        c.classList.remove('ativo'); c.classList.add('feito');
+        c.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 5 5L20 7"/></svg>';
+        l.classList.remove('ativo'); l.classList.add('feito');
+      } else if (i === n) {
+        c.classList.add('ativo'); c.classList.remove('feito');
+        c.textContent = i;
+        l.classList.add('ativo'); l.classList.remove('feito');
+      } else {
+        c.classList.remove('ativo', 'feito');
+        c.textContent = i;
+        l.classList.remove('ativo', 'feito');
+      }
+      if (i <= 3) {
+        const line = document.getElementById('line' + i);
+        if (i < n) line.classList.add('feito');
+        else line.classList.remove('feito');
+      }
+    }
+
+    stepAtual = n;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function enviarCadastro() {
+    document.querySelectorAll('.step-content').forEach(s => s.classList.remove('ativo'));
+    document.getElementById('step5').classList.add('ativo');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>

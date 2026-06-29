@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MeuPsi — Encontre seu psicólogo</title>
+<meta name="description" content="Conectamos você a psicólogos verificados de forma simples, segura e acolhedora." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  /* ── Perinatal 1 palette ─────────────────────────────────────
+     Rosa amniótico → malva → lilás placentário → violeta fundo
+     Verde aquoso para ação / contato
+  ───────────────────────────────────────────────────────────── */
+
+  /* Fundo base — rosa quase branco, vivo e aquecido */
+  --cream: #FDF6F8;
+
+  /* Superfícies de card / seções alternadas */
+  --rose-50:  #FAF0F4;
+  --rose-100: #F5E2EA;
+  --rose-200: #ECC8D8;
+
+  /* Transição malva → lilás (textos secundários, bordas, tags) */
+  --mauve-300: #D4ABBE;
+  --mauve-500: #B87FA0;
+
+  /* Lilás principal — abordagem, labels, destaques */
+  --lila-300: #C9ADE0;
+  --lila-500: #9B6FD8;
+  --lila-700: #6B3FA8;
+
+  /* Lilás profundo — títulos, footer, lila-900 original */
+  --lila-900: #3B1E62;
+
+  /* Verde aquoso — ação, contato, WhatsApp */
+  --verde-400: #7DC9A8;
+  --verde-500: #5AB593;
+  --verde-600: #3F9B7A;
+  --verde-50:  #EBF7F2;
+
+  /* Cinzas com leve tint rosado */
+  --gray-100: #EDE6EA;
+  --gray-300: #BFB2BA;
+  --gray-500: #7A6872;
+  --gray-800: #2E2228;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--cream); color: var(--gray-800); font-size: 16px; line-height: 1.6; }
+img { max-width: 100%; display: block; }
+a { text-decoration: none; color: inherit; }
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(253,246,248,0.93); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rose-100);
+  padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px;
+}
+.nav-logo { font-family: var(--font-display); font-size: 22px; font-weight: 400; font-style: italic; color: var(--lila-700); letter-spacing: -0.3px; }
+.nav-logo span { color: var(--verde-500); font-style: normal; }
+.nav-links { display: flex; align-items: center; gap: 1.75rem; }
+.nav-links a { font-size: 14px; color: var(--gray-500); transition: color 0.2s; }
+.nav-links a:hover { color: var(--gray-800); }
+
+/* BOTÕES */
+.btn { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-pill); font-family: var(--font-body); font-size: 14px; font-weight: 500; padding: 9px 20px; cursor: pointer; transition: all 0.18s; border: none; }
+.btn-ghost { background: transparent; color: var(--gray-800); border: 1.5px solid var(--mauve-300); }
+.btn-ghost:hover { border-color: var(--lila-300); color: var(--lila-700); }
+.btn-primary { background: var(--verde-500); color: #fff; }
+.btn-primary:hover { background: var(--verde-600); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(90,181,147,0.28); }
+.btn-lila { background: var(--lila-500); color: #fff; }
+.btn-lila:hover { background: var(--lila-700); }
+
+/* HERO */
+.hero {
+  padding: 5rem 2rem 4rem; text-align: center;
+  background: linear-gradient(160deg, var(--rose-100) 0%, var(--cream) 65%);
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: -80px; right: -80px;
+  width: 320px; height: 320px; border-radius: 50%;
+  background: var(--rose-200); opacity: 0.45;
+}
+.hero::after {
+  content: ''; position: absolute; bottom: -60px; left: -60px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: var(--verde-50); opacity: 0.7;
+}
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mauve-500); background: var(--rose-50); border: 1px solid var(--rose-100); padding: 5px 14px; border-radius: var(--radius-pill); margin-bottom: 1.5rem; }
+.hero h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 300; line-height: 1.15; color: var(--lila-900); max-width: 640px; margin: 0 auto 1.25rem; }
+.hero h1 em { font-style: italic; color: var(--lila-500); }
+.hero p { font-size: 17px; color: var(--gray-500); max-width: 460px; margin: 0 auto 2.5rem; font-weight: 300; }
+
+/* SEARCH */
+.search-wrap { max-width: 580px; margin: 0 auto 1.5rem; background: rgba(253,246,248,0.9); border: 1.5px solid var(--rose-200); border-radius: var(--radius-lg); display: flex; align-items: center; padding: 6px 6px 6px 1.25rem; box-shadow: 0 4px 24px rgba(184,127,160,0.1); }
+.search-wrap svg { flex-shrink: 0; color: var(--mauve-300); }
+.search-wrap input { flex: 1; border: none; background: transparent; font-family: var(--font-body); font-size: 15px; color: var(--gray-800); outline: none; padding: 6px 12px; }
+.search-wrap input::placeholder { color: var(--mauve-300); }
+
+/* FILTROS */
+.filter-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.pill { font-size: 13px; padding: 6px 16px; border-radius: var(--radius-pill); border: 1.5px solid var(--rose-200); background: var(--rose-50); color: var(--gray-500); cursor: pointer; transition: all 0.18s; }
+.pill:hover, .pill.ativo { border-color: var(--lila-300); background: var(--rose-100); color: var(--lila-700); }
+
+/* SEÇÕES */
+.section { padding: 4rem 2rem; }
+.section-alt { background: var(--rose-50); }
+.section-lila { background: var(--rose-100); }
+.container { max-width: 1080px; margin: 0 auto; }
+.section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mauve-500); margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 300; color: var(--lila-900); margin-bottom: 0.5rem; }
+.section-sub { font-size: 15px; color: var(--gray-500); margin-bottom: 2.5rem; }
+
+/* CARDS DE PSICÓLOGO */
+.psi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+.psi-card { background: var(--rose-50); border: 1.5px solid var(--rose-200); border-radius: var(--radius-md); padding: 1.5rem 1.25rem 1.25rem; display: flex; flex-direction: column; gap: 12px; transition: box-shadow 0.2s, transform 0.2s; }
+.psi-card:hover { box-shadow: 0 8px 28px rgba(155,111,216,0.1); transform: translateY(-2px); }
+.psi-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--rose-200); color: var(--lila-700); display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 500; font-family: var(--font-display); overflow: hidden; }
+.psi-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.psi-name { font-size: 15px; font-weight: 500; color: var(--gray-800); }
+.psi-crp { font-size: 11px; color: var(--mauve-300); margin-top: 1px; }
+.psi-abordagem { font-size: 13px; color: var(--gray-500); }
+.psi-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.tag { font-size: 11px; padding: 3px 10px; border-radius: var(--radius-pill); background: var(--verde-50); color: var(--verde-600); border: 1px solid rgba(90,181,147,0.25); }
+
+/* BOTÕES DE AÇÃO NOS CARDS */
+.psi-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 4px; }
+.btn-wpp { flex: 1; font-size: 13px; padding: 9px; border: none; border-radius: var(--radius-sm); background: var(--verde-500); color: #fff; cursor: pointer; font-family: var(--font-body); font-weight: 500; transition: background 0.18s; }
+.btn-wpp:hover { background: var(--verde-600); }
+.btn-ver { flex: 1; font-size: 13px; padding: 9px; border: 1.5px solid var(--rose-200); border-radius: var(--radius-sm); background: transparent; color: var(--lila-700); cursor: pointer; font-family: var(--font-body); font-weight: 500; transition: all 0.18s; }
+.btn-ver:hover { background: var(--rose-100); border-color: var(--lila-300); }
+
+/* LOADING / VAZIO */
+.estado-grid { grid-column: 1/-1; text-align: center; padding: 3rem 1rem; color: var(--mauve-300); }
+.skeleton { background: linear-gradient(90deg, var(--rose-100) 25%, var(--rose-50) 50%, var(--rose-100) 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: var(--radius-sm); }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.psi-card-skeleton { background: var(--rose-50); border: 1.5px solid var(--rose-100); border-radius: var(--radius-md); padding: 1.5rem 1.25rem; display: flex; flex-direction: column; gap: 12px; }
+
+/* COMO FUNCIONA */
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
+.step { background: var(--cream); border: 1.5px solid var(--rose-200); border-radius: var(--radius-md); padding: 2rem 1.5rem; }
+.step-num { font-family: var(--font-display); font-size: 3rem; font-weight: 300; color: var(--rose-200); line-height: 1; margin-bottom: 1rem; }
+.step-title { font-size: 16px; font-weight: 500; margin-bottom: 6px; color: var(--lila-900); }
+.step-desc { font-size: 14px; color: var(--gray-500); line-height: 1.6; }
+
+/* BLOG */
+.blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+.blog-card { background: var(--cream); border: 1.5px solid var(--rose-100); border-radius: var(--radius-md); overflow: hidden; transition: box-shadow 0.2s; }
+.blog-card:hover { box-shadow: 0 6px 20px rgba(155,111,216,0.08); }
+.blog-thumb { height: 130px; background: var(--rose-100); display: flex; align-items: center; justify-content: center; }
+.blog-body { padding: 1.1rem 1.25rem 1.25rem; }
+.blog-tag { font-size: 11px; color: var(--mauve-500); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.blog-title { font-size: 15px; font-weight: 500; line-height: 1.4; margin-bottom: 8px; color: var(--gray-800); }
+.blog-author { font-size: 12px; color: var(--mauve-300); }
+
+/* CTA BANNER */
+.cta-banner { background: var(--lila-900); border-radius: var(--radius-md); padding: 3rem 2rem; text-align: center; color: #fff; }
+.cta-banner h2 { font-family: var(--font-display); font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 300; margin-bottom: 0.75rem; }
+.cta-banner p { color: var(--lila-300); font-size: 15px; margin-bottom: 2rem; }
+
+/* FOOTER */
+footer { background: var(--lila-900); color: var(--lila-300); padding: 3rem 2rem 2rem; }
+.footer-inner { max-width: 1080px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between; padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.footer-logo { font-family: var(--font-display); font-size: 20px; font-style: italic; color: #fff; margin-bottom: 0.5rem; }
+.footer-desc { font-size: 13px; max-width: 220px; line-height: 1.6; }
+.footer-col h4 { font-size: 12px; font-weight: 500; color: #fff; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem; }
+.footer-col a { display: block; font-size: 14px; color: var(--lila-300); margin-bottom: 0.5rem; transition: color 0.2s; }
+.footer-col a:hover { color: #fff; }
+.footer-copy { max-width: 1080px; margin: 1.5rem auto 0; font-size: 12px; color: var(--lila-500); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+
+@media (max-width: 640px) {
+  nav { padding: 0 1rem; }
+  .nav-links a, .nav-links .btn-ghost { display: none; }
+  .hero { padding: 3rem 1rem 2.5rem; }
+  .section { padding: 3rem 1rem; }
+  .footer-inner { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Meu<span>Psi</span></a>
+  <div class="nav-links">
+    <a href="#psicologos">Psicólogos</a>
+    <a href="#blog">Blog</a>
+    <a href="cadastro.html">Para psicólogos</a>
+    <button class="btn btn-ghost">Entrar</button>
+    <button class="btn btn-primary" onclick="document.getElementById('psicologos').scrollIntoView({behavior:'smooth'})">Encontrar psicólogo</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div style="position:relative; z-index:1;">
+    <div class="hero-eyebrow">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>
+      Psicólogos verificados com CRP
+    </div>
+    <h1>O cuidado certo para <em>você</em></h1>
+    <p>Encontre psicólogos verificados que combinam com sua história, no seu tempo e no seu ritmo.</p>
+    <div class="search-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="inputBusca" placeholder="Busque por especialidade, abordagem ou nome…" />
+      <button class="btn btn-primary" onclick="buscar()">Buscar</button>
+    </div>
+    <div class="filter-row" id="filtros">
+      <span class="pill ativo" data-filtro="Todos" onclick="filtrar(this)">Todos</span>
+      <span class="pill" data-filtro="Ansiedade" onclick="filtrar(this)">Ansiedade</span>
+      <span class="pill" data-filtro="Depressão" onclick="filtrar(this)">Depressão</span>
+      <span class="pill" data-filtro="Relacionamentos" onclick="filtrar(this)">Relacionamentos</span>
+      <span class="pill" data-filtro="TCC" onclick="filtrar(this)">TCC</span>
+      <span class="pill" data-filtro="Psicanálise" onclick="filtrar(this)">Psicanálise</span>
+      <span class="pill" data-filtro="Luto" onclick="filtrar(this)">Luto</span>
+      <span class="pill" data-filtro="Online" onclick="filtrar(this)">Online</span>
+    </div>
+  </div>
+</section>
+
+<!-- PSICÓLOGOS -->
+<section class="section" id="psicologos">
+  <div class="container">
+    <p class="section-label">Profissionais</p>
+    <h2 class="section-title">Psicólogos disponíveis</h2>
+    <p class="section-sub" id="subtitulo">Todos com CRP verificado, prontos para te atender</p>
+    <div class="psi-grid" id="grid">
+      <div class="psi-card-skeleton">
+        <div class="skeleton" style="width:52px;height:52px;border-radius:50%"></div>
+        <div class="skeleton" style="height:14px;width:70%"></div>
+        <div class="skeleton" style="height:12px;width:40%"></div>
+        <div class="skeleton" style="height:12px;width:55%"></div>
+        <div style="display:flex;gap:8px">
+          <div class="skeleton" style="height:34px;flex:1;border-radius:8px"></div>
+          <div class="skeleton" style="height:34px;flex:1;border-radius:8px"></div>
+        </div>
+      </div>
+      <div class="psi-card-skeleton">
+        <div class="skeleton" style="width:52px;height:52px;border-radius:50%"></div>
+        <div class="skeleton" style="height:14px;width:60%"></div>
+        <div class="skeleton" style="height:12px;width:35%"></div>
+        <div class="skeleton" style="height:12px;width:65%"></div>
+        <div style="display:flex;gap:8px">
+          <div class="skeleton" style="height:34px;flex:1;border-radius:8px"></div>
+          <div class="skeleton" style="height:34px;flex:1;border-radius:8px"></div>
+        </div>
+      </div>
+      <div class="psi-card-skeleton">
+        <div class="skeleton" style="width:52px;height:52px;border-radius:50%"></div>
+        <div class="skeleton" style="height:14px;width:75%"></div>
+        <div class="skeleton" style="height:12px;width:40%"></div>
+        <div class="skeleton" style="height:12px;width:50%"></div>
+        <div style="display:flex;gap:8px">
+          <div class="skeleton" style="height:34px;flex:1;border-radius:8px"></div>
+          <div class="skeleton" style="height:34px;flex:1;border-radius:8px"></div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:2.5rem;" id="btnVerMais" style="display:none">
+      <button class="btn btn-ghost" onclick="carregarMais()">Ver mais psicólogos</button>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section class="section section-lila">
+  <div class="container">
+    <p class="section-label">Como funciona</p>
+    <h2 class="section-title">Três passos simples</h2>
+    <p class="section-sub">Do primeiro clique à sua primeira sessão</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <p class="step-title">Escolha</p>
+        <p class="step-desc">Filtre por especialidade, abordagem, valor ou disponibilidade e encontre quem combina com você.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <p class="step-title">Agende</p>
+        <p class="step-desc">Veja os horários disponíveis e marque sua sessão direto pela plataforma, sem intermediários.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <p class="step-title">Conecte-se</p>
+        <p class="step-desc">Inicie sua jornada de autocuidado com um psicólogo que é seu — no seu tempo, no seu ritmo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOG -->
+<section class="section section-alt" id="blog">
+  <div class="container">
+    <p class="section-label">Blog</p>
+    <h2 class="section-title">Saúde mental em palavras</h2>
+    <p class="section-sub">Conteúdo escrito por psicólogos da rede</p>
+    <div class="blog-grid">
+      <div class="blog-card">
+        <div class="blog-thumb">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--mauve-500)" stroke-width="1.2"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>
+        </div>
+        <div class="blog-body">
+          <p class="blog-tag">Autoestima</p>
+          <p class="blog-title">Autoestima da mãe: superando a sobrecarga emocional</p>
+          <p class="blog-author">Psicóloga Andreia Almeida · 2 min</p>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-thumb" style="background:var(--verde-50)">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--verde-500)" stroke-width="1.2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+        </div>
+        <div class="blog-body">
+          <p class="blog-tag">Autocrítica</p>
+          <p class="blog-title">Por que somos tão cruéis conosco mesmos?</p>
+          <p class="blog-author">Psicóloga Ana Lucia · 2 min</p>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-thumb">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--mauve-500)" stroke-width="1.2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+        <div class="blog-body">
+          <p class="blog-tag">Trabalho</p>
+          <p class="blog-title">O trabalho está fazendo mal? Entenda os sinais</p>
+          <p class="blog-author">Psicóloga Ana Lucia · 3 min</p>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:2.5rem;">
+      <button class="btn btn-ghost">Ver todos os artigos</button>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section" id="cadastro">
+  <div class="container">
+    <div class="cta-banner">
+      <h2>Você é psicólogo?</h2>
+      <p>Cadastre seu perfil, alcance mais pacientes e faça parte de uma rede comprometida com o cuidado em saúde mental.</p>
+      <a href="cadastro.html" class="btn btn-primary" style="font-size:15px; padding:12px 28px;">Cadastrar meu perfil</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <p class="footer-logo">MeuPsi</p>
+      <p class="footer-desc">Conectando pessoas a psicólogos verificados de forma simples, segura e acolhedora.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Plataforma</h4>
+      <a href="#psicologos">Encontrar psicólogo</a>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#blog">Blog</a>
+    </div>
+    <div class="footer-col">
+      <h4>Para psicólogos</h4>
+      <a href="cadastro.html">Cadastrar perfil</a>
+      <a href="#">Como funciona</a>
+      <a href="#">Planos</a>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <a href="#">Política de privacidade</a>
+      <a href="#">Termos de uso</a>
+      <a href="#">Contato</a>
+    </div>
+  </div>
+  <div class="footer-copy">
+    <span>© 2026 MeuPsi · Todos os direitos reservados</span>
+    <span>Feito com cuidado 💜</span>
+  </div>
+</footer>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────
+const SUPABASE_URL = 'https://zyfqynjfnnhpsbkwajup.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_1bUv_1N-cIWv7Icthh4fdQ_nH8rdJuz'
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+// ── ESTADO ──────────────────────────────────────────────────
+let filtroAtivo = 'Todos'
+let buscaAtiva = ''
+let pagina = 0
+const POR_PAGINA = 8
+
+// ── INICIALIZA ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  carregarPsicologos(true)
+  document.getElementById('inputBusca').addEventListener('keydown', e => {
+    if (e.key === 'Enter') buscar()
+  })
+})
+
+// ── BUSCA ───────────────────────────────────────────────────
+function buscar() {
+  buscaAtiva = document.getElementById('inputBusca').value.trim()
+  pagina = 0
+  carregarPsicologos(true)
+  document.getElementById('psicologos').scrollIntoView({ behavior: 'smooth' })
+}
+
+function filtrar(el) {
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('ativo'))
+  el.classList.add('ativo')
+  filtroAtivo = el.dataset.filtro
+  pagina = 0
+  carregarPsicologos(true)
+}
+
+function carregarMais() {
+  pagina++
+  carregarPsicologos(false)
+}
+
+// ── QUERY ───────────────────────────────────────────────────
+async function carregarPsicologos(resetar) {
+  if (resetar) mostrarSkeletons()
+  try {
+    let query = sb
+      .from('psicologos')
+      .select('id, nome, crp, abordagem, especialidades, telefone, foto_url, modalidade_online, aceita_pacientes')
+      .eq('status', 'aprovado')
+      .order('created_at', { ascending: false })
+      .range(pagina * POR_PAGINA, pagina * POR_PAGINA + POR_PAGINA - 1)
+
+    if (buscaAtiva) {
+      query = query.or(`nome.ilike.%${buscaAtiva}%,abordagem.ilike.%${buscaAtiva}%`)
+    }
+    if (filtroAtivo === 'Online') {
+      query = query.eq('modalidade_online', true)
+    } else if (filtroAtivo !== 'Todos') {
+      query = query.contains('especialidades', [filtroAtivo])
+    }
+
+    const { data, error } = await query
+    if (error) throw error
+    renderizar(data, resetar)
+  } catch (err) {
+    console.error(err)
+    document.getElementById('grid').innerHTML = `
+      <div class="estado-grid">
+        <p style="color:var(--gray-500)">Erro ao carregar psicólogos. Tente novamente.</p>
+      </div>`
+  }
+}
+
+// ── RENDER ──────────────────────────────────────────────────
+function renderizar(lista, resetar) {
+  const grid = document.getElementById('grid')
+  const btnMais = document.getElementById('btnVerMais')
+  const sub = document.getElementById('subtitulo')
+
+  if (resetar) grid.innerHTML = ''
+
+  if (lista.length === 0 && pagina === 0) {
+    grid.innerHTML = `
+      <div class="estado-grid">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--mauve-300)" stroke-width="1.5" style="margin:0 auto 1rem"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <p>Nenhum psicólogo encontrado para "<strong>${buscaAtiva || filtroAtivo}</strong>"</p>
+      </div>`
+    btnMais.style.display = 'none'
+    sub.textContent = 'Nenhum resultado encontrado'
+    return
+  }
+
+  sub.textContent = `${lista.length < POR_PAGINA ? '' : POR_PAGINA + '+'} psicólogos verificados, prontos para te atender`
+
+  lista.forEach(p => {
+    const iniciais = p.nome.split(' ').slice(0,2).map(n => n[0]).join('')
+    const tags = (p.especialidades || []).slice(0,3)
+    const wpp = p.telefone ? p.telefone.replace(/\D/g,'') : ''
+    const card = document.createElement('div')
+    card.className = 'psi-card'
+    card.innerHTML = `
+      <div class="psi-avatar">
+        ${p.foto_url
+          ? `<img src="${p.foto_url}" alt="${p.nome}" />`
+          : iniciais
+        }
+      </div>
+      <div>
+        <p class="psi-name">${p.nome}</p>
+        <p class="psi-crp">CRP ${p.crp}</p>
+        <p class="psi-abordagem">${p.abordagem || ''}</p>
+      </div>
+      <div class="psi-tags">
+        ${tags.map(t => `<span class="tag">${t}</span>`).join('')}
+        ${p.modalidade_online ? '<span class="tag">Online</span>' : ''}
+      </div>
+      <div class="psi-actions">
+        ${wpp
+          ? `<button class="btn-wpp" onclick="window.open('https://wa.me/55${wpp}','_blank')">WhatsApp</button>`
+          : `<button class="btn-wpp" disabled style="opacity:0.4;cursor:default">WhatsApp</button>`
+        }
+        <button class="btn-ver" onclick="window.location.href='perfil.html?id=${p.id}'">Ver perfil</button>
+      </div>`
+    grid.appendChild(card)
+  })
+
+  btnMais.style.display = lista.length === POR_PAGINA ? 'block' : 'none'
+}
+
+function mostrarSkeletons() {
+  document.getElementById('grid').innerHTML = [1,2,3].map(() => `
+    <div class="psi-card-skeleton">
+      <div class="skeleton" style="width:52px;height:52px;border-radius:50%"></div>
+      <div class="skeleton" style="height:14px;width:70%"></div>
+      <div class="skeleton" style="height:12px;width:40%"></div>
+      <div class="skeleton" style="height:12px;width:55%"></div>
+      <div style="display:flex;gap:8px">
+        <div class="skeleton" style="height:34px;flex:1;border-radius:8px"></div>
+        <div class="skeleton" style="height:34px;flex:1;border-radius:8px"></div>
+      </div>
+    </div>`).join('')
+}
+</script>
+</body>
+</html>
