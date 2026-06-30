@@ -188,7 +188,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', system-u
 </div>
 
 <script>
-const SUPABASE_URL = 'https://uqzmkctsjvjpohzbvtjv.supabase.co';
+const SUPABASE_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -199,13 +199,19 @@ async function init() {
   const { data: { session } } = await db.auth.getSession();
   if (!session) { window.location.href = 'login.html'; return; }
 
-  const { data: p } = await db.from('pacientes').select('*').eq('email', session.user.email).maybeSingle();
+  const { data: p } = await db.from('pacientes_meupsi').select('*').eq('email', session.user.email).maybeSingle();
   pacienteData = p;
 
-  const nome = p?.nome?.split(' ')[0] || 'Olá';
+  if (!p) {
+    alert('Não encontramos um cadastro de paciente vinculado a este login. Fale com seu psicólogo para verificar seu acesso.');
+    await db.auth.signOut();
+    window.location.href = 'login.html';
+    return;
+  }
+
+  const nome = p.nome?.split(' ')[0] || 'Olá';
   document.getElementById('topbar-nome').textContent = nome;
   document.getElementById('saudacao').textContent = 'Olá, ' + nome + '! 👋';
-  if (!p) return;
 
   // Dias em terapia
   if (p.data_inicio) {
