@@ -565,17 +565,22 @@ select.form-control { cursor: pointer; }
       .from('psicologos')
       .select('*')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
-    if (error) console.error('Erro ao carregar perfil de psicólogo:', error);
+    if (error) {
+      console.error('Erro ao carregar perfil de psicólogo:', error);
+    }
 
     if (data) {
       psicologo = data;
       preencherUI(data);
+      carregarStats();
+      carregarProximasSessoes();
+    } else {
+      // Usuário autenticado mas sem perfil de psicólogo
+      document.getElementById('sidebarNome').textContent = user.email || 'Usuário';
+      document.getElementById('proximasSessoes').innerHTML = '<div class="agenda-day"><p class="tag vazio">Perfil não encontrado.</p></div>';
     }
-
-    carregarStats();
-    carregarProximasSessoes();
   }
 
   function preencherUI(d) {
@@ -629,7 +634,7 @@ select.form-control { cursor: pointer; }
     const { count: cs } = await db.from('sessoes')
       .select('*', { count: 'exact', head: true })
       .eq('psicologo_id', psicologo.id)
-      .gte('data', ini.toISOString());
+      .gte('data_hora', ini.toISOString());
     document.getElementById('statSessoes').textContent = cs ?? '0';
 
     document.getElementById('statAvaliacao').textContent = (psicologo.avaliacao ?? '—');
