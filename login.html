@@ -332,8 +332,22 @@ const db = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 // redireciona se já logado
 db.auth.getSession().then(({ data: { session } }) => {
-  if (session) location.href = 'dashboard-psicologo.html';
+  if (session) redirectByRole(session.user);
 });
+
+async function redirectByRole(user) {
+  const { data: psi } = await db
+    .from('psicologos')
+    .select('id')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (psi) {
+    location.href = 'dashboard-psicologo.html';
+  } else {
+    location.href = 'dashboard-paciente.html';
+  }
+}
 
 // TABS
 function mostrarPanel(id) {
@@ -387,8 +401,8 @@ async function login() {
     return;
   }
 
-  // redireciona ao dashboard
-  location.href = 'dashboard-psicologo.html';
+  // redireciona ao dashboard correto
+  await redirectByRole(data.user);
 }
 
 // RECUPERAR SENHA
