@@ -94,7 +94,16 @@
     msg.textContent = '';
 
     // Criar usuário no Auth
-    const { data, error } = await sb.auth.signUp({ email, password: senha });
+    let data, error;
+    try {
+      ({ data, error } = await sb.auth.signUp({ email, password: senha }));
+    } catch (e) {
+      msg.textContent = 'Erro de rede: ' + e.message;
+      btn.disabled = false;
+      btn.textContent = 'Criar conta';
+      return;
+    }
+
     if (error) {
       msg.textContent = error.message;
       btn.disabled = false;
@@ -102,16 +111,34 @@
       return;
     }
 
+    // Supabase pode retornar user null se e-mail já cadastrado ou confirmação pendente
     const uid = data.user?.id;
-    if (uid) {
-      // Salvar perfil na tabela usuarios
-      await sb.from('usuarios').upsert({
-        id: uid, nome, email, telefone: telefone || null, papel: 'paciente'
-      }, { onConflict: 'id' });
+
+    if (!uid) {
+      // Provavelmente e-mail já existe — tenta logar direto
+      const { data: loginData, error: loginErr } = await sb.auth.signInWithPassword({ email, password: senha });
+      if (loginErr) {
+        msg.textContent = 'Conta já existe ou aguarda confirmação de e-mail.';
+        btn.disabled = false;
+        btn.textContent = 'Criar conta';
+        return;
+      }
+      // Salvou perfil antes, só redireciona
+      window.location.href = 'escolher-psicologo.html';
+      return;
     }
 
-    msg.className = 'msg ok';
-    msg.textContent = 'Conta criada! Redirecionando…';
+    // Salvar perfil na tabela usuarios
+    const { error: upsertErr } = await sb.from('usuarios').upsert({
+      id: uid, nome, email, telefone: telefone || null, papel: 'paciente'
+    }, { onConflict: 'id' });
+
+    if (upsertErr) {
+      msg.textContent = 'Conta criada mas erro ao salvar perfil: ' + upsertErr.message;
+    } else {
+      msg.className = 'msg ok';
+      msg.textContent = 'Conta criada! Redirecionando…';
+    }
     setTimeout(() => { window.location.href = 'escolher-psicologo.html'; }, 1800);
   });
 </script>
