@@ -222,7 +222,7 @@ footer { background: var(--lila-900); color: var(--lila-300); padding: 3rem 2rem
     <a href="#psicologos">Psicólogos</a>
     <a href="#blog">Blog</a>
     <a href="cadastro.html">Para psicólogos</a>
-    <button class="btn btn-ghost">Entrar</button>
+    <a href="login.html" class="btn btn-ghost">Entrar</a>
     <button class="btn btn-primary" onclick="document.getElementById('psicologos').scrollIntoView({behavior:'smooth'})">Encontrar psicólogo</button>
   </div>
 </nav>
@@ -331,40 +331,11 @@ footer { background: var(--lila-900); color: var(--lila-300); padding: 3rem 2rem
     <p class="section-label">Blog</p>
     <h2 class="section-title">Saúde mental em palavras</h2>
     <p class="section-sub">Conteúdo escrito por psicólogos da rede</p>
-    <div class="blog-grid">
-      <div class="blog-card">
-        <div class="blog-thumb">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--mauve-500)" stroke-width="1.2"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>
-        </div>
-        <div class="blog-body">
-          <p class="blog-tag">Autoestima</p>
-          <p class="blog-title">Autoestima da mãe: superando a sobrecarga emocional</p>
-          <p class="blog-author">Psicóloga Andreia Almeida · 2 min</p>
-        </div>
-      </div>
-      <div class="blog-card">
-        <div class="blog-thumb" style="background:var(--verde-50)">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--verde-500)" stroke-width="1.2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
-        </div>
-        <div class="blog-body">
-          <p class="blog-tag">Autocrítica</p>
-          <p class="blog-title">Por que somos tão cruéis conosco mesmos?</p>
-          <p class="blog-author">Psicóloga Ana Lucia · 2 min</p>
-        </div>
-      </div>
-      <div class="blog-card">
-        <div class="blog-thumb">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--mauve-500)" stroke-width="1.2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-        </div>
-        <div class="blog-body">
-          <p class="blog-tag">Trabalho</p>
-          <p class="blog-title">O trabalho está fazendo mal? Entenda os sinais</p>
-          <p class="blog-author">Psicóloga Ana Lucia · 3 min</p>
-        </div>
-      </div>
+    <div class="blog-grid" id="homeBlogGrid">
+      <div class="blog-card"><div class="blog-body"><p class="blog-author">Carregando artigos…</p></div></div>
     </div>
     <div style="text-align:center; margin-top:2.5rem;">
-      <button class="btn btn-ghost">Ver todos os artigos</button>
+      <a href="blog.html" class="btn btn-ghost">Ver todos os artigos</a>
     </div>
   </div>
 </section>
@@ -414,8 +385,8 @@ footer { background: var(--lila-900); color: var(--lila-300); padding: 3rem 2rem
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────────
-const SUPABASE_URL = 'https://zyfqynjfnnhpsbkwajup.supabase.co'
-const SUPABASE_ANON_KEY = 'sb_publishable_1bUv_1N-cIWv7Icthh4fdQ_nH8rdJuz'
+const SUPABASE_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_2u0U4PTZuMNCS4LkTgnBBQ_ltfjZYqo'
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // ── ESTADO ──────────────────────────────────────────────────
@@ -541,6 +512,8 @@ function renderizar(lista, resetar) {
   btnMais.style.display = lista.length === POR_PAGINA ? 'block' : 'none'
 }
 
+}
+
 function mostrarSkeletons() {
   document.getElementById('grid').innerHTML = [1,2,3].map(() => `
     <div class="psi-card-skeleton">
@@ -554,6 +527,35 @@ function mostrarSkeletons() {
       </div>
     </div>`).join('')
 }
+
+// ===== Prévia do blog (3 artigos mais recentes) =====
+async function carregarBlogHome() {
+  const grid = document.getElementById('homeBlogGrid')
+  const { data, error } = await sb
+    .from('blog_posts')
+    .select('titulo, slug, resumo, categoria, imagem_capa, psicologos(nome)')
+    .eq('status', 'publicado')
+    .order('publicado_em', { ascending: false })
+    .limit(3)
+
+  if (error || !data || !data.length) {
+    grid.innerHTML = `<div class="blog-card"><div class="blog-body"><p class="blog-author">Em breve, novos artigos por aqui.</p></div></div>`
+    return
+  }
+
+  grid.innerHTML = data.map(p => `
+    <a href="post.html?slug=${encodeURIComponent(p.slug)}" class="blog-card" style="text-decoration:none;color:inherit;display:block;">
+      <div class="blog-thumb" ${p.imagem_capa ? `style="background:url('${p.imagem_capa}') center/cover"` : ''}>
+        ${!p.imagem_capa ? `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--mauve-500)" stroke-width="1.2"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>` : ''}
+      </div>
+      <div class="blog-body">
+        <p class="blog-tag">${p.categoria || 'Saúde Mental'}</p>
+        <p class="blog-title">${p.titulo}</p>
+        <p class="blog-author">${p.psicologos?.nome || 'Equipe MeuPsi'}</p>
+      </div>
+    </a>`).join('')
+}
+carregarBlogHome()
 </script>
 </body>
 </html>
