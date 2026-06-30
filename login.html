@@ -330,22 +330,24 @@ const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
 const db = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-// redireciona se já logado
+// redireciona se já logado (guard contra loop)
+let _redirecionando = false;
 db.auth.getSession().then(({ data: { session } }) => {
-  if (session) redirectByRole(session.user);
+  if (session && !_redirecionando) redirectByRole(session.user);
 });
 
 async function redirectByRole(user) {
-  const { data: psi } = await db
-    .from('psicologos')
-    .select('id')
-    .eq('user_id', user.id)
-    .maybeSingle();
-
-  if (psi) {
-    location.href = 'dashboard-psicologo.html';
-  } else {
-    location.href = 'dashboard-paciente.html';
+  if (_redirecionando) return;
+  _redirecionando = true;
+  try {
+    const { data: psi } = await db
+      .from('psicologos')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    location.href = psi ? 'dashboard-psicologo.html' : 'dashboard-paciente.html';
+  } catch(e) {
+    _redirecionando = false;
   }
 }
 
@@ -402,7 +404,7 @@ async function login() {
   }
 
   // redireciona ao dashboard correto
-  await redirectByRole(data.user);
+  await redirectByRole(data.user || data.session.user);
 }
 
 // RECUPERAR SENHA
