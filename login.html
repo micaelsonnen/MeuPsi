@@ -330,15 +330,7 @@ const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
 const db = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-// redireciona se já logado (guard contra loop)
-let _redirecionando = false;
-db.auth.getSession().then(({ data: { session } }) => {
-  if (session && !_redirecionando) redirectByRole(session.user);
-});
-
 async function redirectByRole(user) {
-  if (_redirecionando) return;
-  _redirecionando = true;
   try {
     const { data: psi } = await db
       .from('psicologos')
@@ -347,7 +339,7 @@ async function redirectByRole(user) {
       .maybeSingle();
     location.href = psi ? 'dashboard-psicologo.html' : 'dashboard-paciente.html';
   } catch(e) {
-    _redirecionando = false;
+    console.error('Erro ao verificar perfil:', e);
   }
 }
 
