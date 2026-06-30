@@ -1,179 +1,140 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Escolher psicólogo — MeuPsi</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap');
-* { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #F7F4EF; --surface: #FFFFFF; --surface2: #f0ece6; --border: #E2DED8;
-  --navy: #2D4A6B; --sage: #5B8C6E; --text: #1A2332; --muted: #6B7A8D; --error: #b91c1c;
-}
-body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
-.topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 16px; }
-.logo-mark { width: 32px; height: 32px; background: linear-gradient(135deg, var(--navy), var(--sage)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: white; }
-.topbar h1 { font-size: 16px; font-weight: 700; color: var(--navy); }
-.topbar a.voltar { margin-left: auto; font-size: 14px; color: var(--muted); }
-.container { max-width: 760px; margin: 0 auto; padding: 28px; }
-.intro h2 { font-family: 'DM Serif Display', serif; font-size: 24px; margin-bottom: 6px; }
-.intro p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
-.lista-psi { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
-.psi-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 18px 20px; cursor: pointer; transition: border-color 0.15s; }
-.psi-card:hover { border-color: var(--navy); }
-.psi-card.selecionado { border-color: var(--navy); background: rgba(45,74,107,0.05); }
-.psi-nome { font-size: 16px; font-weight: 600; }
-.psi-crp { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-.psi-abordagem { font-size: 13px; color: var(--navy); margin-bottom: 4px; }
-.psi-bio { font-size: 13px; color: var(--muted); line-height: 1.5; }
-.psi-valor { font-size: 13px; font-weight: 600; margin-top: 8px; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
-.card h3 { font-size: 15px; font-weight: 600; margin-bottom: 14px; }
-.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-label { font-size: 13px; font-weight: 500; }
-input[type="date"], input[type="time"], textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 14px; }
-textarea { resize: vertical; min-height: 70px; }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.btn-primary { background: linear-gradient(135deg, var(--navy), var(--sage)); color: white; border: none; padding: 12px 24px; border-radius: 999px; cursor: pointer; font-size: 14px; font-weight: 600; }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-.feedback { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 14px; display: none; }
-.feedback.erro { background: #FEE2E2; color: #991B1B; }
-.feedback.sucesso { background: rgba(91,140,110,0.15); color: var(--sage); }
-.loading, .sem-dados { text-align: center; color: var(--muted); padding: 30px; font-size: 14px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escolher psicólogo — MeuPsi</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f0f4ff; min-height: 100vh; padding: 40px 20px; }
+
+    .container { max-width: 800px; margin: 0 auto; }
+    .logo { font-size: 24px; font-weight: 700; color: #4f46e5; margin-bottom: 8px; }
+    .subtitle { font-size: 15px; color: #6b7280; margin-bottom: 32px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      transition: box-shadow 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+    .card:hover { box-shadow: 0 4px 16px rgba(79,70,229,0.15); transform: translateY(-2px); }
+
+    .avatar {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #a78bfa);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 22px; font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .card-name { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 4px; }
+    .card-crp { font-size: 12px; color: #6b7280; margin-bottom: 10px; }
+    .card-bio { font-size: 13px; color: #4b5563; line-height: 1.5; margin-bottom: 16px; }
+
+    .btn-escolher {
+      display: block; width: 100%;
+      padding: 10px; background: #4f46e5; color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-escolher:hover { background: #4338ca; }
+    .btn-escolher:disabled { background: #a5b4fc; cursor: not-allowed; }
+
+    .empty { text-align: center; color: #9ca3af; font-size: 14px; padding: 60px 0; }
+    .msg-topo { margin-bottom: 16px; font-size: 13px; color: #10b981; font-weight: 500; }
+    .msg-erro { color: #ef4444; }
+  </style>
 </head>
 <body>
-
-<div class="topbar">
-  <div class="logo-mark">M</div>
-  <h1>Mind</h1>
-  <a class="voltar" href="dashboard-paciente.html">← Voltar ao painel</a>
-</div>
-
 <div class="container">
-  <div class="intro">
-    <h2>Escolha seu psicólogo</h2>
-    <p>Selecione um profissional, escolha um dia e horário, e envie o pedido. O psicólogo precisa aceitar para confirmar a sessão.</p>
-  </div>
-
-  <div id="lista-psi" class="lista-psi"><div class="loading">Carregando psicólogos…</div></div>
-
-  <div class="card" id="card-agendamento" style="display:none">
-    <h3>📅 Solicitar sessão com <span id="psi-escolhido-nome">—</span></h3>
-    <div id="feedback" class="feedback"></div>
-    <div class="field-row">
-      <div class="field">
-        <label for="data">Dia</label>
-        <input type="date" id="data" />
-      </div>
-      <div class="field">
-        <label for="hora">Horário</label>
-        <input type="time" id="hora" />
-      </div>
-    </div>
-    <div class="field">
-      <label for="mensagem">Mensagem (opcional)</label>
-      <textarea id="mensagem" placeholder="Conte rapidamente o motivo da busca ou alguma preferência de horário…"></textarea>
-    </div>
-    <button class="btn-primary" id="btnEnviar" onclick="enviarSolicitacao()">Enviar pedido de sessão</button>
+  <div class="logo">MeuPsi</div>
+  <div class="subtitle">Escolha o psicólogo que vai te acompanhar.</div>
+  <div id="msgTopo" class="msg-topo" style="display:none"></div>
+  <div class="grid" id="grid">
+    <div class="empty">Carregando psicólogos…</div>
   </div>
 </div>
 
 <script>
-const SUPABASE_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const SUPA_URL = 'https://gqjkslbktxxpyquuklty.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamtzbGJrdHh4cHlxdXVrbHR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI3NTU5MDQsImV4cCI6MjA1ODMzMTkwNH0.aAuZPQKFnHvRK_63Gy8OOLnHDHd4sJlnDHLo1Vfy5yw';
 
-let pacienteId = null;
-let psiSelecionado = null;
+  const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  let pacienteId = null;
 
-async function init() {
-  const { data: { session } } = await db.auth.getSession();
-  if (!session) { location.href = 'login.html'; return; }
-
-  const { data: p } = await db.from('pacientes').select('id').eq('user_id', session.user.id).maybeSingle();
-  if (!p) { location.href = 'cadastro-paciente.html'; return; }
-  pacienteId = p.id;
-
-  carregarPsicologos();
-}
-
-async function carregarPsicologos() {
-  const { data, error } = await db.from('psicologos')
-    .select('id, nome, crp, abordagem, bio, preco_exato, preco_faixa')
-    .eq('ativo', true);
-
-  const el = document.getElementById('lista-psi');
-  if (error || !data?.length) {
-    el.innerHTML = '<div class="sem-dados">Nenhum psicólogo disponível no momento.</div>';
-    return;
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+    pacienteId = session.user.id;
+    await carregarPsicologos();
   }
 
-  el.innerHTML = data.map(psi => `
-    <div class="psi-card" data-id="${psi.id}" data-nome="${psi.nome}" onclick="selecionarPsi(this)">
-      <div class="psi-nome">${psi.nome}</div>
-      <div class="psi-crp">CRP ${psi.crp || '—'}</div>
-      ${psi.abordagem ? `<div class="psi-abordagem">${psi.abordagem}</div>` : ''}
-      ${psi.bio ? `<div class="psi-bio">${psi.bio}</div>` : ''}
-      ${psi.preco_exato ? `<div class="psi-valor">R$ ${Number(psi.preco_exato).toFixed(0)} / sessão</div>` : (psi.preco_faixa ? `<div class="psi-valor">${psi.preco_faixa}</div>` : '')}
-    </div>
-  `).join('');
-}
+  async function carregarPsicologos() {
+    const { data, error } = await sb
+      .from('usuarios')
+      .select('id, nome, crp, bio')
+      .eq('papel', 'psicologo')
+      .order('nome');
 
-function selecionarPsi(el) {
-  document.querySelectorAll('.psi-card').forEach(c => c.classList.remove('selecionado'));
-  el.classList.add('selecionado');
-  psiSelecionado = { id: el.dataset.id, nome: el.dataset.nome };
-  document.getElementById('psi-escolhido-nome').textContent = psiSelecionado.nome;
-  document.getElementById('card-agendamento').style.display = 'block';
-  document.getElementById('card-agendamento').scrollIntoView({ behavior: 'smooth' });
-}
+    const grid = document.getElementById('grid');
 
-async function enviarSolicitacao() {
-  const fb = document.getElementById('feedback');
-  const btn = document.getElementById('btnEnviar');
-  const data = document.getElementById('data').value;
-  const hora = document.getElementById('hora').value;
-  const mensagem = document.getElementById('mensagem').value.trim();
+    if (error || !data?.length) {
+      grid.innerHTML = '<div class="empty">Nenhum psicólogo disponível no momento.</div>';
+      return;
+    }
 
-  fb.style.display = 'none';
-  if (!psiSelecionado || !data || !hora) {
-    fb.className = 'feedback erro'; fb.style.display = 'block';
-    fb.textContent = 'Escolha um psicólogo, dia e horário.'; return;
+    grid.innerHTML = data.map(p => `
+      <div class="card">
+        <div class="avatar">${(p.nome ?? 'P')[0].toUpperCase()}</div>
+        <div class="card-name">${p.nome ?? 'Psicólogo'}</div>
+        <div class="card-crp">${p.crp ? 'CRP ' + p.crp : ''}</div>
+        <div class="card-bio">${p.bio ?? 'Psicólogo cadastrado na plataforma MeuPsi.'}</div>
+        <button class="btn-escolher" data-id="${p.id}">Escolher</button>
+      </div>
+    `).join('');
+
+    grid.querySelectorAll('.btn-escolher').forEach(btn => {
+      btn.addEventListener('click', () => escolher(btn.dataset.id, btn));
+    });
   }
 
-  btn.disabled = true; btn.textContent = 'Enviando...';
+  async function escolher(psicologoId, btn) {
+    btn.disabled = true;
+    btn.textContent = 'Vinculando…';
 
-  const data_hora = new Date(`${data}T${hora}:00`).toISOString();
+    const { error } = await sb
+      .from('pacientes')
+      .upsert({ id: pacienteId, psicologo_id: psicologoId, status: 'pendente' }, { onConflict: 'id' });
 
-  const { error } = await db.from('solicitacoes_sessao').insert({
-    paciente_id: pacienteId,
-    psicologo_id: psiSelecionado.id,
-    data_hora,
-    mensagem: mensagem || null,
-    status: 'pendente'
-  });
+    const msg = document.getElementById('msgTopo');
+    if (error) {
+      msg.textContent = 'Erro ao escolher psicólogo: ' + error.message;
+      msg.className = 'msg-topo msg-erro';
+      msg.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Escolher';
+      return;
+    }
 
-  btn.disabled = false; btn.textContent = 'Enviar pedido de sessão';
-
-  if (error) {
-    fb.className = 'feedback erro'; fb.style.display = 'block';
-    fb.textContent = 'Erro ao enviar pedido: ' + error.message;
-    return;
+    msg.textContent = 'Psicólogo escolhido com sucesso! Redirecionando…';
+    msg.style.display = 'block';
+    setTimeout(() => { window.location.href = 'dashboard-paciente.html'; }, 1800);
   }
 
-  // marca o paciente como aguardando resposta deste psicólogo
-  await db.from('pacientes').update({ status: 'aguardando_psicologo' }).eq('id', pacienteId);
-
-  fb.className = 'feedback sucesso'; fb.style.display = 'block';
-  fb.textContent = '✓ Pedido enviado! Você será avisado(a) quando o psicólogo confirmar.';
-  setTimeout(() => location.href = 'dashboard-paciente.html', 1500);
-}
-
-init();
+  init();
 </script>
-
 </body>
 </html>
