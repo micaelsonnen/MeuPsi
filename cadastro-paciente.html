@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Criar minha conta — MeuPsi</title>
+<meta name="description" content="Crie sua conta de paciente no MeuPsi e escolha seu psicólogo." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --lila-50: #F5F0FB; --lila-100: #E8DCFA; --lila-300: #C4A8F0; --lila-500: #9B6FD8; --lila-700: #6B3FA8; --lila-900: #3B1E62;
+  --verde-400: #4CAF7D; --verde-500: #3A9E6A; --verde-600: #2D8055; --verde-50: #EBF7F1;
+  --cream: #FDFBF8; --gray-100: #F0EDE8; --gray-300: #C8C4BC; --gray-500: #8A8680; --gray-800: #2E2C29;
+  --font-display: 'Fraunces', Georgia, serif; --font-body: 'DM Sans', system-ui, sans-serif;
+  --radius-sm: 8px; --radius-md: 14px; --radius-pill: 999px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); background: var(--cream); color: var(--gray-800); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 3rem 1.5rem; }
+a { text-decoration: none; color: inherit; }
+.logo { font-family: var(--font-display); font-size: 24px; font-style: italic; color: var(--lila-700); margin-bottom: 1.75rem; }
+.logo span { color: var(--verde-500); font-style: normal; }
+.box { width: 100%; max-width: 420px; background: #fff; border: 1.5px solid var(--lila-100); border-radius: var(--radius-md); padding: 2rem; }
+h1 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 300; color: var(--lila-900); margin-bottom: 0.3rem; }
+.sub { font-size: 14px; color: var(--gray-500); margin-bottom: 1.75rem; }
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+label { font-size: 13px; font-weight: 500; }
+input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--gray-300); border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 14px; outline: none; }
+input:focus { border-color: var(--lila-500); box-shadow: 0 0 0 3px rgba(155,111,216,0.08); }
+.btn-primary { width: 100%; padding: 0.85rem; background: var(--lila-700); color: #fff; border: none; border-radius: var(--radius-pill); font-size: 15px; font-weight: 500; cursor: pointer; margin-top: 0.5rem; }
+.btn-primary:hover { background: var(--lila-900); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.feedback { padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 1rem; display: none; }
+.feedback.erro { background: #FEE2E2; color: #991B1B; }
+.feedback.sucesso { background: var(--verde-50); color: var(--verde-600); }
+.foot { text-align: center; margin-top: 1.5rem; font-size: 14px; color: var(--gray-500); }
+.foot a { color: var(--lila-700); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="logo">Meu<span>Psi</span></a>
+
+<div class="box">
+  <h1>Criar minha conta</h1>
+  <p class="sub">Você escolhe o psicólogo depois — primeiro vamos criar seu acesso.</p>
+
+  <div id="feedback" class="feedback"></div>
+
+  <div class="field">
+    <label for="nome">Nome completo</label>
+    <input type="text" id="nome" placeholder="Seu nome" autocomplete="name" />
+  </div>
+  <div class="field">
+    <label for="email">E-mail</label>
+    <input type="email" id="email" placeholder="seu@email.com" autocomplete="email" />
+  </div>
+  <div class="field">
+    <label for="senha">Senha</label>
+    <input type="password" id="senha" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+  </div>
+
+  <button class="btn-primary" id="btnCriar" onclick="criarConta()">Criar minha conta</button>
+
+  <div class="foot">Já tem conta? <a href="login.html">Entrar</a></div>
+</div>
+
+<script>
+const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
+const db = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+async function criarConta() {
+  const fb = document.getElementById('feedback');
+  const btn = document.getElementById('btnCriar');
+  const nome = document.getElementById('nome').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value;
+
+  fb.style.display = 'none';
+  if (!nome || !email || !senha) {
+    fb.className = 'feedback erro'; fb.style.display = 'block';
+    fb.textContent = 'Preencha nome, e-mail e senha.'; return;
+  }
+  if (senha.length < 6) {
+    fb.className = 'feedback erro'; fb.style.display = 'block';
+    fb.textContent = 'A senha deve ter pelo menos 6 caracteres.'; return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Criando...';
+
+  // 1) cria o usuário no Supabase Auth
+  const { data, error } = await db.auth.signUp({ email, password: senha });
+
+  if (error) {
+    btn.disabled = false; btn.textContent = 'Criar minha conta';
+    fb.className = 'feedback erro'; fb.style.display = 'block';
+    fb.textContent = traduzirErro(error.message);
+    return;
+  }
+
+  const user = data.user;
+
+  // 2) cria a linha em pacientes já vinculada por user_id (sem psicólogo ainda)
+  const { error: errPaciente } = await db.from('pacientes').insert({
+    user_id: user.id,
+    nome,
+    email,
+    status: 'incompleto',
+    data_inicio: new Date().toISOString()
+  });
+
+  btn.disabled = false; btn.textContent = 'Criar minha conta';
+
+  if (errPaciente) {
+    fb.className = 'feedback erro'; fb.style.display = 'block';
+    fb.textContent = 'Conta criada, mas houve um erro ao salvar seu perfil: ' + errPaciente.message;
+    return;
+  }
+
+  fb.className = 'feedback sucesso'; fb.style.display = 'block';
+  fb.textContent = '✓ Conta criada! Redirecionando…';
+
+  // se o projeto exigir confirmação de e-mail, data.session será null
+  if (data.session) {
+    setTimeout(() => location.href = 'dashboard-paciente.html', 800);
+  } else {
+    fb.textContent = '✓ Conta criada! Confirme seu e-mail e depois faça login.';
+    setTimeout(() => location.href = 'login.html', 1800);
+  }
+}
+
+document.getElementById('senha').addEventListener('keydown', e => { if (e.key === 'Enter') criarConta(); });
+
+function traduzirErro(msg) {
+  if (msg.includes('already registered')) return 'Já existe uma conta com este e-mail.';
+  if (msg.includes('Password')) return 'Senha muito curta ou inválida.';
+  return 'Erro: ' + msg;
+}
+</script>
+
+</body>
+</html>
