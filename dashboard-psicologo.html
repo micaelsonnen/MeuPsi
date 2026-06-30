@@ -10,7 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
-  --lila-50:  #F5F0FB;
+  --lila-50: #F5F0FB;
   --lila-100: #E8DCFA;
   --lila-300: #C4A8F0;
   --lila-500: #9B6FD8;
@@ -19,15 +19,15 @@
   --verde-400: #4CAF7D;
   --verde-500: #3A9E6A;
   --verde-600: #2D8055;
-  --verde-50:  #EBF7F1;
+  --verde-50: #EBF7F1;
   --rosa-100: #F5E2EA;
-  --cream:    #FDFBF8;
+  --cream: #FDFBF8;
   --gray-100: #F0EDE8;
   --gray-300: #C8C4BC;
   --gray-500: #8A8680;
   --gray-800: #2E2C29;
   --font-display: 'Fraunces', Georgia, serif;
-  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 22px;
@@ -38,11 +38,7 @@
 html { scroll-behavior: smooth; }
 body { font-family: var(--font-body); background: var(--cream); color: var(--gray-800); font-size: 16px; line-height: 1.6; min-height: 100vh; }
 a { text-decoration: none; color: inherit; }
-
-/* ── LAYOUT ── */
 .layout { display: flex; min-height: 100vh; }
-
-/* ── SIDEBAR ── */
 .sidebar {
   width: var(--sidebar-w);
   background: var(--lila-900);
@@ -61,7 +57,6 @@ a { text-decoration: none; color: inherit; }
   color: #fff;
 }
 .sidebar-logo a span { color: var(--verde-400); font-style: normal; }
-
 .sidebar-user {
   padding: 1.25rem 1.5rem;
   display: flex; align-items: center; gap: 12px;
@@ -78,7 +73,6 @@ a { text-decoration: none; color: inherit; }
 .user-info { overflow: hidden; }
 .user-name { font-size: 14px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .user-crp { font-size: 12px; color: rgba(255,255,255,0.5); }
-
 nav.sidebar-nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
 .nav-section { padding: 0.5rem 1.5rem 0.25rem; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; color: rgba(255,255,255,0.35); text-transform: uppercase; }
 .nav-item {
@@ -92,7 +86,6 @@ nav.sidebar-nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
 .nav-item.ativo { background: rgba(155,111,216,0.2); color: #fff; border-left-color: var(--lila-300); }
 .nav-item svg { flex-shrink: 0; opacity: 0.7; }
 .nav-item.ativo svg { opacity: 1; }
-
 .sidebar-bottom {
   padding: 1rem 1.5rem;
   border-top: 1px solid rgba(255,255,255,0.08);
@@ -104,14 +97,11 @@ nav.sidebar-nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
   background: none; border: none; font-family: inherit;
 }
 .btn-sair:hover { color: #fff; }
-
-/* ── MAIN ── */
 .main {
   margin-left: var(--sidebar-w);
   flex: 1; display: flex; flex-direction: column;
   min-height: 100vh;
 }
-
 .topbar {
   background: #fff;
   border-bottom: 1px solid var(--lila-100);
@@ -130,11 +120,7 @@ nav.sidebar-nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
 .badge-status.ativo { background: var(--verde-50); color: var(--verde-600); }
 .badge-status.pendente { background: #FEF3C7; color: #92400E; }
 .badge-status .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-
-/* ── PAGE CONTENT ── */
 .page { padding: 2rem; max-width: 960px; }
-
-/* ── TABS ── */
 .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--lila-100); margin-bottom: 2rem; }
 .tab-btn {
   padding: 0.75rem 1.5rem;
@@ -148,8 +134,6 @@ nav.sidebar-nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
 .tab-btn.ativo { color: var(--lila-700); border-bottom-color: var(--lila-500); }
 .tab-panel { display: none; }
 .tab-panel.ativo { display: block; }
-
-/* ── CARDS ── */
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
 .stat-card {
   background: #fff;
@@ -160,8 +144,6 @@ nav.sidebar-nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
 .stat-label { font-size: 12px; color: var(--gray-500); margin-bottom: 4px; }
 .stat-value { font-family: var(--font-display); font-size: 2rem; font-weight: 300; color: var(--lila-700); line-height: 1; }
 .stat-sub { font-size: 12px; color: var(--verde-500); margin-top: 4px; }
-
-/* ── LISTA DE PACIENTES ── */
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
 .section-title { font-family: var(--font-display); font-size: 18px; font-weight: 300; color: var(--lila-900); }
 .btn-primary {
@@ -180,14 +162,12 @@ nav.sidebar-nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
   border: 1px solid var(--lila-300); cursor: pointer; transition: all 0.2s;
 }
 .btn-ghost:hover { background: var(--lila-50); }
-
 .card {
   background: #fff;
   border: 1px solid var(--lila-100);
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
-
 .paciente-row {
   display: flex; align-items: center; gap: 1rem;
   padding: 1rem 1.5rem;
@@ -209,8 +189,6 @@ nav.sidebar-nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
 .btn-sm.outline:hover { background: var(--lila-50); }
 .btn-sm.green { color: var(--verde-600); border-color: var(--verde-400); background: transparent; }
 .btn-sm.green:hover { background: var(--verde-50); }
-
-/* ── PERFIL / CONFIG ── */
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; }
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-group.full { grid-column: 1 / -1; }
@@ -226,7 +204,6 @@ label { font-size: 13px; font-weight: 500; color: var(--gray-800); }
 .form-control:focus { outline: none; border-color: var(--lila-500); }
 textarea.form-control { resize: vertical; min-height: 100px; }
 select.form-control { cursor: pointer; }
-
 .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem; }
 .price-option {
   border: 2px solid var(--gray-100);
@@ -242,7 +219,6 @@ select.form-control { cursor: pointer; }
 .price-range { font-size: 12px; color: var(--gray-500); }
 .price-custom { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
 .price-custom input { width: 100px; }
-
 .avatar-upload {
   display: flex; align-items: center; gap: 1.5rem;
   padding: 1.5rem;
@@ -260,16 +236,11 @@ select.form-control { cursor: pointer; }
 .avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
 .avatar-info { flex: 1; }
 .avatar-info p { font-size: 13px; color: var(--gray-500); margin-top: 4px; }
-
 .divider { border: none; border-top: 1px solid var(--gray-100); margin: 2rem 0; }
-
 .form-section-title { font-family: var(--font-display); font-size: 16px; font-weight: 300; color: var(--lila-700); margin-bottom: 1rem; }
-
 .feedback { padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 14px; display: none; }
 .feedback.sucesso { background: var(--verde-50); color: var(--verde-600); }
 .feedback.erro { background: #FEE2E2; color: #991B1B; }
-
-/* ── AGENDA SIMPLES ── */
 .agenda-day {
   background: #fff; border: 1px solid var(--lila-100);
   border-radius: var(--radius-md); padding: 1.25rem 1.5rem;
@@ -289,11 +260,7 @@ select.form-control { cursor: pointer; }
 .tag.online { background: var(--lila-100); color: var(--lila-700); }
 .tag.presencial { background: var(--rosa-100); color: #7A3A5A; }
 .tag.vazio { color: var(--gray-300); font-size: 13px; }
-
-/* ── LOADING ── */
 .loading { text-align: center; padding: 3rem; color: var(--gray-500); font-size: 14px; }
-
-/* ── MOBILE TOGGLE ── */
 .menu-toggle {
   display: none; background: none; border: none;
   cursor: pointer; padding: 8px; color: var(--lila-700);
@@ -311,10 +278,7 @@ select.form-control { cursor: pointer; }
 </style>
 </head>
 <body>
-
 <div class="layout">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <a href="index.html">Meu<span>Psi</span></a>
@@ -358,7 +322,6 @@ select.form-control { cursor: pointer; }
     </div>
   </aside>
 
-  <!-- MAIN -->
   <div class="main">
     <div class="topbar">
       <div style="display:flex;align-items:center;gap:12px;">
@@ -373,8 +336,6 @@ select.form-control { cursor: pointer; }
     </div>
 
     <div class="page">
-
-      <!-- ── TAB: INÍCIO ── -->
       <div class="tab-panel ativo" id="tab-inicio">
         <div class="stats-grid" id="statsGrid">
           <div class="stat-card">
@@ -408,7 +369,6 @@ select.form-control { cursor: pointer; }
         </div>
       </div>
 
-      <!-- ── TAB: PACIENTES ── -->
       <div class="tab-panel" id="tab-pacientes">
         <div class="section-header">
           <span class="section-title">Meus pacientes</span>
@@ -422,7 +382,6 @@ select.form-control { cursor: pointer; }
         </div>
       </div>
 
-      <!-- ── TAB: AGENDA ── -->
       <div class="tab-panel" id="tab-agenda">
         <div class="section-header">
           <span class="section-title">Agenda semanal</span>
@@ -432,7 +391,6 @@ select.form-control { cursor: pointer; }
         </div>
       </div>
 
-      <!-- ── TAB: PERFIL ── -->
       <div class="tab-panel" id="tab-perfil">
         <div class="card" style="padding:1.75rem;">
           <h2 class="form-section-title">Foto de perfil</h2>
@@ -444,7 +402,6 @@ select.form-control { cursor: pointer; }
               <input type="file" id="fotoInput" accept="image/*" style="margin-top:8px;font-size:13px;" onchange="previewFoto(this)" />
             </div>
           </div>
-
           <hr class="divider" />
           <h2 class="form-section-title">Informações profissionais</h2>
           <div class="form-grid">
@@ -493,7 +450,6 @@ select.form-control { cursor: pointer; }
               <input class="form-control" id="pCidade" type="text" placeholder="São Paulo, SP" />
             </div>
           </div>
-
           <hr class="divider" />
           <h2 class="form-section-title">Valor da sessão</h2>
           <p style="font-size:13px;color:var(--gray-500);margin-bottom:1rem;">Aparece no seu perfil público como faixa de preço.</p>
@@ -531,7 +487,6 @@ select.form-control { cursor: pointer; }
             <input type="number" class="form-control price-custom" id="pPrecoExato" placeholder="Valor exato (opcional)" style="max-width:220px;" />
             <span style="font-size:13px;color:var(--gray-500);">R$ por sessão</span>
           </div>
-
           <hr class="divider" />
           <div id="feedbackPerfil" class="feedback"></div>
           <button class="btn-primary" onclick="salvarPerfil()" style="width:100%;justify-content:center;padding:0.85rem;">
@@ -540,7 +495,6 @@ select.form-control { cursor: pointer; }
         </div>
       </div>
 
-      <!-- ── TAB: CONFIG ── -->
       <div class="tab-panel" id="tab-config">
         <div class="card" style="padding:1.75rem;">
           <h2 class="form-section-title">Configurações da conta</h2>
@@ -554,7 +508,6 @@ select.form-control { cursor: pointer; }
               <input class="form-control" id="cWhatsapp" type="tel" placeholder="(11) 99999-9999" />
             </div>
           </div>
-
           <hr class="divider" />
           <h2 class="form-section-title">Alterar senha</h2>
           <div class="form-grid">
@@ -567,7 +520,6 @@ select.form-control { cursor: pointer; }
               <input class="form-control" id="cSenhaConf" type="password" placeholder="Repita a senha" />
             </div>
           </div>
-
           <hr class="divider" />
           <h2 class="form-section-title">Visibilidade do perfil</h2>
           <div style="display:flex;align-items:center;gap:12px;margin-top:0.5rem;">
@@ -584,7 +536,6 @@ select.form-control { cursor: pointer; }
             </label>
             <span style="font-size:14px;" id="toggleLabel">Perfil visível para pacientes</span>
           </div>
-
           <hr class="divider" />
           <div id="feedbackConfig" class="feedback"></div>
           <button class="btn-primary" onclick="salvarConfig()" style="width:100%;justify-content:center;padding:0.85rem;">
@@ -592,293 +543,288 @@ select.form-control { cursor: pointer; }
           </button>
         </div>
       </div>
-
-    </div><!-- /page -->
-  </div><!-- /main -->
-</div><!-- /layout -->
+    </div>
+  </div>
+</div>
 
 <script>
-const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
-const db = supabase.createClient(SUPA_URL, SUPA_KEY);
+  const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
+  const SUPA_KEY = 'sb_publishable_2u0U4PTZuMNCS4LkTgnBBQ_ltfjZYqo';
+  const db = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-let psicologo = null;
+  let psicologo = null;
 
-// ── INIT ──
-async function init() {
-  const { data: { user } } = await db.auth.getUser();
-  if (!user) { location.href = 'cadastro.html'; return; }
+  async function init() {
+    const { data: { user }, error: errUser } = await db.auth.getUser();
+    if (errUser) console.error('Erro ao obter usuário:', errUser);
+    if (!user) { location.href = 'login.html'; return; }
 
-  document.getElementById('cEmail').value = user.email || '';
+    document.getElementById('cEmail').value = user.email || '';
 
-  const { data } = await db
-    .from('psicologos')
-    .select('*')
-    .eq('user_id', user.id)
-    .single();
+    const { data, error } = await db
+      .from('psicologos')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
 
-  if (data) {
-    psicologo = data;
-    preencherUI(data);
+    if (error) console.error('Erro ao carregar perfil de psicólogo:', error);
+
+    if (data) {
+      psicologo = data;
+      preencherUI(data);
+    }
+
+    carregarStats();
+    carregarProximasSessoes();
   }
 
-  carregarStats();
-  carregarProximasSessoes();
-}
+  function preencherUI(d) {
+    const iniciais = (d.nome || '?').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+    document.getElementById('sidebarAvatar').textContent = iniciais;
+    document.getElementById('avatarPreview').textContent = iniciais;
+    document.getElementById('sidebarNome').textContent = d.nome || 'Psicólogo';
+    document.getElementById('sidebarCrp').textContent = 'CRP ' + (d.crp || '—');
 
-function preencherUI(d) {
-  const iniciais = (d.nome || '?').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
-  document.getElementById('sidebarAvatar').textContent = iniciais;
-  document.getElementById('avatarPreview').textContent = iniciais;
-  document.getElementById('sidebarNome').textContent = d.nome || 'Psicólogo';
-  document.getElementById('sidebarCrp').textContent = 'CRP ' + (d.crp || '—');
+    if (d.foto_url) {
+      ['sidebarAvatar','avatarPreview'].forEach(id => {
+        const el = document.getElementById(id);
+        el.innerHTML = `<img src="${d.foto_url}" alt="foto" />`;
+      });
+    }
 
-  if (d.foto_url) {
+    document.getElementById('pNome').value = d.nome || '';
+    document.getElementById('pCrp').value = d.crp || '';
+    document.getElementById('pBio').value = d.bio || '';
+    document.getElementById('pAbordagem').value = d.abordagem || '';
+    document.getElementById('pCidade').value = d.cidade || '';
+    document.getElementById('pPrecoExato').value = d.preco_exato || '';
+    if (d.especialidade) document.getElementById('pEspecialidade').value = d.especialidade;
+    if (d.modalidade) document.getElementById('pModalidade').value = d.modalidade;
+
+    if (d.preco_faixa) {
+      const radio = document.querySelector(`input[value="${d.preco_faixa}"]`);
+      if (radio) selecionarPreco(radio.closest('.price-option'));
+    }
+
+    const tog = document.getElementById('toggleAtivo');
+    tog.checked = d.ativo !== false;
+    atualizarToggle(tog.checked);
+
+    if (!d.ativo) {
+      const badge = document.getElementById('statusBadge');
+      badge.className = 'badge-status pendente';
+      badge.innerHTML = '<span class="dot"></span> Oculto';
+    }
+  }
+
+  async function carregarStats() {
+    if (!psicologo) return;
+
+    const { count: cp } = await db.from('pacientes_meupsi')
+      .select('*', { count: 'exact', head: true })
+      .eq('psicologo_id', psicologo.id);
+    document.getElementById('statPacientes').textContent = cp ?? '0';
+
+    const ini = new Date(); ini.setDate(1); ini.setHours(0,0,0,0);
+    const { count: cs } = await db.from('sessoes')
+      .select('*', { count: 'exact', head: true })
+      .eq('psicologo_id', psicologo.id)
+      .gte('data', ini.toISOString());
+    document.getElementById('statSessoes').textContent = cs ?? '0';
+
+    document.getElementById('statAvaliacao').textContent = (psicologo.avaliacao ?? '—');
+    document.getElementById('statVisitas').textContent = (psicologo.visitas ?? '—');
+  }
+
+  async function carregarProximasSessoes() {
+    const container = document.getElementById('proximasSessoes');
+    if (!psicologo) { container.innerHTML = '<div class="loading">Sem dados.</div>'; return; }
+
+    const agora = new Date().toISOString();
+    const { data, error } = await db.from('sessoes')
+      .select('*, pacientes_meupsi(nome)')
+      .eq('psicologo_id', psicologo.id)
+      .gte('data_hora', agora)
+      .order('data_hora', { ascending: true })
+      .limit(5);
+
+    if (!data || data.length === 0) {
+      container.innerHTML = '<div class="agenda-day"><p class="tag vazio">Nenhuma sessão agendada.</p></div>';
+      return;
+    }
+
+    container.innerHTML = data.map(s => {
+      const dt = new Date(s.data_hora);
+      const hora = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      const dia = dt.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' });
+      return `
+        <div class="agenda-day">
+          <div class="agenda-day-title">${dia}</div>
+          <div class="sessao-item">
+            <span class="sessao-hora">${hora}</span>
+            <span class="sessao-nome">${s.pacientes_meupsi?.nome || 'Paciente'}</span>
+            <span class="tag ${s.tipo === 'online' ? 'online' : 'presencial'}">${s.tipo || 'online'}</span>
+          </div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('agendaCompleta').innerHTML = container.innerHTML;
+  }
+
+  async function carregarPacientes() {
+    const container = document.getElementById('listaPacientes');
+    if (!psicologo) { container.innerHTML = '<div class="loading">Sem dados.</div>'; return; }
+
+    const { data, error } = await db.from('pacientes_meupsi')
+      .select('*')
+      .eq('psicologo_id', psicologo.id)
+      .order('nome');
+
+    if (!data || data.length === 0) {
+      container.innerHTML = '<div class="paciente-row"><p style="color:var(--gray-500);font-size:14px;">Nenhum paciente cadastrado ainda. <a href="anamnese.html" style="color:var(--lila-700);">Adicionar primeiro paciente →</a></p></div>';
+      return;
+    }
+
+    container.innerHTML = data.map(p => `
+      <div class="paciente-row">
+        <div class="avatar" style="background:var(--lila-300);font-size:14px;">${(p.nome||'?')[0].toUpperCase()}</div>
+        <div class="paciente-info">
+          <div class="paciente-nome">${p.nome}</div>
+          <div class="paciente-meta">${p.email || ''} ${p.telefone ? '· ' + p.telefone : ''}</div>
+        </div>
+        <div class="paciente-actions">
+          <a href="anamnese.html?paciente_id=${p.id}" class="btn-sm outline">Ver anamnese</a>
+          <button class="btn-sm green" onclick="agendarSessao('${p.id}','${p.nome}')">Agendar</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  const titulos = { inicio:'Início', pacientes:'Pacientes', agenda:'Agenda', perfil:'Meu Perfil', config:'Configurações' };
+  function mostrarTab(id) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('ativo'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('ativo'));
+    document.getElementById('tab-' + id).classList.add('ativo');
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick')?.includes(id)) n.classList.add('ativo');
+    });
+    document.getElementById('topbarTitle').textContent = titulos[id] || '';
+    if (id === 'pacientes') carregarPacientes();
+  }
+
+  function selecionarPreco(el) {
+    document.querySelectorAll('.price-option').forEach(o => o.classList.remove('selecionado'));
+    el.classList.add('selecionado');
+  }
+
+  function previewFoto(input) {
+    if (!input.files[0]) return;
+    const url = URL.createObjectURL(input.files[0]);
     ['sidebarAvatar','avatarPreview'].forEach(id => {
-      const el = document.getElementById(id);
-      el.innerHTML = `<img src="${d.foto_url}" alt="foto" />`;
+      document.getElementById(id).innerHTML = `<img src="${url}" alt="foto" />`;
     });
   }
 
-  // perfil form
-  document.getElementById('pNome').value = d.nome || '';
-  document.getElementById('pCrp').value = d.crp || '';
-  document.getElementById('pBio').value = d.bio || '';
-  document.getElementById('pAbordagem').value = d.abordagem || '';
-  document.getElementById('pCidade').value = d.cidade || '';
-  document.getElementById('pPrecoExato').value = d.preco_exato || '';
-  if (d.especialidade) document.getElementById('pEspecialidade').value = d.especialidade;
-  if (d.modalidade) document.getElementById('pModalidade').value = d.modalidade;
+  async function salvarPerfil() {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return;
 
-  // preço faixa
-  if (d.preco_faixa) {
-    const radio = document.querySelector(`input[value="${d.preco_faixa}"]`);
-    if (radio) selecionarPreco(radio.closest('.price-option'));
+    const fb = document.getElementById('feedbackPerfil');
+    fb.style.display = 'none';
+
+    const faixaSel = document.querySelector('.price-option.selecionado input');
+
+    const payload = {
+      user_id: user.id,
+      nome: document.getElementById('pNome').value.trim(),
+      crp: document.getElementById('pCrp').value.trim(),
+      bio: document.getElementById('pBio').value.trim(),
+      especialidade: document.getElementById('pEspecialidade').value,
+      abordagem: document.getElementById('pAbordagem').value.trim(),
+      modalidade: document.getElementById('pModalidade').value,
+      cidade: document.getElementById('pCidade').value.trim(),
+      preco_faixa: faixaSel ? faixaSel.value : null,
+      preco_exato: document.getElementById('pPrecoExato').value || null,
+    };
+
+    const { error } = psicologo
+      ? await db.from('psicologos').update(payload).eq('id', psicologo.id)
+      : await db.from('psicologos').insert(payload);
+
+    fb.style.display = 'block';
+    if (error) {
+      fb.className = 'feedback erro'; fb.textContent = 'Erro ao salvar: ' + error.message;
+    } else {
+      fb.className = 'feedback sucesso'; fb.textContent = '✓ Perfil salvo com sucesso!';
+      document.getElementById('sidebarNome').textContent = payload.nome;
+      document.getElementById('sidebarCrp').textContent = 'CRP ' + payload.crp;
+    }
   }
 
-  // toggle ativo
-  const tog = document.getElementById('toggleAtivo');
-  tog.checked = d.ativo !== false;
-  atualizarToggle(tog.checked);
-
-  // status badge
-  if (!d.ativo) {
-    const badge = document.getElementById('statusBadge');
-    badge.className = 'badge-status pendente';
-    badge.innerHTML = '<span class="dot"></span> Oculto';
+  function toggleVisibilidade(el) {
+    atualizarToggle(el.checked);
   }
-}
-
-async function carregarStats() {
-  if (!psicologo) return;
-  // pacientes ativos
-  const { count: cp } = await db.from('pacientes_meupsi')
-    .select('*', { count: 'exact', head: true })
-    .eq('psicologo_id', psicologo.id);
-  document.getElementById('statPacientes').textContent = cp ?? '0';
-
-  // sessões do mês
-  const ini = new Date(); ini.setDate(1); ini.setHours(0,0,0,0);
-  const { count: cs } = await db.from('sessoes')
-    .select('*', { count: 'exact', head: true })
-    .eq('psicologo_id', psicologo.id)
-    .gte('data', ini.toISOString());
-  document.getElementById('statSessoes').textContent = cs ?? '0';
-
-  document.getElementById('statAvaliacao').textContent = (psicologo.avaliacao ?? '—');
-  document.getElementById('statVisitas').textContent = (psicologo.visitas ?? '—');
-}
-
-async function carregarProximasSessoes() {
-  const container = document.getElementById('proximasSessoes');
-  if (!psicologo) { container.innerHTML = '<div class="loading">Sem dados.</div>'; return; }
-
-  const agora = new Date().toISOString();
-  const { data, error } = await db.from('sessoes')
-    .select('*, pacientes_meupsi(nome)')
-    .eq('psicologo_id', psicologo.id)
-    .gte('data_hora', agora)
-    .order('data_hora', { ascending: true })
-    .limit(5);
-
-  if (!data || data.length === 0) {
-    container.innerHTML = '<div class="agenda-day"><p class="tag vazio">Nenhuma sessão agendada.</p></div>';
-    return;
+  function atualizarToggle(ativo) {
+    const knob = document.getElementById('toggleKnob');
+    const span = document.getElementById('toggleSpan');
+    const label = document.getElementById('toggleLabel');
+    knob.style.transform = ativo ? 'translateX(20px)' : 'translateX(0)';
+    span.style.background = ativo ? 'var(--verde-500)' : 'var(--gray-300)';
+    label.textContent = ativo ? 'Perfil visível para pacientes' : 'Perfil oculto';
   }
 
-  container.innerHTML = data.map(s => {
-    const dt = new Date(s.data_hora);
-    const hora = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    const dia = dt.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' });
-    return `
-    <div class="agenda-day">
-      <div class="agenda-day-title">${dia}</div>
-      <div class="sessao-item">
-        <span class="sessao-hora">${hora}</span>
-        <span class="sessao-nome">${s.pacientes_meupsi?.nome || 'Paciente'}</span>
-        <span class="tag ${s.tipo === 'online' ? 'online' : 'presencial'}">${s.tipo || 'online'}</span>
-      </div>
-    </div>`;
-  }).join('');
+  async function salvarConfig() {
+    const fb = document.getElementById('feedbackConfig');
+    fb.style.display = 'none';
 
-  // agenda completa igual
-  document.getElementById('agendaCompleta').innerHTML = container.innerHTML;
-}
+    const ativo = document.getElementById('toggleAtivo').checked;
+    const senhaNova = document.getElementById('cSenhaNova').value;
+    const senhaConf = document.getElementById('cSenhaConf').value;
 
-async function carregarPacientes() {
-  const container = document.getElementById('listaPacientes');
-  if (!psicologo) { container.innerHTML = '<div class="loading">Sem dados.</div>'; return; }
+    if (senhaNova && senhaNova !== senhaConf) {
+      fb.style.display = 'block'; fb.className = 'feedback erro';
+      fb.textContent = 'As senhas não coincidem.'; return;
+    }
 
-  const { data, error } = await db.from('pacientes_meupsi')
-    .select('*')
-    .eq('psicologo_id', psicologo.id)
-    .order('nome');
+    let erros = [];
 
-  if (!data || data.length === 0) {
-    container.innerHTML = '<div class="paciente-row"><p style="color:var(--gray-500);font-size:14px;">Nenhum paciente cadastrado ainda. <a href="anamnese.html" style="color:var(--lila-700);">Adicionar primeiro paciente →</a></p></div>';
-    return;
+    if (psicologo) {
+      const { error } = await db.from('psicologos').update({ ativo }).eq('id', psicologo.id);
+      if (error) erros.push(error.message);
+
+      const badge = document.getElementById('statusBadge');
+      badge.className = 'badge-status ' + (ativo ? 'ativo' : 'pendente');
+      badge.innerHTML = `<span class="dot"></span> ${ativo ? 'Ativo' : 'Oculto'}`;
+    }
+
+    if (senhaNova) {
+      const { error } = await db.auth.updateUser({ password: senhaNova });
+      if (error) erros.push(error.message);
+      else { document.getElementById('cSenhaNova').value = ''; document.getElementById('cSenhaConf').value = ''; }
+    }
+
+    fb.style.display = 'block';
+    if (erros.length) {
+      fb.className = 'feedback erro'; fb.textContent = 'Erro: ' + erros.join(' | ');
+    } else {
+      fb.className = 'feedback sucesso'; fb.textContent = '✓ Configurações salvas!';
+    }
   }
 
-  container.innerHTML = data.map(p => `
-    <div class="paciente-row">
-      <div class="avatar" style="background:var(--lila-300);font-size:14px;">${(p.nome||'?')[0].toUpperCase()}</div>
-      <div class="paciente-info">
-        <div class="paciente-nome">${p.nome}</div>
-        <div class="paciente-meta">${p.email || ''} ${p.telefone ? '· ' + p.telefone : ''}</div>
-      </div>
-      <div class="paciente-actions">
-        <a href="anamnese.html?paciente_id=${p.id}" class="btn-sm outline">Ver anamnese</a>
-        <button class="btn-sm green" onclick="agendarSessao('${p.id}','${p.nome}')">Agendar</button>
-      </div>
-    </div>
-  `).join('');
-}
-
-// ── TABS ──
-const titulos = { inicio:'Início', pacientes:'Pacientes', agenda:'Agenda', perfil:'Meu Perfil', config:'Configurações' };
-function mostrarTab(id) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('ativo'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('ativo'));
-  document.getElementById('tab-' + id).classList.add('ativo');
-  document.querySelectorAll('.nav-item').forEach(n => {
-    if (n.getAttribute('onclick')?.includes(id)) n.classList.add('ativo');
-  });
-  document.getElementById('topbarTitle').textContent = titulos[id] || '';
-  if (id === 'pacientes') carregarPacientes();
-}
-
-// ── PERFIL ──
-function selecionarPreco(el) {
-  document.querySelectorAll('.price-option').forEach(o => o.classList.remove('selecionado'));
-  el.classList.add('selecionado');
-}
-
-function previewFoto(input) {
-  if (!input.files[0]) return;
-  const url = URL.createObjectURL(input.files[0]);
-  ['sidebarAvatar','avatarPreview'].forEach(id => {
-    document.getElementById(id).innerHTML = `<img src="${url}" alt="foto" />`;
-  });
-}
-
-async function salvarPerfil() {
-  const { data: { user } } = await db.auth.getUser();
-  if (!user) return;
-  const fb = document.getElementById('feedbackPerfil');
-  fb.style.display = 'none';
-
-  const faixaSel = document.querySelector('.price-option.selecionado input');
-
-  const payload = {
-    user_id: user.id,
-    nome: document.getElementById('pNome').value.trim(),
-    crp: document.getElementById('pCrp').value.trim(),
-    bio: document.getElementById('pBio').value.trim(),
-    especialidade: document.getElementById('pEspecialidade').value,
-    abordagem: document.getElementById('pAbordagem').value.trim(),
-    modalidade: document.getElementById('pModalidade').value,
-    cidade: document.getElementById('pCidade').value.trim(),
-    preco_faixa: faixaSel ? faixaSel.value : null,
-    preco_exato: document.getElementById('pPrecoExato').value || null,
-  };
-
-  const { error } = psicologo
-    ? await db.from('psicologos').update(payload).eq('id', psicologo.id)
-    : await db.from('psicologos').insert(payload);
-
-  fb.style.display = 'block';
-  if (error) {
-    fb.className = 'feedback erro'; fb.textContent = 'Erro ao salvar: ' + error.message;
-  } else {
-    fb.className = 'feedback sucesso'; fb.textContent = '✓ Perfil salvo com sucesso!';
-    document.getElementById('sidebarNome').textContent = payload.nome;
-    document.getElementById('sidebarCrp').textContent = 'CRP ' + payload.crp;
-  }
-}
-
-// ── CONFIG ──
-function toggleVisibilidade(el) {
-  atualizarToggle(el.checked);
-}
-function atualizarToggle(ativo) {
-  const knob = document.getElementById('toggleKnob');
-  const span = document.getElementById('toggleSpan');
-  const label = document.getElementById('toggleLabel');
-  knob.style.transform = ativo ? 'translateX(20px)' : 'translateX(0)';
-  span.style.background = ativo ? 'var(--verde-500)' : 'var(--gray-300)';
-  label.textContent = ativo ? 'Perfil visível para pacientes' : 'Perfil oculto';
-}
-
-async function salvarConfig() {
-  const fb = document.getElementById('feedbackConfig');
-  fb.style.display = 'none';
-  const ativo = document.getElementById('toggleAtivo').checked;
-  const senhaNova = document.getElementById('cSenhaNova').value;
-  const senhaConf = document.getElementById('cSenhaConf').value;
-
-  if (senhaNova && senhaNova !== senhaConf) {
-    fb.style.display = 'block'; fb.className = 'feedback erro';
-    fb.textContent = 'As senhas não coincidem.'; return;
+  function agendarSessao(id, nome) {
+    alert(`Agendamento para ${nome} — funcionalidade de agenda em breve.`);
   }
 
-  let erros = [];
-
-  if (psicologo) {
-    const { error } = await db.from('psicologos').update({ ativo }).eq('id', psicologo.id);
-    if (error) erros.push(error.message);
-    const badge = document.getElementById('statusBadge');
-    badge.className = 'badge-status ' + (ativo ? 'ativo' : 'pendente');
-    badge.innerHTML = `<span class="dot"></span> ${ativo ? 'Ativo' : 'Oculto'}`;
+  async function sair() {
+    await db.auth.signOut();
+    location.href = 'index.html';
   }
 
-  if (senhaNova) {
-    const { error } = await db.auth.updateUser({ password: senhaNova });
-    if (error) erros.push(error.message);
-    else { document.getElementById('cSenhaNova').value = ''; document.getElementById('cSenhaConf').value = ''; }
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('aberto');
   }
 
-  fb.style.display = 'block';
-  if (erros.length) {
-    fb.className = 'feedback erro'; fb.textContent = 'Erro: ' + erros.join(' | ');
-  } else {
-    fb.className = 'feedback sucesso'; fb.textContent = '✓ Configurações salvas!';
-  }
-}
-
-function agendarSessao(id, nome) {
-  alert(`Agendamento para ${nome} — funcionalidade de agenda em breve.`);
-}
-
-async function sair() {
-  await db.auth.signOut();
-  location.href = 'index.html';
-}
-
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('aberto');
-}
-
-init();
+  init();
 </script>
 </body>
 </html>

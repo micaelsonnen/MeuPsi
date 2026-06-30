@@ -11,7 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
-  --lila-50:  #F5F0FB;
+  --lila-50: #F5F0FB;
   --lila-100: #E8DCFA;
   --lila-300: #C4A8F0;
   --lila-500: #9B6FD8;
@@ -20,14 +20,14 @@
   --verde-400: #4CAF7D;
   --verde-500: #3A9E6A;
   --verde-600: #2D8055;
-  --verde-50:  #EBF7F1;
-  --cream:    #FDFBF8;
+  --verde-50: #EBF7F1;
+  --cream: #FDFBF8;
   --gray-100: #F0EDE8;
   --gray-300: #C8C4BC;
   --gray-500: #8A8680;
   --gray-800: #2E2C29;
   --font-display: 'Fraunces', Georgia, serif;
-  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 22px;
@@ -45,8 +45,6 @@ body {
   grid-template-columns: 1fr 1fr;
 }
 a { text-decoration: none; color: inherit; }
-
-/* ── LADO ESQUERDO — ilustração ── */
 .side-left {
   background: linear-gradient(160deg, var(--lila-900) 0%, var(--lila-700) 100%);
   display: flex; flex-direction: column;
@@ -65,7 +63,6 @@ a { text-decoration: none; color: inherit; }
   color: #fff; position: relative; z-index: 1;
 }
 .side-logo span { color: var(--verde-400); font-style: normal; }
-
 .side-content {
   position: relative; z-index: 1;
   padding-bottom: 2rem;
@@ -80,7 +77,6 @@ a { text-decoration: none; color: inherit; }
   font-size: 15px; color: rgba(255,255,255,0.65);
   max-width: 360px; line-height: 1.7;
 }
-
 .depoimento {
   position: relative; z-index: 1;
   background: rgba(255,255,255,0.07);
@@ -100,9 +96,7 @@ a { text-decoration: none; color: inherit; }
   font-size: 14px; font-weight: 500; color: #fff; flex-shrink: 0;
 }
 .dep-nome { font-size: 13px; font-weight: 500; color: #fff; }
-.dep-crp  { font-size: 12px; color: rgba(255,255,255,0.45); }
-
-/* ── LADO DIREITO — formulário ── */
+.dep-crp { font-size: 12px; color: rgba(255,255,255,0.45); }
 .side-right {
   background: var(--cream);
   display: flex; flex-direction: column;
@@ -110,11 +104,9 @@ a { text-decoration: none; color: inherit; }
   padding: 3rem 2rem;
   min-height: 100vh;
 }
-
 .form-box {
   width: 100%; max-width: 400px;
 }
-
 .form-header { margin-bottom: 2rem; }
 .form-header h1 {
   font-family: var(--font-display);
@@ -122,8 +114,6 @@ a { text-decoration: none; color: inherit; }
   color: var(--lila-900); margin-bottom: 0.25rem;
 }
 .form-header p { font-size: 14px; color: var(--gray-500); }
-
-/* TABS LOGIN / RECUPERAR */
 .form-tabs {
   display: flex; gap: 0;
   border-bottom: 2px solid var(--lila-100);
@@ -137,8 +127,6 @@ a { text-decoration: none; color: inherit; }
   transition: all 0.15s;
 }
 .form-tab.ativo { color: var(--lila-700); border-bottom-color: var(--lila-500); }
-
-/* CAMPOS */
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.1rem; }
 label { font-size: 13px; font-weight: 500; color: var(--gray-800); }
 .input-wrap { position: relative; }
@@ -157,7 +145,6 @@ input:focus { border-color: var(--lila-500); box-shadow: 0 0 0 3px rgba(155,111,
   background: none; border: none; padding: 0; display: flex; align-items: center;
 }
 .input-icon:hover { color: var(--lila-700); }
-
 .forgot {
   text-align: right; margin-top: -0.5rem; margin-bottom: 1.1rem;
 }
@@ -165,8 +152,6 @@ input:focus { border-color: var(--lila-500); box-shadow: 0 0 0 3px rgba(155,111,
   font-size: 13px; color: var(--gray-500); transition: color 0.15s;
 }
 .forgot a:hover { color: var(--lila-700); }
-
-/* BOTÃO */
 .btn-primary {
   width: 100%; padding: 0.85rem;
   background: var(--lila-700); color: #fff;
@@ -177,16 +162,12 @@ input:focus { border-color: var(--lila-500); box-shadow: 0 0 0 3px rgba(155,111,
 }
 .btn-primary:hover { background: var(--lila-900); }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-
-/* FEEDBACK */
 .feedback {
   padding: 0.75rem 1rem; border-radius: var(--radius-sm);
   font-size: 13px; margin-bottom: 1rem; display: none;
 }
-.feedback.erro   { background: #FEE2E2; color: #991B1B; }
+.feedback.erro { background: #FEE2E2; color: #991B1B; }
 .feedback.sucesso { background: var(--verde-50); color: var(--verde-600); }
-
-/* DIVIDER */
 .divider {
   display: flex; align-items: center; gap: 12px;
   margin: 1.5rem 0; color: var(--gray-300); font-size: 13px;
@@ -194,28 +175,20 @@ input:focus { border-color: var(--lila-500); box-shadow: 0 0 0 3px rgba(155,111,
 .divider::before, .divider::after {
   content: ''; flex: 1; height: 1px; background: var(--gray-100);
 }
-
-/* CADASTRO LINK */
 .cadastro-link {
   text-align: center; margin-top: 1.5rem;
   font-size: 14px; color: var(--gray-500);
 }
 .cadastro-link a { color: var(--lila-700); font-weight: 500; }
 .cadastro-link a:hover { text-decoration: underline; }
-
-/* PAINEL RECUPERAR */
 .panel { display: none; }
 .panel.ativo { display: block; }
-
-/* RODAPÉ */
 .side-right-footer {
   margin-top: 2.5rem; text-align: center;
   font-size: 12px; color: var(--gray-300);
 }
 .side-right-footer a { color: var(--gray-300); }
 .side-right-footer a:hover { color: var(--lila-700); }
-
-/* MOBILE */
 @media (max-width: 720px) {
   body { grid-template-columns: 1fr; }
   .side-left { display: none; }
@@ -225,16 +198,12 @@ input:focus { border-color: var(--lila-500); box-shadow: 0 0 0 3px rgba(155,111,
 </style>
 </head>
 <body>
-
-<!-- LADO ESQUERDO -->
 <div class="side-left">
   <div class="side-logo">Meu<span>Psi</span></div>
-
   <div class="side-content">
     <h2>Sua prática clínica,<br/>organizada em um só lugar.</h2>
     <p>Gerencie pacientes, anamneses e agenda com segurança e clareza — para que você possa focar no que realmente importa.</p>
   </div>
-
   <div class="depoimento">
     <p>"O MeuPsi transformou minha rotina clínica. Tenho tudo centralizado e mais tempo para estar presente com meus pacientes."</p>
     <div class="depoimento-autor">
@@ -247,10 +216,8 @@ input:focus { border-color: var(--lila-500); box-shadow: 0 0 0 3px rgba(155,111,
   </div>
 </div>
 
-<!-- LADO DIREITO -->
 <div class="side-right">
   <div class="form-box">
-
     <div class="form-header">
       <h1>Bem-vindo de volta</h1>
       <p>Entre com seu e-mail e senha para acessar o dashboard.</p>
@@ -261,15 +228,12 @@ input:focus { border-color: var(--lila-500); box-shadow: 0 0 0 3px rgba(155,111,
       <div class="form-tab" onclick="mostrarPanel('recuperar')">Recuperar senha</div>
     </div>
 
-    <!-- PANEL: LOGIN -->
     <div class="panel ativo" id="panel-login">
       <div id="feedbackLogin" class="feedback"></div>
-
       <div class="field">
         <label for="email">E-mail</label>
         <input type="email" id="email" placeholder="seu@email.com" autocomplete="email" />
       </div>
-
       <div class="field">
         <label for="senha">Senha</label>
         <div class="input-wrap">
@@ -280,39 +244,30 @@ input:focus { border-color: var(--lila-500); box-shadow: 0 0 0 3px rgba(155,111,
           </button>
         </div>
       </div>
-
       <div class="forgot">
         <a href="#" onclick="mostrarPanel('recuperar');return false;">Esqueci minha senha</a>
       </div>
-
       <button class="btn-primary" id="btnLogin" onclick="login()">
         Entrar na minha conta
       </button>
-
       <div class="divider">ou</div>
-
       <div class="cadastro-link">
         Ainda não tem conta? <a href="cadastro.html">Cadastre-se gratuitamente</a>
       </div>
     </div>
 
-    <!-- PANEL: RECUPERAR SENHA -->
     <div class="panel" id="panel-recuperar">
       <div id="feedbackRecuperar" class="feedback"></div>
-
       <p style="font-size:14px;color:var(--gray-500);margin-bottom:1.25rem;">
         Informe seu e-mail e enviaremos um link para redefinir sua senha.
       </p>
-
       <div class="field">
         <label for="emailRecuperar">E-mail</label>
         <input type="email" id="emailRecuperar" placeholder="seu@email.com" autocomplete="email" />
       </div>
-
       <button class="btn-primary" id="btnRecuperar" onclick="recuperarSenha()">
         Enviar link de recuperação
       </button>
-
       <div class="cadastro-link" style="margin-top:1.25rem;">
         <a href="#" onclick="mostrarPanel('login');return false;">← Voltar ao login</a>
       </div>
@@ -321,127 +276,133 @@ input:focus { border-color: var(--lila-500); box-shadow: 0 0 0 3px rgba(155,111,
     <div class="side-right-footer">
       <a href="index.html">MeuPsi</a> · <a href="#">Privacidade</a> · <a href="#">Termos</a>
     </div>
-
   </div>
 </div>
 
 <script>
-const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
-const db = supabase.createClient(SUPA_URL, SUPA_KEY);
+  const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
+  const SUPA_KEY = 'sb_publishable_2u0U4PTZuMNCS4LkTgnBBQ_ltfjZYqo';
+  const db = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-async function redirectByRole(user) {
-  try {
-    const { data: psi } = await db
-      .from('psicologos')
-      .select('id')
-      .eq('user_id', user.id)
-      .maybeSingle();
-    location.href = psi ? 'dashboard-psicologo.html' : 'dashboard-paciente.html';
-  } catch(e) {
-    console.error('Erro ao verificar perfil:', e);
-  }
-}
+  async function redirectByRole(user) {
+    try {
+      const { data: psi, error } = await db
+        .from('psicologos')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-// TABS
-function mostrarPanel(id) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('ativo'));
-  document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('ativo'));
-  document.getElementById('panel-' + id).classList.add('ativo');
-  document.querySelectorAll('.form-tab').forEach(t => {
-    if (t.textContent.toLowerCase().includes(id === 'login' ? 'entrar' : 'recup')) t.classList.add('ativo');
-  });
-}
+      if (error) {
+        console.error('Erro ao verificar perfil de psicólogo:', error);
+        const fb = document.getElementById('feedbackLogin');
+        fb.className = 'feedback erro'; fb.style.display = 'block';
+        fb.textContent = 'Login feito, mas houve um erro ao carregar seu perfil. Tente novamente.';
+        return;
+      }
 
-// MOSTRAR/OCULTAR SENHA
-function toggleSenha() {
-  const input = document.getElementById('senha');
-  const aberto = document.getElementById('icOlhoAberto');
-  const fechado = document.getElementById('icOlhoFechado');
-  if (input.type === 'password') {
-    input.type = 'text';
-    aberto.style.display = 'block';
-    fechado.style.display = 'none';
-  } else {
-    input.type = 'password';
-    aberto.style.display = 'none';
-    fechado.style.display = 'block';
-  }
-}
-
-// LOGIN
-async function login() {
-  const fb  = document.getElementById('feedbackLogin');
-  const btn = document.getElementById('btnLogin');
-  const email = document.getElementById('email').value.trim();
-  const senha = document.getElementById('senha').value;
-
-  fb.style.display = 'none';
-
-  if (!email || !senha) {
-    fb.className = 'feedback erro'; fb.style.display = 'block';
-    fb.textContent = 'Preencha e-mail e senha.'; return;
+      location.href = psi ? 'dashboard-psicologo.html' : 'dashboard-paciente.html';
+    } catch(e) {
+      console.error('Erro ao verificar perfil:', e);
+      const fb = document.getElementById('feedbackLogin');
+      fb.className = 'feedback erro'; fb.style.display = 'block';
+      fb.textContent = 'Login feito, mas houve um erro inesperado. Tente novamente.';
+    }
   }
 
-  btn.disabled = true; btn.textContent = 'Entrando...';
-
-  const { data, error } = await db.auth.signInWithPassword({ email, password: senha });
-
-  btn.disabled = false; btn.textContent = 'Entrar na minha conta';
-
-  if (error) {
-    fb.className = 'feedback erro'; fb.style.display = 'block';
-    fb.textContent = traduzirErro(error.message);
-    return;
+  function mostrarPanel(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('ativo'));
+    document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('ativo'));
+    document.getElementById('panel-' + id).classList.add('ativo');
+    document.querySelectorAll('.form-tab').forEach(t => {
+      if (t.textContent.toLowerCase().includes(id === 'login' ? 'entrar' : 'recup')) t.classList.add('ativo');
+    });
   }
 
-  // redireciona ao dashboard correto
-  await redirectByRole(data.user || data.session.user);
-}
-
-// RECUPERAR SENHA
-async function recuperarSenha() {
-  const fb  = document.getElementById('feedbackRecuperar');
-  const btn = document.getElementById('btnRecuperar');
-  const email = document.getElementById('emailRecuperar').value.trim();
-
-  fb.style.display = 'none';
-
-  if (!email) {
-    fb.className = 'feedback erro'; fb.style.display = 'block';
-    fb.textContent = 'Informe seu e-mail.'; return;
+  function toggleSenha() {
+    const input = document.getElementById('senha');
+    const aberto = document.getElementById('icOlhoAberto');
+    const fechado = document.getElementById('icOlhoFechado');
+    if (input.type === 'password') {
+      input.type = 'text';
+      aberto.style.display = 'block';
+      fechado.style.display = 'none';
+    } else {
+      input.type = 'password';
+      aberto.style.display = 'none';
+      fechado.style.display = 'block';
+    }
   }
 
-  btn.disabled = true; btn.textContent = 'Enviando...';
+  async function login() {
+    const fb = document.getElementById('feedbackLogin');
+    const btn = document.getElementById('btnLogin');
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
 
-  const { error } = await db.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + '/dashboard-psicologo.html'
-  });
+    fb.style.display = 'none';
 
-  btn.disabled = false; btn.textContent = 'Enviar link de recuperação';
+    if (!email || !senha) {
+      fb.className = 'feedback erro'; fb.style.display = 'block';
+      fb.textContent = 'Preencha e-mail e senha.'; return;
+    }
 
-  fb.style.display = 'block';
-  if (error) {
-    fb.className = 'feedback erro'; fb.textContent = traduzirErro(error.message);
-  } else {
-    fb.className = 'feedback sucesso';
-    fb.textContent = '✓ Link enviado! Verifique sua caixa de entrada.';
+    btn.disabled = true; btn.textContent = 'Entrando...';
+
+    const { data, error } = await db.auth.signInWithPassword({ email, password: senha });
+
+    btn.disabled = false; btn.textContent = 'Entrar na minha conta';
+
+    if (error) {
+      fb.className = 'feedback erro'; fb.style.display = 'block';
+      fb.textContent = traduzirErro(error.message);
+      console.error('Erro de login:', error);
+      return;
+    }
+
+    await redirectByRole(data.user || data.session.user);
   }
-}
 
-// ENTER nos campos
-document.getElementById('email').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('senha').focus(); });
-document.getElementById('senha').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
-document.getElementById('emailRecuperar').addEventListener('keydown', e => { if (e.key === 'Enter') recuperarSenha(); });
+  async function recuperarSenha() {
+    const fb = document.getElementById('feedbackRecuperar');
+    const btn = document.getElementById('btnRecuperar');
+    const email = document.getElementById('emailRecuperar').value.trim();
 
-// TRADUÇÃO DE ERROS
-function traduzirErro(msg) {
-  if (msg.includes('Invalid login')) return 'E-mail ou senha incorretos.';
-  if (msg.includes('Email not confirmed')) return 'Confirme seu e-mail antes de entrar.';
-  if (msg.includes('Too many requests')) return 'Muitas tentativas. Aguarde alguns minutos.';
-  if (msg.includes('User not found')) return 'Nenhuma conta encontrada com este e-mail.';
-  return 'Erro: ' + msg;
-}
+    fb.style.display = 'none';
+
+    if (!email) {
+      fb.className = 'feedback erro'; fb.style.display = 'block';
+      fb.textContent = 'Informe seu e-mail.'; return;
+    }
+
+    btn.disabled = true; btn.textContent = 'Enviando...';
+
+    const { error } = await db.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/dashboard-psicologo.html'
+    });
+
+    btn.disabled = false; btn.textContent = 'Enviar link de recuperação';
+    fb.style.display = 'block';
+
+    if (error) {
+      fb.className = 'feedback erro'; fb.textContent = traduzirErro(error.message);
+    } else {
+      fb.className = 'feedback sucesso';
+      fb.textContent = '✓ Link enviado! Verifique sua caixa de entrada.';
+    }
+  }
+
+  document.getElementById('email').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('senha').focus(); });
+  document.getElementById('senha').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+  document.getElementById('emailRecuperar').addEventListener('keydown', e => { if (e.key === 'Enter') recuperarSenha(); });
+
+  function traduzirErro(msg) {
+    if (msg.includes('Invalid login')) return 'E-mail ou senha incorretos.';
+    if (msg.includes('Email not confirmed')) return 'Confirme seu e-mail antes de entrar.';
+    if (msg.includes('Too many requests')) return 'Muitas tentativas. Aguarde alguns minutos.';
+    if (msg.includes('User not found')) return 'Nenhuma conta encontrada com este e-mail.';
+    if (msg.includes('Invalid API key')) return 'Erro de configuração do servidor. Avise o suporte.';
+    return 'Erro: ' + msg;
+  }
 </script>
 </body>
 </html>
