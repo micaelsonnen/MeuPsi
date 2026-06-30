@@ -109,9 +109,8 @@
 
 <script>
   const SUPA_URL = 'https://gqjkslbktxxpyquuklty.supabase.co';
-  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0eHpmanFreXlmanFreXkiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcxNjU1NjQ3NCwiZXhwIjoyMDMyMTMyNDc0fQ.placeholder';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamtzbGJrdHh4cHlxdXVrbHR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI3NTU5MDQsImV4cCI6MjA1ODMzMTkwNH0.aAuZPQKFnHvRK_63Gy8OOLnHDHd4sJlnDHLo1Vfy5yw';
 
-  // Pegar as credenciais reais do arquivo colado
   const supabase = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
   document.getElementById('btnLogin').addEventListener('click', async () => {
