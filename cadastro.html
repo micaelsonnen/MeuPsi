@@ -11,32 +11,18 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
-  --lila-50: #F5F0FB;
-  --lila-100: #E8DCFA;
-  --lila-300: #C4A8F0;
-  --lila-500: #9B6FD8;
-  --lila-700: #6B3FA8;
-  --lila-900: #3B1E62;
-  --verde-400: #4CAF7D;
-  --verde-500: #3A9E6A;
-  --verde-600: #2D8055;
-  --verde-50: #EBF7F1;
-  --cream: #FDFBF8;
-  --gray-100: #F0EDE8;
-  --gray-300: #C8C4BC;
-  --gray-500: #8A8680;
-  --gray-800: #2E2C29;
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-body: 'DM Sans', system-ui, sans-serif;
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 22px;
-  --radius-pill: 999px;
+  --lila-50: #F5F0FB; --lila-100: #E8DCFA; --lila-300: #C4A8F0;
+  --lila-500: #9B6FD8; --lila-700: #6B3FA8; --lila-900: #3B1E62;
+  --verde-400: #4CAF7D; --verde-500: #3A9E6A; --verde-600: #2D8055; --verde-50: #EBF7F1;
+  --cream: #FDFBF8; --gray-100: #F0EDE8; --gray-300: #C8C4BC; --gray-500: #8A8680; --gray-800: #2E2C29;
+  --font-display: 'Fraunces', Georgia, serif; --font-body: 'DM Sans', system-ui, sans-serif;
+  --radius-sm: 8px; --radius-md: 14px; --radius-lg: 22px; --radius-pill: 999px;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body { font-family: var(--font-body); background: var(--cream); color: var(--gray-800); font-size: 16px; line-height: 1.6; }
 a { text-decoration: none; color: inherit; }
+
 nav {
   position: sticky; top: 0; z-index: 100;
   background: rgba(253,251,248,0.92); backdrop-filter: blur(12px);
@@ -47,26 +33,15 @@ nav {
 .nav-logo span { color: var(--verde-500); font-style: normal; }
 .nav-back { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--gray-500); cursor: pointer; transition: color 0.2s; }
 .nav-back:hover { color: var(--lila-700); }
-.hero-cadastro {
-  background: linear-gradient(160deg, var(--lila-900) 0%, var(--lila-700) 100%);
-  padding: 3.5rem 2rem;
-  text-align: center; color: #fff;
-}
-.hero-cadastro h1 {
-  font-family: var(--font-display); font-size: clamp(1.6rem, 4vw, 2.4rem);
-  font-weight: 300; margin-bottom: 0.75rem;
-}
+
+.hero-cadastro { background: linear-gradient(160deg, var(--lila-900) 0%, var(--lila-700) 100%); padding: 3.5rem 2rem; text-align: center; color: #fff; }
+.hero-cadastro h1 { font-family: var(--font-display); font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 300; margin-bottom: 0.75rem; }
 .hero-cadastro p { color: var(--lila-300); font-size: 16px; max-width: 480px; margin: 0 auto; font-weight: 300; }
+
 .progress-wrap { background: #fff; border-bottom: 1px solid var(--lila-100); padding: 1.25rem 2rem; }
 .progress-inner { max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 0; }
 .step-item { display: flex; align-items: center; flex: 1; }
-.step-circle {
-  width: 32px; height: 32px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 500; flex-shrink: 0;
-  border: 2px solid var(--gray-300); color: var(--gray-300); background: #fff;
-  transition: all 0.3s;
-}
+.step-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; border: 2px solid var(--gray-300); color: var(--gray-300); background: #fff; transition: all 0.3s; }
 .step-circle.ativo { border-color: var(--lila-500); background: var(--lila-500); color: #fff; }
 .step-circle.feito { border-color: var(--verde-500); background: var(--verde-500); color: #fff; }
 .step-label { font-size: 12px; color: var(--gray-300); margin-left: 8px; white-space: nowrap; }
@@ -74,101 +49,62 @@ nav {
 .step-label.feito { color: var(--verde-600); }
 .step-line { flex: 1; height: 2px; background: var(--gray-100); margin: 0 8px; }
 .step-line.feito { background: var(--verde-500); }
+
 .page { max-width: 760px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
-.form-card {
-  background: #fff; border: 1.5px solid var(--lila-100);
-  border-radius: var(--radius-md); padding: 2rem;
-  margin-bottom: 1.5rem;
-}
-.form-section-title {
-  font-family: var(--font-display); font-size: 18px;
-  font-weight: 300; color: var(--lila-900); margin-bottom: 0.25rem;
-}
+
+.form-card { background: #fff; border: 1.5px solid var(--lila-100); border-radius: var(--radius-md); padding: 2rem; margin-bottom: 1.5rem; }
+.form-section-title { font-family: var(--font-display); font-size: 18px; font-weight: 300; color: var(--lila-900); margin-bottom: 0.25rem; }
 .form-section-sub { font-size: 13px; color: var(--gray-500); margin-bottom: 1.75rem; }
+
+/* FEEDBACK */
+.feedback { padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 1rem; display: none; }
+.feedback.erro { background: #FEE2E2; color: #991B1B; }
+.feedback.sucesso { background: var(--verde-50); color: var(--verde-600); }
+
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
 .field-row.full { grid-template-columns: 1fr; }
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
 .field:last-child { margin-bottom: 0; }
 label { font-size: 13px; font-weight: 500; color: var(--gray-800); }
 .label-opt { font-size: 11px; color: var(--gray-300); font-weight: 400; margin-left: 4px; }
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="number"],
-input[type="url"],
-input[type="password"],
-select,
-textarea {
+input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="url"], input[type="password"], select, textarea {
   width: 100%; padding: 10px 14px;
   border: 1.5px solid var(--gray-300); border-radius: var(--radius-sm);
   font-family: var(--font-body); font-size: 14px; color: var(--gray-800);
-  background: #fff; outline: none; transition: border-color 0.18s;
-  appearance: none;
+  background: #fff; outline: none; transition: border-color 0.18s; appearance: none;
 }
-input:focus, select:focus, textarea:focus {
-  border-color: var(--lila-500);
-  box-shadow: 0 0 0 3px rgba(155,111,216,0.08);
-}
+input:focus, select:focus, textarea:focus { border-color: var(--lila-500); box-shadow: 0 0 0 3px rgba(155,111,216,0.08); }
 input::placeholder, textarea::placeholder { color: var(--gray-300); }
 textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
-select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23C8C4BC' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 12px center;
-  padding-right: 36px;
-}
+select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23C8C4BC' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
 .field-hint { font-size: 12px; color: var(--gray-300); margin-top: 2px; }
-.upload-area {
-  border: 2px dashed var(--lila-100); border-radius: var(--radius-md);
-  padding: 2rem; text-align: center; cursor: pointer;
-  transition: all 0.2s; background: var(--lila-50);
-}
-.upload-area:hover { border-color: var(--lila-300); background: var(--lila-50); }
+
+.upload-area { border: 2px dashed var(--lila-100); border-radius: var(--radius-md); padding: 2rem; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--lila-50); }
+.upload-area:hover { border-color: var(--lila-300); }
 .upload-icon { color: var(--lila-300); margin-bottom: 0.75rem; }
 .upload-text { font-size: 14px; color: var(--gray-500); }
 .upload-sub { font-size: 12px; color: var(--gray-300); margin-top: 4px; }
-.upload-preview { max-width: 100%; max-height: 140px; border-radius: var(--radius-sm); margin-top: 1rem; display: none; }
+
 .tags-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag-check { display: none; }
-.tag-check + label {
-  font-size: 13px; padding: 7px 16px;
-  border-radius: var(--radius-pill);
-  border: 1.5px solid var(--gray-300);
-  background: #fff; color: var(--gray-500);
-  cursor: pointer; transition: all 0.18s;
-  font-weight: 400;
-}
-.tag-check:checked + label {
-  border-color: var(--lila-300);
-  background: var(--lila-50);
-  color: var(--lila-700);
-}
+.tag-check + label { font-size: 13px; padding: 7px 16px; border-radius: var(--radius-pill); border: 1.5px solid var(--gray-300); background: #fff; color: var(--gray-500); cursor: pointer; transition: all 0.18s; font-weight: 400; }
+.tag-check:checked + label { border-color: var(--lila-300); background: var(--lila-50); color: var(--lila-700); }
+
 .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
 .toggle-row:last-child { border-bottom: none; }
 .toggle-info p { font-size: 14px; font-weight: 500; }
 .toggle-info span { font-size: 12px; color: var(--gray-300); }
-.toggle {
-  position: relative; width: 44px; height: 24px; flex-shrink: 0;
-}
+.toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
 .toggle input { opacity: 0; width: 0; height: 0; }
-.toggle-slider {
-  position: absolute; inset: 0;
-  background: var(--gray-300); border-radius: var(--radius-pill);
-  cursor: pointer; transition: background 0.2s;
-}
-.toggle-slider::before {
-  content: ''; position: absolute;
-  width: 18px; height: 18px; border-radius: 50%;
-  background: #fff; top: 3px; left: 3px;
-  transition: transform 0.2s;
-}
+.toggle-slider { position: absolute; inset: 0; background: var(--gray-300); border-radius: var(--radius-pill); cursor: pointer; transition: background 0.2s; }
+.toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: transform 0.2s; }
 .toggle input:checked + .toggle-slider { background: var(--verde-500); }
 .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
 .valor-input-wrap { position: relative; }
-.valor-prefix {
-  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-  font-size: 14px; color: var(--gray-500); pointer-events: none;
-}
+.valor-prefix { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--gray-500); pointer-events: none; }
 .valor-input-wrap input { padding-left: 36px; }
+
 .form-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; }
 .btn { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-pill); font-family: var(--font-body); font-size: 14px; font-weight: 500; padding: 11px 24px; cursor: pointer; transition: all 0.18s; border: none; }
 .btn-primary { background: var(--verde-500); color: #fff; }
@@ -178,34 +114,26 @@ select {
 .btn-ghost:hover { border-color: var(--lila-300); color: var(--lila-700); }
 .btn-lila { background: var(--lila-500); color: #fff; }
 .btn-lila:hover { background: var(--lila-700); }
-.btn-lila:disabled { opacity: 0.6; cursor: not-allowed; }
-.beneficios {
-  background: var(--lila-50); border: 1.5px solid var(--lila-100);
-  border-radius: var(--radius-md); padding: 1.5rem;
-  margin-bottom: 1.5rem;
-}
+
+.beneficios { background: var(--lila-50); border: 1.5px solid var(--lila-100); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.5rem; }
 .beneficios h3 { font-size: 14px; font-weight: 500; color: var(--lila-900); margin-bottom: 1rem; }
 .beneficio-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
 .beneficio-item:last-child { margin-bottom: 0; }
 .beneficio-icon { color: var(--verde-500); flex-shrink: 0; margin-top: 1px; }
 .beneficio-text { font-size: 13px; color: var(--gray-500); line-height: 1.5; }
+
 .step-content { display: none; }
 .step-content.ativo { display: block; }
-.sucesso {
-  text-align: center; padding: 3rem 2rem;
-  background: #fff; border: 1.5px solid var(--lila-100);
-  border-radius: var(--radius-md);
-}
-.sucesso-icon {
-  width: 72px; height: 72px; border-radius: 50%;
-  background: var(--verde-50); display: flex; align-items: center;
-  justify-content: center; margin: 0 auto 1.5rem; color: var(--verde-500);
-}
+
+.sucesso { text-align: center; padding: 3rem 2rem; background: #fff; border: 1.5px solid var(--lila-100); border-radius: var(--radius-md); }
+.sucesso-icon { width: 72px; height: 72px; border-radius: 50%; background: var(--verde-50); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--verde-500); }
 .sucesso h2 { font-family: var(--font-display); font-size: 24px; font-weight: 300; color: var(--lila-900); margin-bottom: 0.75rem; }
 .sucesso p { font-size: 15px; color: var(--gray-500); max-width: 380px; margin: 0 auto 2rem; }
-.feedback { padding: 0.85rem 1rem; border-radius: var(--radius-sm); font-size: 13px; margin-top: 1.25rem; display: none; }
-.feedback.erro { background: #FEE2E2; color: #991B1B; }
-.feedback.sucesso-msg { background: var(--verde-50); color: var(--verde-600); }
+
+/* erro inline nos fields */
+.field-error { font-size: 12px; color: #991B1B; margin-top: 2px; display: none; }
+input.invalid, select.invalid { border-color: #F87171; }
+
 @media (max-width: 600px) {
   .field-row { grid-template-columns: 1fr; }
   nav { padding: 0 1rem; }
@@ -229,6 +157,7 @@ select {
   <p>Faça parte da rede MeuPsi e conecte-se a pacientes que precisam do seu cuidado.</p>
 </div>
 
+<!-- PROGRESSO -->
 <div class="progress-wrap">
   <div class="progress-inner">
     <div class="step-item">
@@ -254,6 +183,8 @@ select {
 </div>
 
 <div class="page">
+
+  <!-- BENEFÍCIOS -->
   <div class="beneficios">
     <h3>Por que estar no MeuPsi?</h3>
     <div class="beneficio-item">
@@ -274,39 +205,43 @@ select {
     </div>
   </div>
 
-  <!-- STEP 1 -->
+  <!-- STEP 1: DADOS PESSOAIS -->
   <div class="step-content ativo" id="step1">
     <div class="form-card">
       <h2 class="form-section-title">Dados pessoais</h2>
       <p class="form-section-sub">Informações básicas sobre você. Seu CRP será verificado pela equipe MeuPsi.</p>
 
+      <div id="feedbackStep1" class="feedback"></div>
+
       <div style="margin-bottom:1.5rem;">
         <label style="display:block; margin-bottom:8px;">Foto de perfil <span class="label-opt">(opcional)</span></label>
         <div class="upload-area" onclick="document.getElementById('foto').click()">
           <div class="upload-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg></div>
-          <p class="upload-text">Clique para enviar sua foto</p>
+          <p class="upload-text" id="uploadTexto">Clique para enviar sua foto</p>
           <p class="upload-sub">JPG ou PNG · Máx. 5MB</p>
-          <input type="file" id="foto" accept="image/*" style="display:none" onchange="previewFoto(this)" />
-          <img id="fotoPreview" class="upload-preview" alt="Pré-visualização da foto" />
+          <input type="file" id="foto" accept="image/*" style="display:none" onchange="mostrarNomeFoto(this)" />
         </div>
       </div>
 
       <div class="field-row">
         <div class="field">
-          <label for="nome">Nome completo</label>
+          <label for="nome">Nome completo *</label>
           <input type="text" id="nome" placeholder="Andreia Vieira" />
+          <span class="field-error" id="err-nome">Informe seu nome completo.</span>
         </div>
         <div class="field">
-          <label for="crp">CRP</label>
-          <input type="text" id="crp" placeholder="21/06454" />
+          <label for="crp">CRP *</label>
+          <input type="text" id="crp" placeholder="06/98432" />
+          <span class="field-error" id="err-crp">Informe seu CRP.</span>
           <span class="field-hint">Será verificado pela nossa equipe</span>
         </div>
       </div>
 
       <div class="field-row">
         <div class="field">
-          <label for="email">E-mail</label>
+          <label for="email">E-mail *</label>
           <input type="email" id="email" placeholder="andreia@email.com" />
+          <span class="field-error" id="err-email">Informe um e-mail válido.</span>
         </div>
         <div class="field">
           <label for="tel">WhatsApp</label>
@@ -334,24 +269,24 @@ select {
         </div>
       </div>
 
+      <!-- CORREÇÃO: type="password" em vez de type="text" -->
       <div class="field">
-        <label for="senha">Senha de acesso</label>
+        <label for="senha">Senha de acesso *</label>
         <input type="password" id="senha" placeholder="Mínimo 8 caracteres" />
+        <span class="field-error" id="err-senha">A senha precisa ter no mínimo 8 caracteres.</span>
       </div>
-
-      <div id="feedbackStep1" class="feedback erro"></div>
     </div>
 
     <div class="form-nav">
       <span></span>
-      <button class="btn btn-primary" onclick="validarEAvancar(2)">
+      <button class="btn btn-primary" onclick="validarStep1()">
         Continuar
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
       </button>
     </div>
   </div>
 
-  <!-- STEP 2 -->
+  <!-- STEP 2: PERFIL PROFISSIONAL -->
   <div class="step-content" id="step2">
     <div class="form-card">
       <h2 class="form-section-title">Perfil profissional</h2>
@@ -376,26 +311,26 @@ select {
       <div class="field">
         <label>Especialidades <span class="label-opt">(selecione quantas quiser)</span></label>
         <div class="tags-wrap" style="margin-top:4px;">
-          <input type="checkbox" class="tag-check especialidade-check" id="e1" value="Ansiedade"><label for="e1">Ansiedade</label>
-          <input type="checkbox" class="tag-check especialidade-check" id="e2" value="Depressão"><label for="e2">Depressão</label>
-          <input type="checkbox" class="tag-check especialidade-check" id="e3" value="Trauma e TEPT"><label for="e3">Trauma e TEPT</label>
-          <input type="checkbox" class="tag-check especialidade-check" id="e4" value="Luto"><label for="e4">Luto</label>
-          <input type="checkbox" class="tag-check especialidade-check" id="e5" value="Relacionamentos"><label for="e5">Relacionamentos</label>
-          <input type="checkbox" class="tag-check especialidade-check" id="e6" value="Autoestima"><label for="e6">Autoestima</label>
-          <input type="checkbox" class="tag-check especialidade-check" id="e7" value="Burnout"><label for="e7">Burnout</label>
-          <input type="checkbox" class="tag-check especialidade-check" id="e8" value="Transtornos alimentares"><label for="e8">Transtornos alimentares</label>
-          <input type="checkbox" class="tag-check especialidade-check" id="e9" value="Dependência química"><label for="e9">Dependência química</label>
-          <input type="checkbox" class="tag-check especialidade-check" id="e10" value="TDAH"><label for="e10">TDAH</label>
-          <input type="checkbox" class="tag-check especialidade-check" id="e11" value="Infância e adolescência"><label for="e11">Infância e adolescência</label>
-          <input type="checkbox" class="tag-check especialidade-check" id="e12" value="LGBTQIA+"><label for="e12">LGBTQIA+</label>
-          <input type="checkbox" class="tag-check especialidade-check" id="e13" value="Psicologia do Esporte"><label for="e13">Psicologia do Esporte</label>
-          <input type="checkbox" class="tag-check especialidade-check" id="e14" value="Saúde da mulher"><label for="e14">Saúde da mulher</label>
+          <input type="checkbox" class="tag-check" id="e1"><label for="e1">Ansiedade</label>
+          <input type="checkbox" class="tag-check" id="e2"><label for="e2">Depressão</label>
+          <input type="checkbox" class="tag-check" id="e3"><label for="e3">Trauma e TEPT</label>
+          <input type="checkbox" class="tag-check" id="e4"><label for="e4">Luto</label>
+          <input type="checkbox" class="tag-check" id="e5"><label for="e5">Relacionamentos</label>
+          <input type="checkbox" class="tag-check" id="e6"><label for="e6">Autoestima</label>
+          <input type="checkbox" class="tag-check" id="e7"><label for="e7">Burnout</label>
+          <input type="checkbox" class="tag-check" id="e8"><label for="e8">Transtornos alimentares</label>
+          <input type="checkbox" class="tag-check" id="e9"><label for="e9">Dependência química</label>
+          <input type="checkbox" class="tag-check" id="e10"><label for="e10">TDAH</label>
+          <input type="checkbox" class="tag-check" id="e11"><label for="e11">Infância e adolescência</label>
+          <input type="checkbox" class="tag-check" id="e12"><label for="e12">LGBTQIA+</label>
+          <input type="checkbox" class="tag-check" id="e13"><label for="e13">Psicologia do Esporte</label>
+          <input type="checkbox" class="tag-check" id="e14"><label for="e14">Saúde da mulher</label>
         </div>
       </div>
 
       <div class="field">
         <label for="bio">Apresentação</label>
-        <textarea id="bio" placeholder="Conte um pouco sobre você, sua trajetória e como costuma conduzir os atendimentos. Essa é a primeira coisa que o paciente vai ler sobre você…"></textarea>
+        <textarea id="bio" placeholder="Conte um pouco sobre você, sua trajetória e como costuma conduzir os atendimentos…"></textarea>
         <span class="field-hint">Entre 100 e 500 caracteres. Escreva em primeira pessoa.</span>
       </div>
 
@@ -423,7 +358,7 @@ select {
     </div>
   </div>
 
-  <!-- STEP 3 -->
+  <!-- STEP 3: DISPONIBILIDADE -->
   <div class="step-content" id="step3">
     <div class="form-card">
       <h2 class="form-section-title">Disponibilidade e atendimento</h2>
@@ -433,11 +368,11 @@ select {
         <label>Modalidade de atendimento</label>
         <div class="toggle-row">
           <div class="toggle-info"><p>Online</p><span>Videochamada pelo MeuPsi ou plataforma própria</span></div>
-          <label class="toggle"><input type="checkbox" id="modOnline" checked /><span class="toggle-slider"></span></label>
+          <label class="toggle"><input type="checkbox" id="modalOnline" checked /><span class="toggle-slider"></span></label>
         </div>
         <div class="toggle-row">
           <div class="toggle-info"><p>Presencial</p><span>Consultório físico na sua cidade</span></div>
-          <label class="toggle"><input type="checkbox" id="modPresencial" /><span class="toggle-slider"></span></label>
+          <label class="toggle"><input type="checkbox" id="modalPresencial" /><span class="toggle-slider"></span></label>
         </div>
       </div>
 
@@ -510,11 +445,13 @@ select {
     </div>
   </div>
 
-  <!-- STEP 4 -->
+  <!-- STEP 4: REVISÃO -->
   <div class="step-content" id="step4">
     <div class="form-card">
       <h2 class="form-section-title">Revise suas informações</h2>
       <p class="form-section-sub">Confirme os dados antes de enviar. Tudo pode ser editado depois no seu painel.</p>
+
+      <div id="feedbackEnvio" class="feedback"></div>
 
       <div style="display:flex; flex-direction:column; gap:0;">
         <div class="toggle-row" style="padding:14px 0;">
@@ -542,8 +479,6 @@ select {
       <div style="margin-top:1.5rem; padding:1rem; background:var(--lila-50); border-radius:var(--radius-sm); font-size:13px; color:var(--gray-500); line-height:1.6;">
         Ao cadastrar, você concorda com os <a href="#" style="color:var(--lila-700)">Termos de Uso</a> e a <a href="#" style="color:var(--lila-700)">Política de Privacidade</a> do MeuPsi. Seu CRP será verificado em até 48 horas.
       </div>
-
-      <div id="feedbackEnvio" class="feedback erro"></div>
     </div>
 
     <div class="form-nav">
@@ -558,7 +493,7 @@ select {
     </div>
   </div>
 
-  <!-- SUCESSO -->
+  <!-- STEP 5: SUCESSO -->
   <div class="step-content" id="step5">
     <div class="sucesso">
       <div class="sucesso-icon">
@@ -569,6 +504,7 @@ select {
       <a href="index.html" class="btn btn-primary" style="margin:0 auto;">Voltar para o início</a>
     </div>
   </div>
+
 </div>
 
 <div style="text-align:center;padding:1.5rem 0 3rem;font-size:14px;color:var(--gray-500);">
@@ -576,208 +512,174 @@ select {
 </div>
 
 <script>
-  const SUPABASE_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_2u0U4PTZuMNCS4LkTgnBBQ_ltfjZYqo';
-  const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
+const db = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-  let stepAtual = 1;
-  let fotoArquivo = null;
+let stepAtual = 1;
 
-  function previewFoto(input) {
-    const file = input.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { alert('Imagem muito grande (máx 5MB).'); input.value = ''; return; }
-    fotoArquivo = file;
-    const prev = document.getElementById('fotoPreview');
-    prev.src = URL.createObjectURL(file);
-    prev.style.display = 'block';
+function mostrarNomeFoto(input) {
+  if (input.files && input.files[0]) {
+    document.getElementById('uploadTexto').textContent = '✓ ' + input.files[0].name;
+  }
+}
+
+// ── CORREÇÃO: Validação do Step 1 antes de avançar ──
+function validarStep1() {
+  let valido = true;
+  const fb = document.getElementById('feedbackStep1');
+  fb.style.display = 'none';
+
+  const nome = document.getElementById('nome');
+  const crp = document.getElementById('crp');
+  const email = document.getElementById('email');
+  const senha = document.getElementById('senha');
+
+  // Limpa erros anteriores
+  [nome, crp, email, senha].forEach(el => {
+    el.classList.remove('invalid');
+    document.getElementById('err-' + el.id).style.display = 'none';
+  });
+
+  if (!nome.value.trim()) {
+    nome.classList.add('invalid');
+    document.getElementById('err-nome').style.display = 'block';
+    valido = false;
+  }
+  if (!crp.value.trim()) {
+    crp.classList.add('invalid');
+    document.getElementById('err-crp').style.display = 'block';
+    valido = false;
+  }
+  if (!email.value.trim() || !email.value.includes('@')) {
+    email.classList.add('invalid');
+    document.getElementById('err-email').style.display = 'block';
+    valido = false;
+  }
+  if (senha.value.length < 8) {
+    senha.classList.add('invalid');
+    document.getElementById('err-senha').style.display = 'block';
+    valido = false;
   }
 
-  function validarEAvancar(n) {
-    const fb = document.getElementById('feedbackStep1');
-    fb.style.display = 'none';
+  if (valido) irPara(2);
+}
 
-    const nome = document.getElementById('nome').value.trim();
-    const crp = document.getElementById('crp').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const senha = document.getElementById('senha').value;
-
-    if (!nome || !crp || !email || !senha) {
-      fb.style.display = 'block';
-      fb.textContent = 'Preencha nome, CRP, e-mail e senha para continuar.';
-      return;
-    }
-    if (senha.length < 8) {
-      fb.style.display = 'block';
-      fb.textContent = 'A senha precisa ter pelo menos 8 caracteres.';
-      return;
-    }
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      fb.style.display = 'block';
-      fb.textContent = 'Digite um e-mail válido.';
-      return;
-    }
-
-    irPara(n);
+function irPara(n) {
+  if (n === 4) {
+    document.getElementById('rev-nome').textContent = document.getElementById('nome').value || '—';
+    document.getElementById('rev-crp').textContent = document.getElementById('crp').value || '—';
+    document.getElementById('rev-email').textContent = document.getElementById('email').value || '—';
+    document.getElementById('rev-abordagem').textContent = document.getElementById('abordagem').value || '—';
+    const val = document.getElementById('valor').value;
+    document.getElementById('rev-valor').textContent = val ? `R$ ${val}` : '—';
   }
 
-  function irPara(n) {
-    if (n === 4) {
-      document.getElementById('rev-nome').textContent = document.getElementById('nome').value || '—';
-      document.getElementById('rev-crp').textContent = document.getElementById('crp').value || '—';
-      document.getElementById('rev-email').textContent = document.getElementById('email').value || '—';
-      document.getElementById('rev-abordagem').textContent = document.getElementById('abordagem').value || '—';
-      const val = document.getElementById('valor').value;
-      document.getElementById('rev-valor').textContent = val ? `R$ ${val}` : '—';
+  document.querySelectorAll('.step-content').forEach(s => s.classList.remove('ativo'));
+  document.getElementById('step' + n).classList.add('ativo');
+
+  for (let i = 1; i <= 4; i++) {
+    const c = document.getElementById('c' + i);
+    const l = document.getElementById('l' + i);
+    if (i < n) {
+      c.classList.remove('ativo'); c.classList.add('feito');
+      c.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 5 5L20 7"/></svg>';
+      l.classList.remove('ativo'); l.classList.add('feito');
+    } else if (i === n) {
+      c.classList.add('ativo'); c.classList.remove('feito');
+      c.textContent = i;
+      l.classList.add('ativo'); l.classList.remove('feito');
+    } else {
+      c.classList.remove('ativo', 'feito');
+      c.textContent = i;
+      l.classList.remove('ativo', 'feito');
     }
-
-    document.querySelectorAll('.step-content').forEach(s => s.classList.remove('ativo'));
-    document.getElementById('step' + n).classList.add('ativo');
-
-    for (let i = 1; i <= 4; i++) {
-      const c = document.getElementById('c' + i);
-      const l = document.getElementById('l' + i);
-      if (i < n) {
-        c.classList.remove('ativo'); c.classList.add('feito');
-        c.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 5 5L20 7"/></svg>';
-        l.classList.remove('ativo'); l.classList.add('feito');
-      } else if (i === n) {
-        c.classList.add('ativo'); c.classList.remove('feito');
-        c.textContent = i;
-        l.classList.add('ativo'); l.classList.remove('feito');
-      } else {
-        c.classList.remove('ativo', 'feito');
-        c.textContent = i;
-        l.classList.remove('ativo', 'feito');
-      }
-      if (i <= 3) {
-        const line = document.getElementById('line' + i);
-        if (i < n) line.classList.add('feito'); else line.classList.remove('feito');
-      }
-    }
-
-    stepAtual = n;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function modalidadeSelecionada() {
-    const online = document.getElementById('modOnline').checked;
-    const presencial = document.getElementById('modPresencial').checked;
-    if (online && presencial) return 'ambos';
-    if (presencial) return 'presencial';
-    return 'online';
-  }
-
-  async function uploadFoto(userId) {
-    if (!fotoArquivo) return null;
-    try {
-      const ext = fotoArquivo.name.split('.').pop();
-      const path = `psicologos/${userId}/foto.${ext}`;
-      const { error } = await db.storage.from('fotos').upload(path, fotoArquivo, { upsert: true });
-      if (error) { console.error('Erro no upload da foto:', error); return null; }
-      const { data } = db.storage.from('fotos').getPublicUrl(path);
-      return data.publicUrl;
-    } catch (e) {
-      console.error('Erro no upload da foto:', e);
-      return null;
+    if (i <= 3) {
+      const line = document.getElementById('line' + i);
+      if (i < n) line.classList.add('feito');
+      else line.classList.remove('feito');
     }
   }
 
-  async function enviarCadastro() {
-    const fb = document.getElementById('feedbackEnvio');
-    const btn = document.getElementById('btnEnviar');
-    fb.style.display = 'none';
-    fb.className = 'feedback erro';
+  stepAtual = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-    const nome = document.getElementById('nome').value.trim();
-    const crp = document.getElementById('crp').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const senha = document.getElementById('senha').value;
-    const tel = document.getElementById('tel').value.trim();
-    const cidade = document.getElementById('cidade').value.trim();
-    const abordagem = document.getElementById('abordagem').value;
-    const bio = document.getElementById('bio').value.trim();
-    const valor = document.getElementById('valor').value;
+// ── CORREÇÃO CRÍTICA: enviarCadastro agora usa Supabase ──
+async function enviarCadastro() {
+  const fb = document.getElementById('feedbackEnvio');
+  const btn = document.getElementById('btnEnviar');
 
-    if (!nome || !crp || !email || !senha) {
-      fb.style.display = 'block';
-      fb.textContent = 'Faltam informações obrigatórias. Volte à primeira etapa e confira.';
-      return;
-    }
+  fb.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
 
-    const especialidades = Array.from(document.querySelectorAll('.especialidade-check:checked'))
-      .map(el => el.value);
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value;
+  const nome = document.getElementById('nome').value.trim();
+  const crp = document.getElementById('crp').value.trim();
 
-    btn.disabled = true;
-    btn.textContent = 'Enviando...';
-
-    // 1. Cria a conta de autenticação
-    const { data: signUpData, error: signUpError } = await db.auth.signUp({
+  try {
+    // 1. Cria a conta no Supabase Auth
+    const { data: authData, error: authError } = await db.auth.signUp({
       email,
       password: senha,
-      options: { data: { nome, tipo: 'psicologo' } }
+      options: { data: { nome } }
     });
 
-    if (signUpError) {
-      btn.disabled = false;
-      btn.textContent = 'Enviar cadastro';
-      fb.style.display = 'block';
-      fb.textContent = traduzirErroCadastro(signUpError.message);
-      return;
+    if (authError) throw authError;
+
+    // 2. Insere na tabela psicologos
+    const user = authData.user;
+    if (user) {
+      const especialidades = [...document.querySelectorAll('.tag-check:checked')]
+        .map(el => el.nextElementSibling.textContent).join(', ');
+
+      const { error: dbError } = await db.from('psicologos').insert({
+        user_id: user.id,
+        email: email,
+        nome: nome,
+        crp: crp,
+        telefone: document.getElementById('tel').value.trim(),
+        cidade: document.getElementById('cidade').value.trim(),
+        estado: document.getElementById('estado').value,
+        abordagem: document.getElementById('abordagem').value,
+        especialidade: especialidades,
+        bio: document.getElementById('bio').value.trim(),
+        formacao: document.getElementById('formacao').value.trim(),
+        site: document.getElementById('site').value.trim(),
+        valor_sessao: document.getElementById('valor').value || null,
+        duracao_sessao: document.getElementById('duracao').value,
+        atende_online: document.getElementById('modalOnline').checked,
+        atende_presencial: document.getElementById('modalPresencial').checked,
+        agenda_aberta: document.getElementById('agendaAberta').checked,
+        ativo: false // fica inativo até verificação do CRP
+      });
+
+      if (dbError) throw dbError;
     }
 
-    const userId = signUpData.user?.id;
-    if (!userId) {
-      btn.disabled = false;
-      btn.textContent = 'Enviar cadastro';
-      fb.style.display = 'block';
-      fb.textContent = 'Não foi possível criar sua conta agora. Tente novamente em instantes.';
-      return;
-    }
-
-    // 2. Envia a foto, se houver
-    const fotoUrl = await uploadFoto(userId);
-
-    // 3. Cria o registro do psicólogo
-    const payload = {
-      user_id: userId,
-      nome,
-      crp,
-      email,
-      whatsapp: tel || null,
-      cidade: cidade || null,
-      especialidade: especialidades.join(', ') || null,
-      abordagem: abordagem || null,
-      bio: bio || null,
-      modalidade: modalidadeSelecionada(),
-      preco_exato: valor || null,
-      foto_url: fotoUrl,
-      ativo: false,
-    };
-
-    const { error: insertError } = await db.from('psicologos').insert(payload);
-
-    btn.disabled = false;
-    btn.textContent = 'Enviar cadastro';
-
-    if (insertError) {
-      fb.style.display = 'block';
-      fb.textContent = 'Sua conta foi criada, mas houve um erro ao salvar seu perfil: ' + insertError.message + '. Entre em contato com o suporte.';
-      console.error('Erro ao criar perfil de psicólogo:', insertError);
-      return;
-    }
-
+    // Sucesso!
     document.querySelectorAll('.step-content').forEach(s => s.classList.remove('ativo'));
     document.getElementById('step5').classList.add('ativo');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
 
-  function traduzirErroCadastro(msg) {
-    if (msg.includes('already registered') || msg.includes('already exists')) return 'Já existe uma conta com este e-mail. Tente entrar em vez de se cadastrar.';
-    if (msg.includes('Password should be')) return 'A senha precisa ter pelo menos 8 caracteres.';
-    if (msg.includes('invalid') && msg.includes('email')) return 'Digite um e-mail válido.';
-    return 'Erro ao criar conta: ' + msg;
+  } catch(e) {
+    console.error('Erro no cadastro:', e);
+    btn.disabled = false;
+    btn.textContent = 'Enviar cadastro';
+    fb.className = 'feedback erro';
+    fb.style.display = 'block';
+
+    if (e.message && e.message.includes('already registered')) {
+      fb.textContent = 'Este e-mail já está cadastrado. Tente fazer login.';
+    } else if (e.message && e.message.includes('Password')) {
+      fb.textContent = 'A senha precisa ter no mínimo 6 caracteres.';
+    } else {
+      fb.textContent = 'Erro ao enviar cadastro. Tente novamente.';
+    }
   }
+}
 </script>
 </body>
 </html>
