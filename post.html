@@ -187,7 +187,7 @@
 
     const { data: post, error } = await supabase
       .from('blog_posts')
-      .select('*, psicologos(nome, foto_url, bio, slug)')
+      .select('*, psicologos(id, nome, foto_url, bio)')
       .eq('slug', slug)
       .eq('status', 'publicado')
       .single();
@@ -221,7 +221,7 @@
         <div>
           <h4>${escapeHTML(authorName)}</h4>
           <p>${escapeHTML(post.psicologos?.bio || 'Psicólogo(a) verificado(a) na plataforma MeuPsi.')}</p>
-          ${post.psicologos?.slug ? `<a href="perfil.html?slug=${encodeURIComponent(post.psicologos.slug)}">Ver perfil e agendar consulta →</a>` : ''}
+          ${post.psicologos?.id ? `<a href="perfil.html?id=${encodeURIComponent(post.psicologos.id)}">Ver perfil e agendar consulta →</a>` : ''}
         </div>
       </div>
       <section class="related" id="related"></section>
