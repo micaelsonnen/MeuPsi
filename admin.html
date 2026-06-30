@@ -558,8 +558,8 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────────
-const SUPABASE_URL = 'https://zyfqynjfnnhpsbkwajup.supabase.co'
-const SUPABASE_ANON_KEY = 'sb_publishable_1bUv_1N-cIWv7Icthh4fdQ_nH8rdJuz'
+const SUPABASE_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8'
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // ── ESTADO ──────────────────────────────────────────────────
@@ -609,11 +609,11 @@ function irPara(pag) {
 
 // ── DADOS ───────────────────────────────────────────────────
 async function carregarTudo() {
-  const { data: todos } = await sb.from('psicologos').select('id, status')
+  const { data: todos } = await sb.from('psicologos').select('id, ativo')
   psicologos = (await sb.from('psicologos').select('*').order('created_at', { ascending: false })).data || []
-  const aprovados = todos?.filter(p => p.status === 'aprovado').length || 0
-  const pendentes = todos?.filter(p => p.status === 'pendente').length || 0
-  const { count: agends } = await sb.from('agendamentos').select('id', { count: 'exact', head: true })
+  const aprovados = todos?.filter(p => p.ativo !== false).length || 0
+  const pendentes = todos?.filter(p => p.ativo === false).length || 0
+  const { count: agends } = await sb.from('sessoes').select('id', { count: 'exact', head: true })
   document.getElementById('statTotal').textContent = todos?.length || 0
   document.getElementById('statAprovados').textContent = aprovados
   document.getElementById('statPendentes').textContent = pendentes
@@ -624,6 +624,11 @@ async function carregarTudo() {
     badge.style.display = 'inline'
   }
   renderTabela(psicologos)
+}
+
+// Deriva um "status" visual (aprovado/pendente) a partir do campo real 'ativo'
+function statusDe(p) {
+  return p.ativo !== false ? 'aprovado' : 'pendente'
 }
 
 // ── TABELA PSICÓLOGOS ───────────────────────────────────────
@@ -649,11 +654,11 @@ function renderTabela(lista) {
       <td>${p.abordagem || '—'}</td>
       <td>${p.cidade ? `${p.cidade} / ${p.estado}` : '—'}</td>
       <td>${p.valor_sessao ? `R$ ${Number(p.valor_sessao).toFixed(0)}` : '—'}</td>
-      <td><span class="badge badge-${p.status}">${p.status}</span></td>
+      <td><span class="badge badge-${statusDe(p)}">${statusDe(p)}</span></td>
       <td>
         <div class="acoes">
           <button class="btn btn-ghost btn-sm" onclick="abrirModalEditar('${p.id}')">Editar</button>
-          ${p.status !== 'aprovado'
+          ${statusDe(p) !== 'aprovado'
             ? `<button class="btn btn-primary btn-sm" onclick="mudarStatus('${p.id}','aprovado')">Aprovar</button>`
             : ``
           }
@@ -672,7 +677,7 @@ function filtrarTabela(busca) {
 
 // ── PENDENTES ───────────────────────────────────────────────
 function renderPendentes() {
-  const pendentes = psicologos.filter(p => p.status === 'pendente')
+  const pendentes = psicologos.filter(p => statusDe(p) === 'pendente')
   const tbody = document.getElementById('tabelaPendentes')
   if (!pendentes.length) {
     tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum cadastro pendente 🎉</td></tr>'
@@ -701,12 +706,12 @@ function renderPendentes() {
     </tr>`).join('')
 }
 
-// ── AGENDAMENTOS ────────────────────────────────────────────
+// ── AGENDAMENTOS (tabela real: sessoes) ──────────────────────
 async function carregarAgendamentos() {
   const { data } = await sb
-    .from('agendamentos')
-    .select('*, psicologo:psicologos(nome)')
-    .order('data', { ascending: false })
+    .from('sessoes')
+    .select('*, psicologo:psicologos(nome), paciente:pacientes_meupsi(nome, email)')
+    .order('data_hora', { ascending: false })
     .limit(50)
   const tbody = document.getElementById('tabelaAgendamentos')
   if (!data?.length) {
@@ -716,20 +721,20 @@ async function carregarAgendamentos() {
   tbody.innerHTML = data.map(a => `
     <tr>
       <td>
-        <p style="font-weight:500">${a.paciente_nome}</p>
-        <p style="font-size:11px;color:var(--malva)">${a.paciente_email}</p>
+        <p style="font-weight:500">${a.paciente?.nome || '—'}</p>
+        <p style="font-size:11px;color:var(--malva)">${a.paciente?.email || ''}</p>
       </td>
       <td>${a.psicologo?.nome || '—'}</td>
-      <td>${new Date(a.data + 'T12:00:00').toLocaleDateString('pt-BR')}</td>
-      <td>${a.horario?.slice(0,5)}</td>
-      <td>${a.modalidade}</td>
+      <td>${a.data_hora ? new Date(a.data_hora).toLocaleDateString('pt-BR') : '—'}</td>
+      <td>${a.data_hora ? new Date(a.data_hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '—'}</td>
+      <td>${a.tipo || '—'}</td>
       <td><span class="badge badge-${a.status}">${a.status}</span></td>
     </tr>`).join('')
 }
 
 // ── STATUS ──────────────────────────────────────────────────
 async function mudarStatus(id, novoStatus) {
-  const { error } = await sb.from('psicologos').update({ status: novoStatus }).eq('id', id)
+  const { error } = await sb.from('psicologos').update({ ativo: novoStatus === 'aprovado' }).eq('id', id)
   if (error) return toast('Erro ao atualizar status', 'erro')
   toast(`Psicólogo ${novoStatus === 'aprovado' ? 'aprovado' : 'atualizado'} com sucesso!`)
   await carregarTudo()
@@ -818,7 +823,7 @@ function preencherForm(p) {
   document.getElementById('fSite').value = p.site || ''
   document.getElementById('fValor').value = p.valor_sessao || ''
   document.getElementById('fDuracao').value = p.duracao_sessao || '50'
-  document.getElementById('fStatus').value = p.status || 'pendente'
+  document.getElementById('fStatus').value = statusDe(p)
   document.getElementById('fOnline').checked = p.modalidade_online ?? true
   document.getElementById('fPresencial').checked = p.modalidade_presencial ?? false
   document.getElementById('fAceita').checked = p.aceita_pacientes ?? true
@@ -859,7 +864,7 @@ async function salvarPsicologo() {
     site: document.getElementById('fSite').value.trim(),
     valor_sessao: Number(document.getElementById('fValor').value) || null,
     duracao_sessao: Number(document.getElementById('fDuracao').value),
-    status: document.getElementById('fStatus').value,
+    ativo: document.getElementById('fStatus').value === 'aprovado',
     modalidade_online: document.getElementById('fOnline').checked,
     modalidade_presencial: document.getElementById('fPresencial').checked,
     aceita_pacientes: document.getElementById('fAceita').checked,
