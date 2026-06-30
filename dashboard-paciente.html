@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mind — Minha Jornada</title>
+<title>MeuPsi — Minha Jornada</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -29,7 +29,7 @@
 body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
 .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100; }
 .logo-mark { width: 32px; height: 32px; background: linear-gradient(135deg, var(--navy), var(--sage)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: white; }
-.topbar h1 { font-size: 16px; font-weight: 700; background: linear-gradient(135deg, var(--navy), var(--sage)); color: var(--navy); }
+.topbar h1 { font-size: 16px; font-weight: 700; color: var(--navy); }
 .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
 .topbar-nome { font-size: 14px; font-weight: 500; }
 .logout-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; }
@@ -45,6 +45,11 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', system-u
 .boas-vindas h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
 .boas-vindas p { color: var(--muted); font-size: 14px; }
 .dias-badge { display: inline-block; background: rgba(45,74,107,0.2); color: var(--navy); padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-top: 10px; }
+
+/* BANNER DE STATUS (sem psicólogo vinculado ainda) */
+#banner-status { display: none; background: var(--surface); border: 1.5px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+#banner-status h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+
 .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
 .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
@@ -84,19 +89,20 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', system-u
 .economia-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
 .loading { text-align: center; color: var(--muted); padding: 40px; font-size: 14px; }
 .sem-dados { text-align: center; color: var(--muted); padding: 20px; font-size: 14px; }
+.btn-cta { display: inline-block; background: linear-gradient(135deg, var(--navy), var(--sage)); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: 13px; font-weight: 600; }
 </style>
 </head>
 <body>
 <div class="topbar">
   <div class="logo-mark">M</div>
-  <h1>Mind</h1>
+  <h1>MeuPsi</h1>
   <div class="topbar-right">
     <span class="topbar-nome" id="topbar-nome">—</span>
     <button class="logout-btn" onclick="sair()" title="Sair">⏏</button>
   </div>
 </div>
 
-<div class="tabs-bar">
+<div class="tabs-bar" id="tabs-bar">
   <button class="tab-btn active" onclick="abrirTab('inicio', this)">🏠 Início</button>
   <button class="tab-btn" onclick="abrirTab('progresso', this)">📈 Meu Progresso</button>
   <button class="tab-btn" onclick="abrirTab('sessoes', this)">📋 Sessões</button>
@@ -104,6 +110,9 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', system-u
 </div>
 
 <div class="container">
+
+  <!-- BANNER: aparece quando o paciente ainda não tem psicólogo vinculado -->
+  <div id="banner-status"></div>
 
   <!-- INÍCIO -->
   <div id="tab-inicio" class="tab-content active">
@@ -199,19 +208,50 @@ async function init() {
   const { data: { session } } = await db.auth.getSession();
   if (!session) { window.location.href = 'login.html'; return; }
 
-  const { data: p } = await db.from('pacientes_meupsi').select('*').eq('email', session.user.email).maybeSingle();
-  pacienteData = p;
+  // busca por user_id (vínculo confiável com o Supabase Auth), não mais por e-mail
+  const { data: p, error } = await db.from('pacientes').select('*').eq('user_id', session.user.id).maybeSingle();
 
-  if (!p) {
-    alert('Não encontramos um cadastro de paciente vinculado a este login. Fale com seu psicólogo para verificar seu acesso.');
-    await db.auth.signOut();
-    window.location.href = 'login.html';
+  if (error) {
+    document.getElementById('banner-status').style.display = 'block';
+    document.getElementById('banner-status').innerHTML =
+      '<h3>⚠️ Erro ao carregar seu perfil</h3><p style="font-size:14px;color:var(--muted);">' + error.message + '</p>';
     return;
   }
 
+  // se a pessoa logou mas nunca completou o cadastro de paciente
+  if (!p) { window.location.href = 'cadastro-paciente.html'; return; }
+
+  pacienteData = p;
   const nome = p.nome?.split(' ')[0] || 'Olá';
   document.getElementById('topbar-nome').textContent = nome;
   document.getElementById('saudacao').textContent = 'Olá, ' + nome + '! 👋';
+
+  // ainda não escolheu / não foi aceito por um psicólogo
+  if (!p.psicologo_id) {
+    document.getElementById('tabs-bar').style.display = 'none';
+    document.getElementById('tab-inicio').classList.remove('active');
+
+    const banner = document.getElementById('banner-status');
+    banner.style.display = 'block';
+
+    if (p.status === 'aguardando_psicologo') {
+      banner.innerHTML = `
+        <h3>⏳ Pedido enviado</h3>
+        <p style="font-size:14px;color:var(--muted);">
+          Você solicitou uma sessão e está aguardando o psicólogo confirmar o dia e horário.
+          Assim que for aceito, seu painel será liberado.
+        </p>`;
+    } else {
+      banner.innerHTML = `
+        <h3>👋 Vamos começar</h3>
+        <p style="font-size:14px;color:var(--muted);margin-bottom:14px;">
+          Você ainda não escolheu um psicólogo. Veja os profissionais disponíveis e solicite o seu primeiro horário.
+        </p>
+        <a href="escolher-psicologo.html" class="btn-cta">Escolher meu psicólogo</a>`;
+    }
+    // não tenta carregar sessões/stats de um vínculo que ainda não existe
+    return;
+  }
 
   // Dias em terapia
   if (p.data_inicio) {
@@ -279,7 +319,6 @@ async function carregarProgresso() {
       options: { plugins: { legend: { labels: { color: '#1A2332' } } }, scales: { x: { ticks: { color: '#6B7A8D' }, grid: { color: '#E2DED8' } }, y: { min: 0, max: 10, ticks: { color: '#6B7A8D' }, grid: { color: '#E2DED8' } } } }
     });
 
-    // Melhorias
     if (comSintomas.length >= 2) {
       const primeiro = comSintomas[0].sintomas[0];
       const ultimo = comSintomas[comSintomas.length - 1].sintomas[0];
@@ -300,7 +339,6 @@ async function carregarProgresso() {
     document.getElementById('melhorias-lista').innerHTML = '<div class="sem-dados">Nenhum dado de sintoma registrado</div>';
   }
 
-  // Marcos
   const marcos = [];
   if (sessoes?.length >= 1) marcos.push({ icon: '🌱', data: sessoes[0].data_hora, desc: 'Primeira sessão realizada' });
   if (sessoes?.length >= 5) marcos.push({ icon: '⭐', data: sessoes[4].data_hora, desc: '5ª sessão — constância' });
