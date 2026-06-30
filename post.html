@@ -1,131 +1,138 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<!-- Estes valores são substituídos dinamicamente via JS assim que o post carrega,
-     o que garante título/descrição corretos para compartilhamento e indexação. -->
 <title id="metaTitle">Artigo — Blog MeuPsi</title>
-<meta id="metaDescription" name="description" content="Artigo do blog MeuPsi sobre saúde mental.">
-<link id="metaCanonical" rel="canonical" href="https://meupsi.com.br/post.html">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta id="metaDescription" name="description" content="Artigo do blog MeuPsi sobre saúde mental." />
+<link id="metaCanonical" rel="canonical" href="https://micaeltatuagem.github.io/meupsi/post.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
 
-<meta id="ogType" property="og:type" content="article">
-<meta id="ogTitle" property="og:title" content="Artigo — Blog MeuPsi">
-<meta id="ogDescription" property="og:description" content="Artigo do blog MeuPsi sobre saúde mental.">
-<meta id="ogUrl" property="og:url" content="https://meupsi.com.br/post.html">
-<meta id="ogImage" property="og:image" content="https://meupsi.com.br/assets/og-blog.jpg">
-<meta property="og:site_name" content="MeuPsi">
-<meta property="og:locale" content="pt_BR">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta id="twTitle" name="twitter:title" content="Artigo — Blog MeuPsi">
-<meta id="twDescription" name="twitter:description" content="Artigo do blog MeuPsi.">
-<meta id="twImage" name="twitter:image" content="https://meupsi.com.br/assets/og-blog.jpg">
+<meta id="ogTitle" property="og:type" content="article" />
+<meta id="ogTitleMeta" property="og:title" content="Artigo — Blog MeuPsi" />
+<meta id="ogDescription" property="og:description" content="Artigo do blog MeuPsi sobre saúde mental." />
+<meta id="ogUrl" property="og:url" content="https://micaeltatuagem.github.io/meupsi/post.html" />
+<meta id="ogImage" property="og:image" content="" />
+<meta property="og:site_name" content="MeuPsi" />
+<meta property="og:locale" content="pt_BR" />
 
 <script type="application/ld+json" id="ldJson"></script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-  :root{
-    --ink:#1F2C29; --paper:#EFEDE6; --paper-raised:#FAF9F5;
-    --forest:#3E6259; --forest-dark:#2C463F; --clay:#C4633A;
-    --line:#D9D5C9; --muted:#6B6F69;
-  }
-  *{box-sizing:border-box;}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.6;}
-  a{color:var(--forest-dark);}
-  .wrap{max-width:760px;margin:0 auto;padding:0 24px;}
+:root {
+  --cream: #FDF6F8; --rose-50: #FAF0F4; --rose-100: #F5E2EA; --rose-200: #ECC8D8;
+  --mauve-300: #D4ABBE; --mauve-500: #B87FA0;
+  --lila-300: #C9ADE0; --lila-500: #9B6FD8; --lila-700: #6B3FA8; --lila-900: #3B1E62;
+  --verde-500: #5AB593; --verde-600: #3F9B7A;
+  --gray-500: #7A6872; --gray-800: #2E2228;
+  --font-display: 'Fraunces', Georgia, serif; --font-body: 'DM Sans', system-ui, sans-serif;
+  --radius-sm: 8px; --radius-md: 14px; --radius-pill: 999px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); background: var(--cream); color: var(--gray-800); font-size: 16px; line-height: 1.6; }
+img { max-width: 100%; display: block; }
+a { text-decoration: none; color: inherit; }
 
-  header.site{border-bottom:1px solid var(--line);background:var(--paper-raised);}
-  .site-bar{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;max-width:1080px;margin:0 auto;}
-  .brand{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;letter-spacing:-0.02em;text-decoration:none;color:var(--ink);}
-  .brand span{color:var(--forest);}
-  nav.site a{margin-left:28px;font-size:0.92rem;color:var(--muted);text-decoration:none;}
-  nav.site a:hover{color:var(--ink);}
+nav { position: sticky; top: 0; z-index: 100; background: rgba(253,246,248,0.93); backdrop-filter: blur(12px); border-bottom: 1px solid var(--rose-100); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.nav-logo { font-family: var(--font-display); font-size: 22px; font-weight: 400; font-style: italic; color: var(--lila-700); }
+.nav-logo span { color: var(--verde-500); font-style: normal; }
+.nav-links { display: flex; align-items: center; gap: 1.75rem; }
+.nav-links a { font-size: 14px; color: var(--gray-500); transition: color 0.2s; }
+.nav-links a:hover { color: var(--lila-700); }
+.btn { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-pill); font-family: var(--font-body); font-size: 14px; font-weight: 500; padding: 9px 20px; cursor: pointer; transition: all 0.18s; border: none; }
+.btn-ghost { background: transparent; color: var(--gray-800); border: 1.5px solid var(--mauve-300); }
+.btn-ghost:hover { border-color: var(--lila-300); color: var(--lila-700); }
+.btn-primary { background: var(--verde-500); color: #fff; }
+.btn-primary:hover { background: var(--verde-600); }
 
-  .post-meta-bar{font-family:'IBM Plex Mono',monospace;font-size:0.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--clay);margin:48px 0 14px;display:flex;gap:14px;flex-wrap:wrap;}
-  h1.title{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(2rem,4.5vw,2.7rem);line-height:1.1;margin:0 0 18px;}
-  .byline{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:0.9rem;margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid var(--line);}
-  .byline .avatar{width:36px;height:36px;border-radius:50%;background:var(--forest);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:0.95rem;}
+.breadcrumb { padding: 1rem 2rem; font-size: 13px; color: var(--mauve-300); max-width: 760px; margin: 0 auto; }
+.breadcrumb a:hover { color: var(--lila-700); }
+.breadcrumb span { margin: 0 6px; }
 
-  img.cover{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:2px;margin-bottom:8px;background:var(--line);}
-  .cover-caption{font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--muted);margin-bottom:32px;}
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 2rem; }
 
-  .content{font-size:1.08rem;}
-  .content h2{font-family:'Fraunces',serif;font-weight:500;font-size:1.5rem;margin:40px 0 14px;}
-  .content h3{font-family:'Fraunces',serif;font-weight:500;font-size:1.2rem;margin:32px 0 12px;}
-  .content p{margin:0 0 18px;}
-  .content ul,.content ol{margin:0 0 18px;padding-left:22px;}
-  .content blockquote{border-left:3px solid var(--clay);margin:24px 0;padding:4px 0 4px 18px;color:var(--muted);font-style:italic;}
-  .content img{max-width:100%;border-radius:2px;}
+.post-cat-badge { display: inline-flex; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mauve-500); background: var(--rose-50); border: 1px solid var(--rose-100); padding: 4px 12px; border-radius: var(--radius-pill); margin: 1.5rem 0 1.1rem; }
+h1.title { font-family: var(--font-display); font-weight: 300; font-size: clamp(1.9rem, 4.5vw, 2.6rem); line-height: 1.18; color: var(--lila-900); margin-bottom: 1.2rem; }
+.byline { display: flex; align-items: center; gap: 10px; color: var(--gray-500); font-size: 14px; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--rose-100); }
+.avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--rose-200); color: var(--lila-700); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 14px; font-weight: 500; flex-shrink: 0; overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-  .tags{display:flex;flex-wrap:wrap;gap:8px;margin:36px 0;}
-  .tag-pill{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;padding:5px 12px;border:1px solid var(--line);border-radius:20px;color:var(--muted);}
+img.cover { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 2.2rem; background: var(--rose-100); }
 
-  .author-card{display:flex;gap:16px;background:var(--paper-raised);border:1px solid var(--line);border-radius:4px;padding:22px;margin:40px 0;}
-  .author-card .avatar{width:54px;height:54px;border-radius:50%;background:var(--forest);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:1.3rem;flex-shrink:0;}
-  .author-card h4{margin:0 0 4px;font-family:'Fraunces',serif;font-weight:500;}
-  .author-card p{margin:0;color:var(--muted);font-size:0.88rem;}
-  .author-card a{font-size:0.85rem;font-weight:600;}
+.content { font-size: 17px; line-height: 1.8; }
+.content h2 { font-family: var(--font-display); font-weight: 300; font-size: 1.45rem; color: var(--lila-900); margin: 2.2rem 0 1rem; }
+.content h3 { font-family: var(--font-display); font-weight: 300; font-size: 1.18rem; color: var(--lila-700); margin: 1.8rem 0 0.8rem; }
+.content p { margin-bottom: 1.2rem; }
+.content ul, .content ol { margin: 0 0 1.2rem 1.4rem; }
+.content blockquote { border-left: 3px solid var(--lila-300); padding: 1rem 1.4rem; margin: 1.6rem 0; background: var(--rose-50); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-style: italic; color: var(--lila-700); }
+.content img { border-radius: var(--radius-sm); margin: 1.4rem 0; }
+.content a { color: var(--lila-500); text-decoration: underline; }
 
-  .related{padding:40px 0 70px;border-top:1px solid var(--line);margin-top:30px;}
-  .related h3{font-family:'Fraunces',serif;font-weight:500;font-size:1.2rem;}
-  .related-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:20px;}
-  .related-grid a{text-decoration:none;color:inherit;}
-  .related-grid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:2px;margin-bottom:10px;background:var(--line);}
-  .related-grid h4{font-family:'Fraunces',serif;font-weight:500;font-size:1rem;margin:0;}
+.tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 2rem 0; }
+.tag-pill { font-size: 11.5px; padding: 5px 12px; border: 1.5px solid var(--rose-200); border-radius: var(--radius-pill); color: var(--mauve-500); }
 
-  .loading,.error-box{padding:80px 0;text-align:center;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:0.85rem;}
+.author-card { display: flex; gap: 16px; background: var(--rose-50); border: 1.5px solid var(--rose-100); border-radius: var(--radius-md); padding: 1.4rem; margin: 2.5rem 0; }
+.author-card .avatar { width: 52px; height: 52px; font-size: 1.15rem; flex-shrink: 0; }
+.author-card h4 { font-family: var(--font-display); font-weight: 400; color: var(--lila-900); margin-bottom: 4px; }
+.author-card p { font-size: 13.5px; color: var(--gray-500); margin-bottom: 6px; }
+.author-card a { font-size: 13.5px; font-weight: 500; color: var(--lila-700); }
 
-  footer.site{border-top:1px solid var(--line);padding:32px 0;text-align:center;color:var(--muted);font-size:0.82rem;}
+.relacionados { background: var(--rose-50); padding: 3rem 2rem; margin-top: 3rem; }
+.relacionados .inner { max-width: 760px; margin: 0 auto; }
+.section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mauve-500); margin-bottom: 0.5rem; }
+.section-title { font-family: var(--font-display); font-weight: 300; font-size: 1.35rem; color: var(--lila-900); margin-bottom: 1.4rem; }
+.rel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.rel-card { background: var(--cream); border: 1.5px solid var(--rose-200); border-radius: var(--radius-md); overflow: hidden; transition: box-shadow .2s, transform .2s; }
+.rel-card:hover { box-shadow: 0 6px 20px rgba(155,111,216,0.1); transform: translateY(-2px); }
+.rel-card img { aspect-ratio: 4/3; object-fit: cover; background: var(--rose-100); }
+.rel-card .b { padding: 0.9rem 1rem; }
+.rel-card .cat { font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--mauve-500); margin-bottom: 4px; }
+.rel-card h4 { font-family: var(--font-display); font-weight: 400; font-size: 0.96rem; color: var(--lila-900); line-height: 1.35; }
 
-  @media(max-width:600px){
-    nav.site{display:none;}
-    .related-grid{grid-template-columns:1fr;}
-  }
-  :focus-visible{outline:2px solid var(--forest);outline-offset:2px;}
+.loading-state, .error-box { padding: 5rem 0; text-align: center; color: var(--mauve-300); }
+
+footer { background: var(--lila-900); color: var(--lila-300); padding: 3rem 2rem 2rem; }
+.footer-copy { max-width: 1080px; margin: 0 auto; font-size: 12px; }
+
+@media (max-width: 640px) {
+  .nav-links a:not(.btn-primary) { display: none; }
+  .rel-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
 
-<header class="site">
-  <div class="site-bar">
-    <a href="index.html" class="brand">Meu<span>Psi</span></a>
-    <nav class="site">
-      <a href="index.html">Início</a>
-      <a href="blog.html">Blog</a>
-      <a href="login.html">Entrar</a>
-    </nav>
+<nav>
+  <a href="index.html" class="nav-logo">Meu<span>Psi</span></a>
+  <div class="nav-links">
+    <a href="index.html#psicologos">Psicólogos</a>
+    <a href="blog.html">Blog</a>
+    <a href="login.html" class="btn btn-ghost">Entrar</a>
   </div>
-</header>
+</nav>
 
-<main class="wrap" id="main">
-  <div class="loading">Carregando artigo…</div>
+<main id="main" class="wrap">
+  <div class="loading-state">Carregando artigo…</div>
 </main>
 
-<footer class="site">
-  <div class="wrap">© <span id="year"></span> MeuPsi · Conteúdo escrito e revisado por psicólogos verificados</div>
+<footer>
+  <div class="footer-copy">© <span id="year"></span> MeuPsi · Conteúdo escrito e revisado por psicólogos verificados</div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  // ===== CONFIGURE AQUI =====
   const SUPABASE_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_2u0U4PTZuMNCS4LkTgnBBQ_ltfjZYqo';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  function escapeHTML(str){
-    const d = document.createElement('div');
-    d.textContent = str || '';
-    return d.innerHTML;
-  }
+  function escapeHTML(str){ const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
 
   function readingTime(html){
     const text = (html || '').replace(/<[^>]*>/g,' ');
@@ -139,21 +146,18 @@
   }
 
   function setSEO(post){
-    const url = `https://meupsi.com.br/post.html?slug=${encodeURIComponent(post.slug)}`;
+    const url = `https://micaeltatuagem.github.io/meupsi/post.html?slug=${encodeURIComponent(post.slug)}`;
     const desc = post.resumo || 'Artigo do blog MeuPsi sobre saúde mental.';
-    const img = post.imagem_capa || 'https://meupsi.com.br/assets/og-blog.jpg';
+    const img = post.imagem_capa || '';
 
     document.title = `${post.titulo} — Blog MeuPsi`;
     document.getElementById('metaTitle').textContent = `${post.titulo} — Blog MeuPsi`;
     document.getElementById('metaDescription').setAttribute('content', desc);
     document.getElementById('metaCanonical').setAttribute('href', url);
-    document.getElementById('ogTitle').setAttribute('content', post.titulo);
+    document.getElementById('ogTitleMeta').setAttribute('content', post.titulo);
     document.getElementById('ogDescription').setAttribute('content', desc);
     document.getElementById('ogUrl').setAttribute('content', url);
     document.getElementById('ogImage').setAttribute('content', img);
-    document.getElementById('twTitle').setAttribute('content', post.titulo);
-    document.getElementById('twDescription').setAttribute('content', desc);
-    document.getElementById('twImage').setAttribute('content', img);
 
     document.getElementById('ldJson').textContent = JSON.stringify({
       "@context": "https://schema.org",
@@ -164,15 +168,8 @@
       "datePublished": post.publicado_em,
       "dateModified": post.updated_at || post.publicado_em,
       "mainEntityOfPage": { "@type": "WebPage", "@id": url },
-      "author": {
-        "@type": "Person",
-        "name": post.psicologos?.nome || "Equipe MeuPsi"
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "MeuPsi",
-        "logo": { "@type": "ImageObject", "url": "https://meupsi.com.br/assets/logo.png" }
-      }
+      "author": { "@type": "Person", "name": post.psicologos?.nome || "Equipe MeuPsi" },
+      "publisher": { "@type": "Organization", "name": "MeuPsi" }
     });
   }
 
@@ -181,11 +178,11 @@
     const main = document.getElementById('main');
 
     if(!slug){
-      main.innerHTML = `<div class="error-box">Artigo não especificado. <a href="blog.html">Voltar ao blog</a></div>`;
+      main.innerHTML = `<div class="error-box">Artigo não especificado. <a href="blog.html" style="color:var(--lila-500);text-decoration:underline">Voltar ao blog</a></div>`;
       return;
     }
 
-    const { data: post, error } = await supabase
+    const { data: post, error } = await sb
       .from('blog_posts')
       .select('*, psicologos(id, nome, foto_url, bio)')
       .eq('slug', slug)
@@ -193,7 +190,7 @@
       .single();
 
     if(error || !post){
-      main.innerHTML = `<div class="error-box">Não encontramos esse artigo. <a href="blog.html">Voltar ao blog</a></div>`;
+      main.innerHTML = `<div class="error-box">Não encontramos esse artigo. <a href="blog.html" style="color:var(--lila-500);text-decoration:underline">Voltar ao blog</a></div>`;
       return;
     }
 
@@ -201,56 +198,68 @@
 
     const authorName = post.psicologos?.nome || 'Equipe MeuPsi';
     const authorInitial = authorName.charAt(0).toUpperCase();
+    const authorPhoto = post.psicologos?.foto_url;
 
     main.innerHTML = `
-      <div class="post-meta-bar">
-        <span>${escapeHTML(post.categoria || 'Saúde Mental')}</span>
-        <span>${formatDate(post.publicado_em)}</span>
-        <span>${readingTime(post.conteudo)} min de leitura</span>
-      </div>
+      <nav aria-label="Breadcrumb" style="position:static;background:none;backdrop-filter:none;border:none;height:auto;padding:0;display:block;">
+        <div class="breadcrumb" style="padding-left:0;padding-right:0;">
+          <a href="index.html">Início</a><span>›</span>
+          <a href="blog.html">Blog</a><span>›</span>
+          <span style="color:var(--gray-500)">${escapeHTML(post.categoria || 'Artigo')}</span>
+        </div>
+      </nav>
+      <span class="post-cat-badge">${escapeHTML(post.categoria || 'Saúde Mental')} · ${readingTime(post.conteudo)} min de leitura</span>
       <h1 class="title">${escapeHTML(post.titulo)}</h1>
       <div class="byline">
-        <div class="avatar">${escapeHTML(authorInitial)}</div>
-        <div>por <strong>${escapeHTML(authorName)}</strong></div>
+        <div class="avatar">${authorPhoto ? `<img src="${escapeHTML(authorPhoto)}" alt="${escapeHTML(authorName)}">` : escapeHTML(authorInitial)}</div>
+        <div>por <strong>${escapeHTML(authorName)}</strong> · ${formatDate(post.publicado_em)}</div>
       </div>
       ${post.imagem_capa ? `<img class="cover" src="${escapeHTML(post.imagem_capa)}" alt="${escapeHTML(post.titulo)}">` : ''}
       <article class="content">${post.conteudo || ''}</article>
       ${post.tags?.length ? `<div class="tags">${post.tags.map(t=>`<span class="tag-pill">#${escapeHTML(t)}</span>`).join('')}</div>` : ''}
       <div class="author-card">
-        <div class="avatar">${escapeHTML(authorInitial)}</div>
+        <div class="avatar">${authorPhoto ? `<img src="${escapeHTML(authorPhoto)}" alt="${escapeHTML(authorName)}">` : escapeHTML(authorInitial)}</div>
         <div>
           <h4>${escapeHTML(authorName)}</h4>
           <p>${escapeHTML(post.psicologos?.bio || 'Psicólogo(a) verificado(a) na plataforma MeuPsi.')}</p>
           ${post.psicologos?.id ? `<a href="perfil.html?id=${encodeURIComponent(post.psicologos.id)}">Ver perfil e agendar consulta →</a>` : ''}
         </div>
       </div>
-      <section class="related" id="related"></section>
+      <section id="related"></section>
     `;
 
     loadRelated(post);
   }
 
   async function loadRelated(post){
-    const { data } = await supabase
+    const { data } = await sb
       .from('blog_posts')
-      .select('titulo, slug, imagem_capa, resumo')
+      .select('titulo, slug, imagem_capa, categoria')
       .eq('status', 'publicado')
       .eq('categoria', post.categoria)
       .neq('id', post.id)
       .limit(2);
 
     const box = document.getElementById('related');
-    if(!data || !data.length){ box.remove(); return; }
+    if(!data || !data.length) return;
 
     box.innerHTML = `
-      <h3>Continue lendo sobre ${escapeHTML(post.categoria)}</h3>
-      <div class="related-grid">
-        ${data.map(p => `
-          <a href="post.html?slug=${encodeURIComponent(p.slug)}">
-            <img src="${escapeHTML(p.imagem_capa) || 'https://placehold.co/300x225/EFEDE6/3E6259?text=MeuPsi'}" alt="" loading="lazy">
-            <h4>${escapeHTML(p.titulo)}</h4>
-          </a>
-        `).join('')}
+      <div class="relacionados">
+        <div class="inner">
+          <p class="section-label">Continue lendo</p>
+          <h3 class="section-title">Mais sobre ${escapeHTML(post.categoria)}</h3>
+          <div class="rel-grid">
+            ${data.map(p => `
+              <a class="rel-card" href="post.html?slug=${encodeURIComponent(p.slug)}">
+                <img src="${escapeHTML(p.imagem_capa) || 'https://placehold.co/300x225/F5E2EA/6B3FA8?text=MeuPsi'}" alt="" loading="lazy">
+                <div class="b">
+                  <p class="cat">${escapeHTML(p.categoria || '')}</p>
+                  <h4>${escapeHTML(p.titulo)}</h4>
+                </div>
+              </a>
+            `).join('')}
+          </div>
+        </div>
       </div>
     `;
   }

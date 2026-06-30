@@ -1,185 +1,183 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<!-- ===== SEO PRIMÁRIO ===== -->
-<title>Blog MeuPsi — Artigos sobre saúde mental escritos por psicólogos</title>
-<meta name="description" content="Artigos sobre ansiedade, depressão, terapia e bem-estar emocional, escritos por psicólogos verificados da plataforma MeuPsi. Conteúdo confiável, sem jargão.">
-<link rel="canonical" href="https://meupsi.com.br/blog.html">
-<meta name="robots" content="index, follow, max-image-preview:large">
-<meta name="author" content="MeuPsi">
+<title>Blog MeuPsi — Saúde mental, escrito por psicólogos</title>
+<meta name="description" content="Artigos sobre ansiedade, depressão, terapia e bem-estar emocional, escritos por psicólogos verificados da plataforma MeuPsi." />
+<link rel="canonical" href="https://micaeltatuagem.github.io/meupsi/blog.html" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
 
-<!-- ===== OPEN GRAPH ===== -->
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="MeuPsi">
-<meta property="og:title" content="Blog MeuPsi — Artigos sobre saúde mental escritos por psicólogos">
-<meta property="og:description" content="Artigos sobre ansiedade, depressão, terapia e bem-estar emocional, escritos por psicólogos verificados.">
-<meta property="og:url" content="https://meupsi.com.br/blog.html">
-<meta property="og:image" content="https://meupsi.com.br/assets/og-blog.jpg">
-<meta property="og:locale" content="pt_BR">
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="MeuPsi" />
+<meta property="og:title" content="Blog MeuPsi — Saúde mental, escrito por psicólogos" />
+<meta property="og:description" content="Artigos sobre ansiedade, depressão, terapia e bem-estar emocional, escritos por psicólogos verificados." />
+<meta property="og:url" content="https://micaeltatuagem.github.io/meupsi/blog.html" />
+<meta property="og:locale" content="pt_BR" />
 
-<!-- ===== TWITTER CARD ===== -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Blog MeuPsi — Saúde mental, escrito por psicólogos">
-<meta name="twitter:description" content="Artigos sobre ansiedade, depressão, terapia e bem-estar emocional.">
-<meta name="twitter:image" content="https://meupsi.com.br/assets/og-blog.jpg">
-
-<!-- ===== JSON-LD: Blog ===== -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Blog",
   "name": "Blog MeuPsi",
-  "url": "https://meupsi.com.br/blog.html",
+  "url": "https://micaeltatuagem.github.io/meupsi/blog.html",
   "description": "Artigos sobre saúde mental escritos por psicólogos verificados.",
-  "publisher": {
-    "@type": "Organization",
-    "name": "MeuPsi",
-    "logo": { "@type": "ImageObject", "url": "https://meupsi.com.br/assets/logo.png" }
-  }
+  "publisher": { "@type": "Organization", "name": "MeuPsi" }
 }
 </script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-  :root{
-    --ink:#1F2C29;
-    --paper:#EFEDE6;
-    --paper-raised:#FAF9F5;
-    --forest:#3E6259;
-    --forest-dark:#2C463F;
-    --clay:#C4633A;
-    --line:#D9D5C9;
-    --muted:#6B6F69;
-    --radius:2px;
-  }
-  *{box-sizing:border-box;}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.55;}
-  a{color:inherit;text-decoration:none;}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+:root {
+  --cream: #FDF6F8;
+  --rose-50: #FAF0F4;
+  --rose-100: #F5E2EA;
+  --rose-200: #ECC8D8;
+  --mauve-300: #D4ABBE;
+  --mauve-500: #B87FA0;
+  --lila-300: #C9ADE0;
+  --lila-500: #9B6FD8;
+  --lila-700: #6B3FA8;
+  --lila-900: #3B1E62;
+  --verde-500: #5AB593;
+  --verde-600: #3F9B7A;
+  --verde-50: #EBF7F2;
+  --gray-100: #EDE6EA;
+  --gray-300: #BFB2BA;
+  --gray-500: #7A6872;
+  --gray-800: #2E2228;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --radius-sm: 8px; --radius-md: 14px; --radius-lg: 22px; --radius-pill: 999px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--cream); color: var(--gray-800); font-size: 16px; line-height: 1.6; }
+img { max-width: 100%; display: block; }
+a { text-decoration: none; color: inherit; }
 
-  /* ---------- header ---------- */
-  header.site{border-bottom:1px solid var(--line);background:var(--paper-raised);}
-  .site-bar{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;max-width:1080px;margin:0 auto;}
-  .brand{font-family:'Fraunces',serif;font-weight:600;font-size:1.3rem;letter-spacing:-0.02em;}
-  .brand span{color:var(--forest);}
-  nav.site a{margin-left:28px;font-size:0.92rem;color:var(--muted);transition:color .15s;}
-  nav.site a:hover{color:var(--ink);}
+nav { position: sticky; top: 0; z-index: 100; background: rgba(253,246,248,0.93); backdrop-filter: blur(12px); border-bottom: 1px solid var(--rose-100); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.nav-logo { font-family: var(--font-display); font-size: 22px; font-weight: 400; font-style: italic; color: var(--lila-700); }
+.nav-logo span { color: var(--verde-500); font-style: normal; }
+.nav-links { display: flex; align-items: center; gap: 1.75rem; }
+.nav-links a { font-size: 14px; color: var(--gray-500); transition: color 0.2s; }
+.nav-links a:hover { color: var(--lila-700); }
+.btn { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-pill); font-family: var(--font-body); font-size: 14px; font-weight: 500; padding: 9px 20px; cursor: pointer; transition: all 0.18s; border: none; }
+.btn-ghost { background: transparent; color: var(--gray-800); border: 1.5px solid var(--mauve-300); }
+.btn-ghost:hover { border-color: var(--lila-300); color: var(--lila-700); }
+.btn-primary { background: var(--verde-500); color: #fff; }
+.btn-primary:hover { background: var(--verde-600); }
 
-  /* ---------- hero ---------- */
-  .hero{padding:64px 0 40px;border-bottom:1px solid var(--line);}
-  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:0.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--forest);margin-bottom:14px;display:block;}
-  h1.hero-title{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(2.1rem,4.5vw,3.2rem);line-height:1.08;margin:0 0 16px;max-width:18ch;}
-  .hero-sub{max-width:48ch;color:var(--muted);font-size:1.05rem;margin:0;}
+.hero { padding: 3.5rem 2rem 2.5rem; max-width: 1080px; margin: 0 auto; }
+.eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mauve-500); margin-bottom: 0.6rem; display: block; }
+.hero h1 { font-family: var(--font-display); font-weight: 300; font-size: clamp(2rem, 4.5vw, 2.8rem); line-height: 1.1; color: var(--lila-900); max-width: 18ch; margin-bottom: 0.85rem; }
+.hero p { color: var(--gray-500); max-width: 48ch; font-size: 15px; }
 
-  /* ---------- controls ---------- */
-  .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid var(--line);}
-  .cats{display:flex;flex-wrap:wrap;gap:8px;}
-  .cat-btn{font-family:'IBM Plex Mono',monospace;font-size:0.78rem;padding:7px 14px;border:1px solid var(--line);border-radius:20px;background:transparent;cursor:pointer;color:var(--muted);transition:all .15s;}
-  .cat-btn:hover{border-color:var(--forest);color:var(--forest);}
-  .cat-btn.active{background:var(--forest);border-color:var(--forest);color:#fff;}
-  .search-box{position:relative;}
-  .search-box input{font-family:'Inter';font-size:0.9rem;padding:9px 14px 9px 36px;border:1px solid var(--line);border-radius:20px;background:var(--paper-raised);width:220px;outline:none;}
-  .search-box input:focus{border-color:var(--forest);}
-  .search-box svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--muted);}
+.controls { max-width: 1080px; margin: 0 auto; padding: 0 2rem 2rem; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--rose-100); }
+.cats { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-size: 13px; padding: 6px 16px; border-radius: var(--radius-pill); border: 1.5px solid var(--rose-200); background: var(--rose-50); color: var(--gray-500); cursor: pointer; transition: all 0.18s; }
+.pill:hover, .pill.ativo { border-color: var(--lila-300); background: var(--rose-100); color: var(--lila-700); }
+.search-box { position: relative; }
+.search-box input { font-family: var(--font-body); font-size: 14px; padding: 9px 14px 9px 36px; border: 1.5px solid var(--rose-200); border-radius: var(--radius-pill); background: #fff; width: 220px; outline: none; color: var(--gray-800); }
+.search-box input:focus { border-color: var(--lila-300); }
+.search-box svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: var(--mauve-300); }
 
-  /* ---------- featured ---------- */
-  .featured{display:grid;grid-template-columns:1.1fr 1fr;gap:36px;padding:40px 0;border-bottom:1px solid var(--line);align-items:center;}
-  .featured img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:var(--radius);background:var(--line);}
-  .featured .tag{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--clay);text-transform:uppercase;letter-spacing:.06em;}
-  .featured h2{font-family:'Fraunces',serif;font-size:1.9rem;font-weight:500;line-height:1.15;margin:10px 0 12px;}
-  .featured p{color:var(--muted);margin:0 0 16px;}
-  .read-link{font-weight:600;font-size:0.92rem;color:var(--forest-dark);border-bottom:1px solid var(--forest-dark);padding-bottom:2px;}
+.section { max-width: 1080px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
 
-  /* ---------- grid ---------- */
-  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0;padding:8px 0 60px;}
-  .post-card{display:grid;grid-template-columns:96px 1fr;gap:18px;padding:26px 0;border-bottom:1px solid var(--line);}
-  .post-card:nth-child(odd){padding-right:28px;border-right:1px solid var(--line);}
-  .post-card:nth-child(even){padding-left:28px;}
-  .post-card img{width:96px;height:96px;object-fit:cover;border-radius:var(--radius);background:var(--line);}
-  .post-meta{font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--clay);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;display:flex;gap:10px;}
-  .post-card h3{font-family:'Fraunces',serif;font-weight:500;font-size:1.12rem;margin:0 0 6px;line-height:1.25;}
-  .post-card p{margin:0;color:var(--muted);font-size:0.88rem;}
-  .margin-note{font-family:'IBM Plex Mono',monospace;font-size:0.68rem;color:var(--muted);margin-top:8px;border-left:2px solid var(--clay);padding-left:8px;}
+.featured { display: grid; grid-template-columns: 1.05fr 1fr; gap: 32px; align-items: center; padding-bottom: 2.5rem; margin-bottom: 2.5rem; border-bottom: 1px solid var(--rose-100); }
+.featured img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: var(--radius-md); background: var(--rose-100); }
+.featured .post-cat-badge { display: inline-flex; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mauve-500); background: var(--rose-50); border: 1px solid var(--rose-100); padding: 4px 12px; border-radius: var(--radius-pill); margin-bottom: 1rem; }
+.featured h2 { font-family: var(--font-display); font-weight: 300; font-size: 1.9rem; line-height: 1.18; color: var(--lila-900); margin-bottom: 0.85rem; }
+.featured p.resumo { color: var(--gray-500); margin-bottom: 1.1rem; }
+.read-link { font-weight: 500; font-size: 14px; color: var(--lila-700); border-bottom: 1.5px solid var(--lila-300); padding-bottom: 2px; }
 
-  .empty,.loading{padding:60px 0;text-align:center;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:0.85rem;}
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; }
+.post-card { display: grid; grid-template-columns: 96px 1fr; gap: 18px; padding: 24px 0; border-bottom: 1px solid var(--rose-100); }
+.post-card:nth-child(odd) { padding-right: 28px; border-right: 1px solid var(--rose-100); }
+.post-card:nth-child(even) { padding-left: 28px; }
+.post-card img { width: 96px; height: 96px; object-fit: cover; border-radius: var(--radius-sm); background: var(--rose-100); }
+.post-meta-row { font-size: 11px; color: var(--mauve-500); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; display: flex; gap: 10px; }
+.post-card h3 { font-family: var(--font-display); font-weight: 400; font-size: 1.08rem; margin-bottom: 6px; line-height: 1.3; color: var(--lila-900); }
+.post-card p { color: var(--gray-500); font-size: 13.5px; }
+.margin-note { font-size: 11.5px; color: var(--mauve-300); margin-top: 8px; }
 
-  footer.site{border-top:1px solid var(--line);padding:32px 0;text-align:center;color:var(--muted);font-size:0.82rem;}
+.empty, .loading { padding: 4rem 0; text-align: center; color: var(--mauve-300); }
 
-  @media(max-width:760px){
-    .featured{grid-template-columns:1fr;}
-    .grid{grid-template-columns:1fr;}
-    .post-card:nth-child(odd){border-right:none;padding-right:0;}
-    .post-card:nth-child(even){padding-left:0;}
-    nav.site{display:none;}
-    .controls{flex-direction:column;align-items:flex-start;}
-    .search-box input{width:100%;}
-  }
-  :focus-visible{outline:2px solid var(--forest);outline-offset:2px;}
-  @media (prefers-reduced-motion: reduce){*{transition:none!important;}}
+footer { background: var(--lila-900); color: var(--lila-300); padding: 3rem 2rem 2rem; }
+.footer-inner { max-width: 1080px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between; padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.footer-logo { font-family: var(--font-display); font-size: 20px; font-style: italic; color: #fff; margin-bottom: 0.5rem; }
+.footer-copy { max-width: 1080px; margin: 1.5rem auto 0; font-size: 12px; color: var(--lila-500); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+
+@media (max-width: 760px) {
+  .featured { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: 1fr; }
+  .post-card:nth-child(odd) { border-right: none; padding-right: 0; }
+  .post-card:nth-child(even) { padding-left: 0; }
+  .nav-links a:not(.btn-primary) { display: none; }
+  .controls { flex-direction: column; align-items: flex-start; }
+  .search-box input { width: 100%; }
+}
 </style>
 </head>
 <body>
 
-<header class="site">
-  <div class="site-bar">
-    <a href="index.html" class="brand">Meu<span>Psi</span></a>
-    <nav class="site">
-      <a href="index.html">Início</a>
-      <a href="blog.html" style="color:var(--forest);">Blog</a>
-      <a href="login.html">Entrar</a>
-    </nav>
+<nav>
+  <a href="index.html" class="nav-logo">Meu<span>Psi</span></a>
+  <div class="nav-links">
+    <a href="index.html#psicologos">Psicólogos</a>
+    <a href="blog.html" style="color:var(--lila-700)">Blog</a>
+    <a href="login.html" class="btn btn-ghost">Entrar</a>
   </div>
-</header>
+</nav>
 
-<main class="wrap">
-  <section class="hero">
-    <span class="eyebrow">Notas clínicas, em linguagem clara</span>
-    <h1 class="hero-title">Saúde mental explicada por quem trata, todos os dias.</h1>
-    <p class="hero-sub">Artigos escritos por psicólogos da plataforma MeuPsi — sem jargão, com a profundidade que o tema merece.</p>
-  </section>
+<section class="hero">
+  <span class="eyebrow">Notas clínicas, em linguagem clara</span>
+  <h1>Saúde mental explicada por quem trata, todos os dias.</h1>
+  <p>Artigos escritos por psicólogos da plataforma MeuPsi — sem jargão, com a profundidade que o tema merece.</p>
+</section>
 
-  <section class="controls">
-    <div class="cats" id="cats"></div>
-    <div class="search-box">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-      <input type="text" id="searchInput" placeholder="Buscar artigos...">
-    </div>
-  </section>
+<div class="controls">
+  <div class="cats" id="cats"></div>
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" id="searchInput" placeholder="Buscar artigos...">
+  </div>
+</div>
 
-  <section id="featuredSlot"></section>
-
-  <section class="grid" id="postsGrid">
+<section class="section">
+  <div id="featuredSlot"></div>
+  <div class="grid" id="postsGrid">
     <div class="loading">Carregando artigos…</div>
-  </section>
-</main>
+  </div>
+</section>
 
-<footer class="site">
-  <div class="wrap">© <span id="year"></span> MeuPsi · Conteúdo escrito e revisado por psicólogos verificados</div>
+<footer>
+  <div class="footer-inner">
+    <div>
+      <p class="footer-logo">MeuPsi</p>
+    </div>
+  </div>
+  <div class="footer-copy">
+    <span>© <span id="year"></span> MeuPsi · Conteúdo escrito e revisado por psicólogos verificados</span>
+  </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  // ===== CONFIGURE AQUI =====
   const SUPABASE_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_2u0U4PTZuMNCS4LkTgnBBQ_ltfjZYqo';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let allPosts = [];
   let activeCategory = 'Todos';
 
-  function escapeHTML(str){
-    const d = document.createElement('div');
-    d.textContent = str || '';
-    return d.innerHTML;
-  }
+  function escapeHTML(str){ const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
 
   function readingTime(html){
     const text = (html || '').replace(/<[^>]*>/g,' ');
@@ -193,7 +191,7 @@
   }
 
   async function loadPosts(){
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from('blog_posts')
       .select('id, titulo, slug, resumo, conteudo, imagem_capa, categoria, tags, publicado_em, psicologo_id, psicologos(nome)')
       .eq('status', 'publicado')
@@ -212,14 +210,10 @@
   function renderCategories(){
     const cats = ['Todos', ...new Set(allPosts.map(p => p.categoria).filter(Boolean))];
     document.getElementById('cats').innerHTML = cats.map(c =>
-      `<button class="cat-btn ${c===activeCategory?'active':''}" data-cat="${escapeHTML(c)}">${escapeHTML(c)}</button>`
+      `<button class="pill ${c===activeCategory?'ativo':''}" data-cat="${escapeHTML(c)}">${escapeHTML(c)}</button>`
     ).join('');
-    document.querySelectorAll('.cat-btn').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        activeCategory = btn.dataset.cat;
-        renderCategories();
-        render();
-      });
+    document.querySelectorAll('.pill').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ activeCategory = btn.dataset.cat; renderCategories(); render(); });
     });
   }
 
@@ -247,22 +241,22 @@
     featuredSlot.innerHTML = `
       <article class="featured">
         <a href="post.html?slug=${encodeURIComponent(featured.slug)}">
-          <img src="${escapeHTML(featured.imagem_capa) || 'https://placehold.co/640x480/3E6259/EFEDE6?text=MeuPsi'}" alt="${escapeHTML(featured.titulo)}" loading="lazy">
+          <img src="${escapeHTML(featured.imagem_capa) || 'https://placehold.co/640x480/F5E2EA/6B3FA8?text=MeuPsi'}" alt="${escapeHTML(featured.titulo)}" loading="lazy">
         </a>
         <div>
-          <span class="tag">${escapeHTML(featured.categoria || 'Saúde Mental')} · destaque</span>
+          <span class="post-cat-badge">${escapeHTML(featured.categoria || 'Saúde Mental')} · destaque</span>
           <h2><a href="post.html?slug=${encodeURIComponent(featured.slug)}">${escapeHTML(featured.titulo)}</a></h2>
-          <p>${escapeHTML(featured.resumo || '')}</p>
+          <p class="resumo">${escapeHTML(featured.resumo || '')}</p>
           <a class="read-link" href="post.html?slug=${encodeURIComponent(featured.slug)}">Ler artigo completo →</a>
         </div>
       </article>
     `;
 
     grid.innerHTML = rest.map(p => `
-      <a class="post-card" href="post.html?slug=${encodeURIComponent(p.slug)}" style="color:inherit;">
-        <img src="${escapeHTML(p.imagem_capa) || 'https://placehold.co/200x200/EFEDE6/3E6259?text=MeuPsi'}" alt="" loading="lazy">
+      <a class="post-card" href="post.html?slug=${encodeURIComponent(p.slug)}">
+        <img src="${escapeHTML(p.imagem_capa) || 'https://placehold.co/200x200/F5E2EA/6B3FA8?text=MeuPsi'}" alt="" loading="lazy">
         <div>
-          <div class="post-meta"><span>${escapeHTML(p.categoria || 'Saúde Mental')}</span><span>${formatDate(p.publicado_em)}</span></div>
+          <div class="post-meta-row"><span>${escapeHTML(p.categoria || 'Saúde Mental')}</span><span>${formatDate(p.publicado_em)}</span></div>
           <h3>${escapeHTML(p.titulo)}</h3>
           <p>${escapeHTML(p.resumo || '')}</p>
           <div class="margin-note">${readingTime(p.conteudo)} min de leitura · por ${escapeHTML(p.psicologos?.nome || 'equipe MeuPsi')}</div>
@@ -272,7 +266,6 @@
   }
 
   document.getElementById('searchInput').addEventListener('input', render);
-
   loadPosts();
 </script>
 </body>
