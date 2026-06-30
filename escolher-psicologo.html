@@ -101,10 +101,9 @@ async function init() {
 }
 
 async function carregarPsicologos() {
-  // ajuste os nomes de coluna conforme seu schema real de "psicologos"
   const { data, error } = await db.from('psicologos')
-    .select('id, nome, crp, abordagem, bio, valor_sessao')
-    .eq('aceita_pacientes', true);
+    .select('id, nome, crp, abordagem, bio, preco_exato, preco_faixa')
+    .eq('ativo', true);
 
   const el = document.getElementById('lista-psi');
   if (error || !data?.length) {
@@ -118,7 +117,7 @@ async function carregarPsicologos() {
       <div class="psi-crp">CRP ${psi.crp || '—'}</div>
       ${psi.abordagem ? `<div class="psi-abordagem">${psi.abordagem}</div>` : ''}
       ${psi.bio ? `<div class="psi-bio">${psi.bio}</div>` : ''}
-      ${psi.valor_sessao ? `<div class="psi-valor">R$ ${Number(psi.valor_sessao).toFixed(0)} / sessão</div>` : ''}
+      ${psi.preco_exato ? `<div class="psi-valor">R$ ${Number(psi.preco_exato).toFixed(0)} / sessão</div>` : (psi.preco_faixa ? `<div class="psi-valor">${psi.preco_faixa}</div>` : '')}
     </div>
   `).join('');
 }
