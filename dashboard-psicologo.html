@@ -8,7 +8,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <style>
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', sans-serif; background: #fce8f0; min-height: 100vh; }
 
@@ -134,7 +136,63 @@
       border: 1.5px solid #e5e7eb; border-radius: 8px;
       font-size: 14px; color: #6b7280; cursor: pointer;
     }
-    #msgModal, #msgModalHorario { font-size: 13px; color: #ef4444; margin-bottom: 8px; }
+    #msgModal, #msgModalHorario, #msgModalSessao { font-size: 13px; color: #ef4444; margin-bottom: 8px; }
+
+    /* ── Prontuário ── */
+    .link-voltar {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; color: #7c3aed; font-weight: 500;
+      cursor: pointer; margin-bottom: 12px; text-decoration: none;
+    }
+    .prontuario-header {
+      background: #fdf4f8; border-radius: 12px; padding: 20px 24px;
+      box-shadow: 0 1px 6px rgba(236,72,153,0.08); margin-bottom: 20px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    .prontuario-header h2 { font-size: 19px; font-weight: 700; color: #111827; }
+    .prontuario-header .sub { font-size: 13px; color: #6b7280; margin-top: 4px; }
+    .prontuario-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .prontuario-tab-btn {
+      padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 500;
+      border: 1.5px solid #e5e7eb; background: #fff; color: #6b7280; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .prontuario-tab-btn:hover { border-color: #c4b5fd; }
+    .prontuario-tab-btn.active { background: #7c3aed; border-color: #7c3aed; color: #fff; }
+    .prontuario-pane { display: none; }
+    .prontuario-pane.active { display: block; }
+
+    .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .chart-box { background: #fdf4f8; border-radius: 12px; padding: 20px; box-shadow: 0 1px 6px rgba(236,72,153,0.08); }
+    .chart-box h3 { font-size: 14px; font-weight: 600; color: #111827; margin-bottom: 12px; }
+    .chart-box canvas { max-height: 240px; }
+
+    .slider-row { margin-bottom: 16px; }
+    .slider-row label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; color: #6b21a8; margin-bottom: 6px; }
+    .slider-row .slider-val { font-weight: 700; color: #7c3aed; }
+    .slider-row input[type="range"] { width: 100%; accent-color: #7c3aed; }
+
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .timeline { display: flex; flex-direction: column; gap: 12px; }
+    .timeline-item {
+      background: #fff; border: 1.5px solid #f3f4f6; border-radius: 10px;
+      padding: 14px 16px; position: relative;
+    }
+    .timeline-item.intercorrencia { border-color: #fca5a5; background: #fef2f2; }
+    .timeline-item .ti-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+    .timeline-item .ti-data { font-size: 13px; font-weight: 600; color: #111827; }
+    .timeline-item .ti-resumo { font-size: 13px; color: #374151; line-height: 1.5; margin-top: 4px; }
+    .timeline-item .ti-scores { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+    .ti-score { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #f3f4f6; color: #4b5563; }
+    .badge-intercorrencia { background: #fee2e2; color: #b91c1c; }
+
+    .anamnese-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+    .anamnese-item { font-size: 13px; }
+    .anamnese-item .a-label { font-weight: 600; color: #6b21a8; margin-bottom: 2px; }
+    .anamnese-item .a-val { color: #374151; line-height: 1.5; }
+    .anamnese-full { grid-column: 1 / -1; }
+    @media (max-width: 700px) { .anamnese-grid, .form-row-2 { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -247,12 +305,100 @@
             <th>Telefone</th>
             <th>Status</th>
             <th>Desde</th>
+            <th>Prontuário</th>
           </tr>
         </thead>
         <tbody id="tabelaPacientes">
-          <tr><td colspan="5" class="empty">Carregando…</td></tr>
+          <tr><td colspan="6" class="empty">Carregando…</td></tr>
         </tbody>
       </table>
+    </div>
+  </section>
+
+  <!-- ========== SEÇÃO: PRONTUÁRIO ========== -->
+  <section class="section" id="secProntuario">
+    <a class="link-voltar" onclick="voltarPacientes()">← Voltar para Pacientes</a>
+
+    <div class="prontuario-header">
+      <div>
+        <h2 id="pHeaderNome">—</h2>
+        <div class="sub" id="pHeaderSub">—</div>
+      </div>
+      <span class="badge" id="pHeaderStatus">—</span>
+    </div>
+
+    <div class="prontuario-tabs">
+      <button class="prontuario-tab-btn active" data-ptab="pVisao">Visão Geral</button>
+      <button class="prontuario-tab-btn" data-ptab="pEvolucao">Evolução Clínica</button>
+      <button class="prontuario-tab-btn" data-ptab="pSessoes">Sessões</button>
+      <button class="prontuario-tab-btn" data-ptab="pAnamnese">Anamnese</button>
+    </div>
+
+    <!-- Aba: Visão Geral -->
+    <div class="prontuario-pane active" id="pVisao">
+      <div class="metrics">
+        <div class="metric-card">
+          <div class="metric-label">Total de sessões</div>
+          <div class="metric-value" id="pTotalSessoes">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Faltas</div>
+          <div class="metric-value" id="pTotalFaltas">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Intercorrências</div>
+          <div class="metric-value" id="pTotalIntercorrencias">—</div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-title">Queixa principal</div>
+        <p id="pQueixa" style="font-size:13px;color:#374151;line-height:1.6;">—</p>
+      </div>
+      <div class="section-card">
+        <div class="section-title">Última sessão registrada</div>
+        <div id="pUltimaSessao"><p class="empty">Nenhuma sessão registrada ainda.</p></div>
+      </div>
+    </div>
+
+    <!-- Aba: Evolução Clínica -->
+    <div class="prontuario-pane" id="pEvolucao">
+      <div class="charts-grid">
+        <div class="chart-box">
+          <h3>Sintomas ao longo das sessões</h3>
+          <canvas id="chartSintomas"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3>Adesão (comparecimento x faltas)</h3>
+          <canvas id="chartAdesao"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3>Funcionamento por área</h3>
+          <canvas id="chartFuncionamento"></canvas>
+        </div>
+      </div>
+      <div class="empty" id="pEvolucaoEmpty" style="display:none;">Registre ao menos uma sessão para ver os gráficos de evolução.</div>
+    </div>
+
+    <!-- Aba: Sessões -->
+    <div class="prontuario-pane" id="pSessoes">
+      <div class="section-card">
+        <div class="section-title">
+          Histórico de sessões
+          <button class="btn-primary" id="btnRegistrarSessao">+ Registrar sessão</button>
+        </div>
+        <div class="timeline" id="timelineSessoes">
+          <p class="empty">Nenhuma sessão registrada ainda.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aba: Anamnese -->
+    <div class="prontuario-pane" id="pAnamnese">
+      <div class="section-card">
+        <div class="anamnese-grid" id="anamneseGrid">
+          <p class="empty">Carregando dados…</p>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -300,6 +446,88 @@
   </div>
 </div>
 
+<!-- Modal: Registrar Sessão -->
+<div class="modal-overlay" id="modalRegistrarSessao">
+  <div class="modal" style="max-width: 560px; max-height: 88vh; overflow-y: auto;">
+    <h2>Registrar sessão</h2>
+
+    <div class="form-row-2">
+      <div>
+        <label>Data</label>
+        <input type="date" id="sData" />
+      </div>
+      <div>
+        <label>Hora</label>
+        <input type="time" id="sHora" />
+      </div>
+    </div>
+
+    <label>Status</label>
+    <select id="sStatus">
+      <option value="realizada">Realizada</option>
+      <option value="falta_avisada">Falta avisada</option>
+      <option value="falta_nao_avisada">Falta sem aviso</option>
+    </select>
+
+    <label>Resumo da evolução clínica</label>
+    <textarea id="sResumo" rows="3" placeholder="Como foi a sessão, o que foi trabalhado..."></textarea>
+
+    <div class="slider-row">
+      <label>Ansiedade <span class="slider-val" id="valAnsiedade">5</span></label>
+      <input type="range" id="sAnsiedade" min="0" max="10" value="5" />
+    </div>
+    <div class="slider-row">
+      <label>Humor <span class="slider-val" id="valHumor">5</span></label>
+      <input type="range" id="sHumor" min="0" max="10" value="5" />
+    </div>
+    <div class="slider-row">
+      <label>Sono <span class="slider-val" id="valSono">5</span></label>
+      <input type="range" id="sSono" min="0" max="10" value="5" />
+    </div>
+    <div class="slider-row">
+      <label>Funcionamento social <span class="slider-val" id="valFuncSocial">5</span></label>
+      <input type="range" id="sFuncSocial" min="0" max="10" value="5" />
+    </div>
+
+    <div class="form-row-2">
+      <div>
+        <label>Funcionamento ocupacional</label>
+        <select id="sFuncOcupacional">
+          <option value="preservado">Preservado</option>
+          <option value="moderadamente_prejudicado">Moderadamente prejudicado</option>
+          <option value="gravemente_prejudicado">Gravemente prejudicado</option>
+        </select>
+      </div>
+      <div>
+        <label>Funcionamento interpessoal</label>
+        <select id="sFuncInterpessoal">
+          <option value="preservado">Preservado</option>
+          <option value="moderadamente_prejudicado">Moderadamente prejudicado</option>
+          <option value="gravemente_prejudicado">Gravemente prejudicado</option>
+        </select>
+      </div>
+    </div>
+
+    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+      <input type="checkbox" id="sIntercorrencia" style="width:auto; margin:0;" />
+      Marcar como intercorrência relevante
+    </label>
+    <div style="height:14px"></div>
+
+    <label>Tarefa de casa</label>
+    <textarea id="sTarefaCasa" rows="2" placeholder="Opcional"></textarea>
+
+    <label>Plano para a próxima sessão</label>
+    <textarea id="sPlanoProximo" rows="2" placeholder="Opcional"></textarea>
+
+    <div id="msgModalSessao"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="btnCancelarSessao">Cancelar</button>
+      <button class="btn-primary" id="btnSalvarSessao">Salvar sessão</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
   const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
@@ -342,7 +570,7 @@
     const tbody = document.getElementById('tabelaPacientes');
 
     if (error || !pacientes?.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhum paciente cadastrado ainda.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum paciente cadastrado ainda.</td></tr>';
       document.getElementById('totalPacientes').textContent = 0;
       document.getElementById('totalAtivos').textContent = 0;
       document.getElementById('totalPendentes').textContent = 0;
@@ -353,6 +581,8 @@
     document.getElementById('totalAtivos').textContent = pacientes.filter(p => p.status === 'ativo').length;
     document.getElementById('totalPendentes').textContent = pacientes.filter(p => p.status === 'pendente').length;
 
+    pacientesCache = pacientes;
+
     tbody.innerHTML = pacientes.map(p => `
       <tr>
         <td>${p.nome ?? '—'}</td>
@@ -360,9 +590,11 @@
         <td>${p.telefone ?? '—'}</td>
         <td><span class="badge badge-${p.status ?? 'inativo'}">${p.status ?? 'inativo'}</span></td>
         <td>${p.criado_em ? new Date(p.criado_em).toLocaleDateString('pt-BR') : '—'}</td>
+        <td><button class="btn-danger-ghost" style="color:#7c3aed;border-color:#ddd6fe" onclick="abrirProntuario('${p.id}')">Ver ficha</button></td>
       </tr>
     `).join('');
   }
+  let pacientesCache = [];
 
   document.getElementById('btnAddPaciente').addEventListener('click', () => {
     document.getElementById('modalAddPaciente').classList.add('open');
@@ -392,6 +624,299 @@
     document.getElementById('mEmail').value = '';
     document.getElementById('mTelefone').value = '';
     await carregarPacientes();
+  });
+
+  /* ========== PRONTUÁRIO ========== */
+  let pacienteAtualId = null;
+  let sessoesCache = [];
+  let chartSintomas, chartAdesao, chartFuncionamento;
+
+  function calcularIdade(dataNasc) {
+    const hoje = new Date();
+    const nasc = new Date(dataNasc + 'T00:00:00');
+    let idade = hoje.getFullYear() - nasc.getFullYear();
+    const m = hoje.getMonth() - nasc.getMonth();
+    if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) idade--;
+    return idade;
+  }
+
+  function formatarStatusSessao(status) {
+    const map = { realizada: 'Realizada', falta_avisada: 'Falta avisada', falta_nao_avisada: 'Falta sem aviso' };
+    return map[status] || status || '—';
+  }
+
+  async function abrirProntuario(pacienteId) {
+    const p = pacientesCache.find(x => x.id === pacienteId);
+    if (!p) return;
+    pacienteAtualId = pacienteId;
+
+    document.getElementById('pHeaderNome').textContent = p.nome ?? '—';
+    const idade = p.data_nascimento ? calcularIdade(p.data_nascimento) : null;
+    const sub = [idade !== null ? idade + ' anos' : null, p.profissao, p.email].filter(Boolean).join(' · ');
+    document.getElementById('pHeaderSub').textContent = sub || '—';
+    const statusEl = document.getElementById('pHeaderStatus');
+    statusEl.textContent = p.status ?? 'inativo';
+    statusEl.className = 'badge badge-' + (p.status ?? 'inativo');
+    document.getElementById('pQueixa').textContent = p.queixa_principal || 'Não informado.';
+
+    renderAnamnese(p);
+
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('secProntuario').classList.add('active');
+    document.querySelectorAll('.prontuario-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.prontuario-tab-btn[data-ptab="pVisao"]').classList.add('active');
+    document.querySelectorAll('.prontuario-pane').forEach(pane => pane.classList.remove('active'));
+    document.getElementById('pVisao').classList.add('active');
+
+    await carregarSessoesPaciente(pacienteId);
+  }
+  window.abrirProntuario = abrirProntuario;
+
+  function voltarPacientes() {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('secPacientes').classList.add('active');
+  }
+  window.voltarPacientes = voltarPacientes;
+
+  function renderAnamnese(p) {
+    const campos = [
+      ['Data de nascimento', p.data_nascimento ? new Date(p.data_nascimento + 'T00:00:00').toLocaleDateString('pt-BR') : null],
+      ['Gênero', p.genero],
+      ['Estado civil', p.estado_civil],
+      ['Profissão', p.profissao],
+      ['Escolaridade', p.escolaridade],
+      ['Tempo da queixa', p.tempo_queixa],
+      ['Áreas de impacto', Array.isArray(p.areas_impacto) ? p.areas_impacto.join(', ') : p.areas_impacto],
+      ['Terapia anterior', p.terapia_anterior],
+      ['Detalhes da terapia anterior', p.terapia_detalhes],
+      ['Diagnósticos', Array.isArray(p.diagnosticos) ? p.diagnosticos.join(', ') : p.diagnosticos],
+      ['Observações sobre diagnóstico', p.diagnosticos_obs],
+      ['Medicação em uso', p.medicacao],
+      ['Detalhes da medicação', p.medicacao_detalhe],
+      ['Nota de saúde física (0–10)', p.saude_fisica_nota],
+      ['Histórico de internação', p.internacao],
+      ['Detalhes da internação', p.internacao_detalhe],
+      ['Uso de substâncias', Array.isArray(p.substancias) ? p.substancias.join(', ') : p.substancias],
+      ['Situação familiar atual', p.familia_atual],
+      ['Histórico familiar', Array.isArray(p.historico_familiar) ? p.historico_familiar.join(', ') : p.historico_familiar],
+      ['Eventos de vida relevantes', Array.isArray(p.eventos_vida) ? p.eventos_vida.join(', ') : p.eventos_vida],
+    ];
+
+    const html = campos.map(([label, val]) => `
+      <div class="anamnese-item">
+        <div class="a-label">${label}</div>
+        <div class="a-val">${(val || val === 0) ? val : '—'}</div>
+      </div>
+    `).join('') + `
+      <div class="anamnese-item anamnese-full">
+        <div class="a-label">História — observações</div>
+        <div class="a-val">${p.historia_obs || '—'}</div>
+      </div>
+      <div class="anamnese-item anamnese-full">
+        <div class="a-label">Observações clínicas gerais</div>
+        <div class="a-val">${p.obs_clinicas || '—'}</div>
+      </div>
+    `;
+
+    document.getElementById('anamneseGrid').innerHTML = html;
+  }
+
+  async function carregarSessoesPaciente(pacienteId) {
+    const { data: sessoes, error } = await sb
+      .from('sessoes')
+      .select('*')
+      .eq('paciente_id', pacienteId)
+      .order('data_hora', { ascending: true });
+
+    sessoesCache = (!error && sessoes) ? sessoes : [];
+
+    renderMetricasVisao(sessoesCache);
+    renderTimeline(sessoesCache);
+    renderGraficos(sessoesCache);
+  }
+
+  function renderMetricasVisao(sessoes) {
+    document.getElementById('pTotalSessoes').textContent = sessoes.length;
+    document.getElementById('pTotalFaltas').textContent = sessoes.filter(s => s.status === 'falta_avisada' || s.status === 'falta_nao_avisada').length;
+    document.getElementById('pTotalIntercorrencias').textContent = sessoes.filter(s => s.intercorrencia).length;
+
+    const ultimaEl = document.getElementById('pUltimaSessao');
+    if (!sessoes.length) {
+      ultimaEl.innerHTML = '<p class="empty">Nenhuma sessão registrada ainda.</p>';
+      return;
+    }
+    const ultima = sessoes[sessoes.length - 1];
+    ultimaEl.innerHTML = `
+      <p style="font-size:13px;color:#374151;line-height:1.6;">
+        <strong>${new Date(ultima.data_hora).toLocaleDateString('pt-BR')}</strong> — ${ultima.resumo_sessao || 'Sem resumo registrado.'}
+      </p>
+      ${ultima.plano_proxima_sessao ? `<p style="font-size:13px;color:#6b7280;margin-top:8px;"><strong>Plano:</strong> ${ultima.plano_proxima_sessao}</p>` : ''}
+    `;
+  }
+
+  function renderTimeline(sessoes) {
+    const el = document.getElementById('timelineSessoes');
+    if (!sessoes.length) {
+      el.innerHTML = '<p class="empty">Nenhuma sessão registrada ainda.</p>';
+      return;
+    }
+    const ordenadas = [...sessoes].reverse();
+    el.innerHTML = ordenadas.map(s => `
+      <div class="timeline-item ${s.intercorrencia ? 'intercorrencia' : ''}">
+        <div class="ti-top">
+          <span class="ti-data">${new Date(s.data_hora).toLocaleDateString('pt-BR')} · ${new Date(s.data_hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+          <span class="badge badge-${s.status === 'realizada' ? 'concluido' : 'cancelado'}">${formatarStatusSessao(s.status)}</span>
+          ${s.intercorrencia ? '<span class="badge badge-intercorrencia">Intercorrência</span>' : ''}
+        </div>
+        <div class="ti-resumo">${s.resumo_sessao || 'Sem resumo registrado.'}</div>
+        ${s.status === 'realizada' ? `
+          <div class="ti-scores">
+            ${s.intensidade_ansiedade != null ? `<span class="ti-score">Ansiedade: ${s.intensidade_ansiedade}</span>` : ''}
+            ${s.intensidade_humor != null ? `<span class="ti-score">Humor: ${s.intensidade_humor}</span>` : ''}
+            ${s.intensidade_sono != null ? `<span class="ti-score">Sono: ${s.intensidade_sono}</span>` : ''}
+            ${s.funcionamento_social != null ? `<span class="ti-score">Func. social: ${s.funcionamento_social}</span>` : ''}
+          </div>
+        ` : ''}
+      </div>
+    `).join('');
+  }
+
+  function renderGraficos(sessoes) {
+    const realizadas = sessoes.filter(s => s.status === 'realizada');
+    const emptyEl = document.getElementById('pEvolucaoEmpty');
+    const gridEl = document.querySelector('#pEvolucao .charts-grid');
+
+    if (!realizadas.length) {
+      emptyEl.style.display = 'block';
+      gridEl.style.display = 'none';
+      return;
+    }
+    emptyEl.style.display = 'none';
+    gridEl.style.display = 'grid';
+
+    const labels = realizadas.map(s => new Date(s.data_hora).toLocaleDateString('pt-BR'));
+
+    if (chartSintomas) chartSintomas.destroy();
+    chartSintomas = new Chart(document.getElementById('chartSintomas'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Ansiedade', data: realizadas.map(s => s.intensidade_ansiedade), borderColor: '#ef4444', tension: 0.3 },
+          { label: 'Humor', data: realizadas.map(s => s.intensidade_humor), borderColor: '#22c55e', tension: 0.3 },
+          { label: 'Sono', data: realizadas.map(s => s.intensidade_sono), borderColor: '#3b82f6', tension: 0.3 },
+        ]
+      },
+      options: { responsive: true, scales: { y: { min: 0, max: 10 } } }
+    });
+
+    const meses = {};
+    sessoes.forEach(s => {
+      const d = new Date(s.data_hora);
+      const chave = d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+      if (!meses[chave]) meses[chave] = { realizadas: 0, faltas: 0 };
+      if (s.status === 'realizada') meses[chave].realizadas++; else meses[chave].faltas++;
+    });
+    const mesesLabels = Object.keys(meses);
+
+    if (chartAdesao) chartAdesao.destroy();
+    chartAdesao = new Chart(document.getElementById('chartAdesao'), {
+      type: 'bar',
+      data: {
+        labels: mesesLabels,
+        datasets: [
+          { label: 'Realizadas', data: mesesLabels.map(m => meses[m].realizadas), backgroundColor: '#86efac' },
+          { label: 'Faltas', data: mesesLabels.map(m => meses[m].faltas), backgroundColor: '#fca5a5' },
+        ]
+      },
+      options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true } } }
+    });
+
+    const primeira = realizadas[0];
+    const ultima = realizadas[realizadas.length - 1];
+    const funcScore = v => v === 'preservado' ? 10 : v === 'moderadamente_prejudicado' ? 5 : v === 'gravemente_prejudicado' ? 1 : null;
+
+    if (chartFuncionamento) chartFuncionamento.destroy();
+    chartFuncionamento = new Chart(document.getElementById('chartFuncionamento'), {
+      type: 'radar',
+      data: {
+        labels: ['Social', 'Ocupacional', 'Interpessoal'],
+        datasets: [
+          { label: 'Início', data: [primeira.funcionamento_social, funcScore(primeira.funcionamento_ocupacional), funcScore(primeira.funcionamento_interpessoal)], borderColor: '#c4b5fd', backgroundColor: 'rgba(196,181,253,0.2)' },
+          { label: 'Atual', data: [ultima.funcionamento_social, funcScore(ultima.funcionamento_ocupacional), funcScore(ultima.funcionamento_interpessoal)], borderColor: '#7c3aed', backgroundColor: 'rgba(124,58,237,0.2)' },
+        ]
+      },
+      options: { responsive: true, scales: { r: { min: 0, max: 10 } } }
+    });
+  }
+
+  document.querySelectorAll('.prontuario-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.prontuario-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.prontuario-pane').forEach(p => p.classList.remove('active'));
+      document.getElementById(btn.dataset.ptab).classList.add('active');
+    });
+  });
+
+  const sliderMap = { sAnsiedade: 'valAnsiedade', sHumor: 'valHumor', sSono: 'valSono', sFuncSocial: 'valFuncSocial' };
+  Object.entries(sliderMap).forEach(([inputId, valId]) => {
+    document.getElementById(inputId).addEventListener('input', e => {
+      document.getElementById(valId).textContent = e.target.value;
+    });
+  });
+
+  document.getElementById('btnRegistrarSessao').addEventListener('click', () => {
+    const agora = new Date();
+    document.getElementById('sData').value = agora.toISOString().slice(0, 10);
+    document.getElementById('sHora').value = agora.toTimeString().slice(0, 5);
+    document.getElementById('modalRegistrarSessao').classList.add('open');
+  });
+  document.getElementById('btnCancelarSessao').addEventListener('click', () => {
+    document.getElementById('modalRegistrarSessao').classList.remove('open');
+  });
+
+  document.getElementById('btnSalvarSessao').addEventListener('click', async () => {
+    const msg = document.getElementById('msgModalSessao');
+    const data = document.getElementById('sData').value;
+    const hora = document.getElementById('sHora').value;
+    if (!data || !hora) { msg.textContent = 'Data e hora são obrigatórias.'; return; }
+    if (!pacienteAtualId) { msg.textContent = 'Nenhum paciente selecionado.'; return; }
+
+    const dataHora = new Date(`${data}T${hora}:00`).toISOString();
+    const status = document.getElementById('sStatus').value;
+
+    const payload = {
+      psicologo_id: psiId,
+      paciente_id: pacienteAtualId,
+      data_hora: dataHora,
+      status,
+      resumo_sessao: document.getElementById('sResumo').value.trim() || null,
+      tarefa_casa: document.getElementById('sTarefaCasa').value.trim() || null,
+      plano_proxima_sessao: document.getElementById('sPlanoProximo').value.trim() || null,
+      intercorrencia: document.getElementById('sIntercorrencia').checked,
+    };
+
+    if (status === 'realizada') {
+      payload.intensidade_ansiedade = Number(document.getElementById('sAnsiedade').value);
+      payload.intensidade_humor = Number(document.getElementById('sHumor').value);
+      payload.intensidade_sono = Number(document.getElementById('sSono').value);
+      payload.funcionamento_social = Number(document.getElementById('sFuncSocial').value);
+      payload.funcionamento_ocupacional = document.getElementById('sFuncOcupacional').value;
+      payload.funcionamento_interpessoal = document.getElementById('sFuncInterpessoal').value;
+    }
+
+    msg.textContent = '';
+    const { error } = await sb.from('sessoes').insert(payload);
+    if (error) { msg.textContent = 'Erro ao salvar: ' + error.message; return; }
+
+    document.getElementById('modalRegistrarSessao').classList.remove('open');
+    document.getElementById('sResumo').value = '';
+    document.getElementById('sTarefaCasa').value = '';
+    document.getElementById('sPlanoProximo').value = '';
+    document.getElementById('sIntercorrencia').checked = false;
+
+    await carregarSessoesPaciente(pacienteAtualId);
   });
 
   /* ========== AGENDA ========== */
