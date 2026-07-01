@@ -8,10 +8,10 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: #f0f4ff; min-height: 100vh; padding: 40px 20px; }
+    body { font-family: 'Inter', sans-serif; background: #fce8f0; min-height: 100vh; padding: 40px 20px; }
 
     .container { max-width: 800px; margin: 0 auto; }
-    .logo { font-size: 24px; font-weight: 700; color: #4f46e5; margin-bottom: 8px; }
+    .logo { font-size: 24px; font-weight: 700; color: #7c3aed; margin-bottom: 8px; }
     .subtitle { font-size: 15px; color: #6b7280; margin-bottom: 32px; }
 
     .grid {
@@ -21,7 +21,7 @@
     }
 
     .card {
-      background: #fff;
+      background: #fdf4f8;
       border-radius: 14px;
       padding: 24px;
       box-shadow: 0 1px 6px rgba(0,0,0,0.07);
@@ -33,9 +33,9 @@
     .avatar {
       width: 56px; height: 56px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #6366f1, #a78bfa);
+      background: linear-gradient(135deg, #e879f9, #c084fc);
       display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 22px; font-weight: 700;
+      color: #14532d; font-size: 22px; font-weight: 700;
       margin-bottom: 14px;
     }
 
@@ -45,13 +45,13 @@
 
     .btn-escolher {
       display: block; width: 100%;
-      padding: 10px; background: #4f46e5; color: #fff;
+      padding: 10px; background: #86efac; color: #14532d;
       border: none; border-radius: 8px;
       font-size: 13px; font-weight: 600; cursor: pointer;
       transition: background 0.2s;
     }
-    .btn-escolher:hover { background: #4338ca; }
-    .btn-escolher:disabled { background: #a5b4fc; cursor: not-allowed; }
+    .btn-escolher:hover { background: #4ade80; }
+    .btn-escolher:disabled { background: #bbf7d0; cursor: not-allowed; }
 
     .empty { text-align: center; color: #9ca3af; font-size: 14px; padding: 60px 0; }
     .msg-topo { margin-bottom: 16px; font-size: 13px; color: #10b981; font-weight: 500; }
@@ -69,8 +69,8 @@
 </div>
 
 <script>
-  const SUPA_URL = 'https://gqjkslbktxxpyquuklty.supabase.co';
-  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxamtzbGJrdHh4cHlxdXVrbHR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI3NTU5MDQsImV4cCI6MjA1ODMzMTkwNH0.aAuZPQKFnHvRK_63Gy8OOLnHDHd4sJlnDHLo1Vfy5yw';
+  const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
 
   const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
   let pacienteId = null;
