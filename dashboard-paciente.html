@@ -6,6 +6,7 @@
   <title>Meu espaço — MeuPsi</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', sans-serif; background: #fce8f0; min-height: 100vh; }
@@ -76,15 +77,48 @@
     }
     .psi-info h3 { font-size: 16px; font-weight: 600; color: #111827; }
     .psi-info p { font-size: 13px; color: #6b7280; margin-top: 2px; }
+
+    /* ── Seções (tabs) ── */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ── Check-in ── */
+    .checkin-row { margin-bottom: 20px; }
+    .checkin-row .ck-label { font-size: 13px; font-weight: 600; color: #6b21a8; margin-bottom: 8px; }
+    .emoji-picker { display: flex; gap: 8px; }
+    .emoji-btn {
+      flex: 1; padding: 10px 4px; border-radius: 10px; border: 1.5px solid #e5e7eb;
+      background: #fff; font-size: 22px; cursor: pointer; text-align: center;
+      transition: all 0.15s;
+    }
+    .emoji-btn:hover { border-color: #c4b5fd; }
+    .emoji-btn.selected { border-color: #7c3aed; background: #f5f3ff; }
+    .btn-primary {
+      padding: 10px 20px; background: #86efac; color: #14532d;
+      border: none; border-radius: 8px; font-size: 13px;
+      font-weight: 600; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #4ade80; }
+    .btn-primary:disabled { opacity: 0.6; cursor: default; }
+    #msgCheckin { font-size: 13px; margin-top: 10px; }
+    #msgCheckin.ok { color: #065f46; }
+    #msgCheckin.erro { color: #ef4444; }
+
+    .chart-box canvas { max-height: 260px; }
+    .empty { text-align: center; padding: 30px; color: #9ca3af; font-size: 14px; }
   </style>
 </head>
 <body>
 
 <nav class="sidebar">
   <div class="logo">MeuPsi</div>
-  <a class="nav-item active" href="dashboard-paciente.html">
+  <a class="nav-item active" data-section="secEspaco" href="#">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
     Meu espaço
+  </a>
+  <a class="nav-item" data-section="secProgresso" href="#">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+    Meu progresso
   </a>
   <a class="nav-item" href="escolher-psicologo.html">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -96,6 +130,8 @@
 </nav>
 
 <main class="main">
+  <!-- ========== SEÇÃO: MEU ESPAÇO ========== -->
+  <section class="section active" id="secEspaco">
   <div class="page-header">
     <h1>Olá, <span id="nomePaciente">Paciente</span> 👋</h1>
     <p>Bem-vindo ao seu espaço no MeuPsi.</p>
@@ -127,6 +163,61 @@
     <div class="info-row"><span class="info-label">Telefone</span><span class="info-value" id="infoTelefone">—</span></div>
     <div class="info-row"><span class="info-label">Status</span><span class="info-value" id="infoStatus">—</span></div>
   </div>
+  </section>
+
+  <!-- ========== SEÇÃO: MEU PROGRESSO ========== -->
+  <section class="section" id="secProgresso">
+    <div class="page-header">
+      <h1>Meu progresso</h1>
+      <p>Um check-in rápido ajuda você e seu psicólogo a acompanhar sua evolução entre as sessões.</p>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">Como você está se sentindo hoje?</div>
+
+      <div class="checkin-row">
+        <div class="ck-label">Ansiedade</div>
+        <div class="emoji-picker" data-campo="ansiedade">
+          <button class="emoji-btn" data-valor="1">😰</button>
+          <button class="emoji-btn" data-valor="3">😟</button>
+          <button class="emoji-btn" data-valor="5">😐</button>
+          <button class="emoji-btn" data-valor="7">🙂</button>
+          <button class="emoji-btn" data-valor="9">😌</button>
+        </div>
+      </div>
+
+      <div class="checkin-row">
+        <div class="ck-label">Humor</div>
+        <div class="emoji-picker" data-campo="humor">
+          <button class="emoji-btn" data-valor="1">😢</button>
+          <button class="emoji-btn" data-valor="3">🙁</button>
+          <button class="emoji-btn" data-valor="5">😐</button>
+          <button class="emoji-btn" data-valor="7">🙂</button>
+          <button class="emoji-btn" data-valor="9">😄</button>
+        </div>
+      </div>
+
+      <div class="checkin-row">
+        <div class="ck-label">Sono</div>
+        <div class="emoji-picker" data-campo="sono">
+          <button class="emoji-btn" data-valor="1">😵</button>
+          <button class="emoji-btn" data-valor="3">😴</button>
+          <button class="emoji-btn" data-valor="5">😐</button>
+          <button class="emoji-btn" data-valor="7">🙂</button>
+          <button class="emoji-btn" data-valor="9">😄</button>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btnSalvarCheckin">Salvar check-in de hoje</button>
+      <div id="msgCheckin"></div>
+    </div>
+
+    <div class="section-card chart-box">
+      <div class="section-title">Sua evolução recente</div>
+      <canvas id="chartProgresso"></canvas>
+      <div class="empty" id="progressoEmpty" style="display:none;">Faça seu primeiro check-in para começar a ver sua evolução aqui.</div>
+    </div>
+  </section>
 </main>
 
 <script>
@@ -173,9 +264,9 @@
     const s = paciente.status ?? 'pendente';
     document.getElementById('infoStatus').innerHTML = `<span class="badge badge-${s}">${s}</span>`;
 
-    // Dados do psicólogo
+    // Dados do psicólogo (pacientes.psicologo_id referencia psicologos.id, não usuarios.id)
     const { data: psi } = await sb
-      .from('usuarios')
+      .from('psicologos')
       .select('nome, crp')
       .eq('id', paciente.psicologo_id)
       .single();
@@ -186,6 +277,137 @@
       document.getElementById('psiCrp').textContent = psi.crp ? 'CRP ' + psi.crp : '';
       document.getElementById('psiAvatar').textContent = (psi.nome ?? 'P')[0].toUpperCase();
     }
+
+    await carregarCheckinHoje(uid);
+    await carregarProgresso(uid);
+  }
+
+  // Navegação entre seções
+  document.querySelectorAll('.nav-item[data-section]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelectorAll('.nav-item[data-section]').forEach(n => n.classList.remove('active'));
+      link.classList.add('active');
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(link.dataset.section).classList.add('active');
+    });
+  });
+
+  /* ========== CHECK-IN / PROGRESSO ========== */
+  let checkinSelecoes = {};
+  let chartProgresso;
+
+  document.querySelectorAll('.emoji-picker').forEach(picker => {
+    const campo = picker.dataset.campo;
+    picker.querySelectorAll('.emoji-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        picker.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        checkinSelecoes[campo] = Number(btn.dataset.valor);
+      });
+    });
+  });
+
+  async function carregarCheckinHoje(uid) {
+    const hoje = new Date().toISOString().slice(0, 10);
+    const { data } = await sb
+      .from('checkins_paciente')
+      .select('*')
+      .eq('paciente_id', uid)
+      .eq('data', hoje)
+      .order('criado_em', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (data) {
+      ['ansiedade', 'humor', 'sono'].forEach(campo => {
+        const valor = data[campo];
+        if (valor == null) return;
+        checkinSelecoes[campo] = valor;
+        const picker = document.querySelector(`.emoji-picker[data-campo="${campo}"]`);
+        const maisProximo = [...picker.querySelectorAll('.emoji-btn')]
+          .reduce((a, b) => Math.abs(Number(b.dataset.valor) - valor) < Math.abs(Number(a.dataset.valor) - valor) ? b : a);
+        maisProximo.classList.add('selected');
+      });
+      const btn = document.getElementById('btnSalvarCheckin');
+      btn.textContent = 'Check-in de hoje já registrado (clique para atualizar)';
+    }
+  }
+
+  document.getElementById('btnSalvarCheckin').addEventListener('click', async () => {
+    const msg = document.getElementById('msgCheckin');
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const uid = session.user.id;
+
+    if (!checkinSelecoes.ansiedade || !checkinSelecoes.humor || !checkinSelecoes.sono) {
+      msg.textContent = 'Selecione um emoji para cada item.';
+      msg.className = 'erro';
+      return;
+    }
+
+    const btn = document.getElementById('btnSalvarCheckin');
+    btn.disabled = true;
+    msg.textContent = '';
+    msg.className = '';
+
+    const { error } = await sb.from('checkins_paciente').insert({
+      paciente_id: uid,
+      data: new Date().toISOString().slice(0, 10),
+      ansiedade: checkinSelecoes.ansiedade,
+      humor: checkinSelecoes.humor,
+      sono: checkinSelecoes.sono,
+    });
+
+    btn.disabled = false;
+
+    if (error) {
+      msg.textContent = 'Erro ao salvar: ' + error.message;
+      msg.className = 'erro';
+      return;
+    }
+
+    msg.textContent = 'Check-in salvo!';
+    msg.className = 'ok';
+    btn.textContent = 'Check-in de hoje já registrado (clique para atualizar)';
+    await carregarProgresso(uid);
+  });
+
+  async function carregarProgresso(uid) {
+    const { data: checkins, error } = await sb
+      .from('checkins_paciente')
+      .select('*')
+      .eq('paciente_id', uid)
+      .order('data', { ascending: true })
+      .limit(30);
+
+    const canvas = document.getElementById('chartProgresso');
+    const emptyEl = document.getElementById('progressoEmpty');
+
+    if (error || !checkins?.length) {
+      canvas.style.display = 'none';
+      emptyEl.style.display = 'block';
+      return;
+    }
+
+    canvas.style.display = 'block';
+    emptyEl.style.display = 'none';
+
+    const labels = checkins.map(c => new Date(c.data + 'T00:00:00').toLocaleDateString('pt-BR'));
+
+    if (chartProgresso) chartProgresso.destroy();
+    chartProgresso = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Ansiedade', data: checkins.map(c => c.ansiedade), borderColor: '#ef4444', tension: 0.3 },
+          { label: 'Humor', data: checkins.map(c => c.humor), borderColor: '#22c55e', tension: 0.3 },
+          { label: 'Sono', data: checkins.map(c => c.sono), borderColor: '#3b82f6', tension: 0.3 },
+        ]
+      },
+      options: { responsive: true, scales: { y: { min: 0, max: 10 } } }
+    });
   }
 
   document.getElementById('btnSair').addEventListener('click', async () => {
