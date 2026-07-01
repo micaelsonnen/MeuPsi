@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Andreia Vieira — MeuPsi</title>
-<meta name="description" content="Psicóloga especialista em ansiedade e trauma. Atendimento online." />
+<title>Perfil do Psicólogo — MeuPsi</title>
+<meta name="description" content="Perfil de psicólogo na plataforma MeuPsi." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
   --rosa-50:  #FDF0F4;
@@ -59,6 +60,7 @@ nav {
 .btn-ghost:hover { border-color: var(--lila-300); color: var(--lila-700); }
 .btn-lila { background: var(--lila-500); color: #fff; }
 .btn-lila:hover { background: var(--lila-700); }
+.btn-lila:disabled { background: var(--rosa-200); cursor: not-allowed; }
 
 /* LAYOUT */
 .page { max-width: 1000px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
@@ -137,30 +139,9 @@ nav {
 .bio { font-size: 15px; color: var(--gray-500); line-height: 1.8; }
 .bio p + p { margin-top: 1rem; }
 
-/* ESPECIALIDADES */
-.esp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.esp-item {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 14px; color: var(--gray-500); padding: 8px;
-  background: var(--rosa-100); border-radius: var(--radius-sm);
-}
-.esp-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--lila-300); flex-shrink: 0; }
-
-/* FORMAÇÃO */
-.formacao-list { display: flex; flex-direction: column; gap: 12px; }
-.formacao-item { display: flex; gap: 12px; }
-.formacao-icon {
-  width: 36px; height: 36px; border-radius: var(--radius-sm);
-  background: var(--rosa-100); display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; color: var(--lila-500);
-}
-.formacao-titulo { font-size: 14px; font-weight: 500; color: var(--gray-800); }
-.formacao-inst { font-size: 13px; color: var(--gray-500); }
-.formacao-ano { font-size: 12px; color: var(--malva); }
-
 /* AGENDAMENTO */
 .agenda-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-.agenda-mes { font-size: 15px; font-weight: 500; }
+.agenda-mes { font-size: 15px; font-weight: 500; text-transform: capitalize; }
 .agenda-nav { display: flex; gap: 6px; }
 .agenda-nav button {
   width: 30px; height: 30px; border-radius: var(--radius-sm);
@@ -196,17 +177,6 @@ nav {
 }
 .horario:hover { border-color: var(--lila-300); color: var(--lila-700); background: var(--rosa-100); }
 .horario.selecionado { background: var(--lila-500); color: #fff; border-color: var(--lila-500); }
-.horario.ocupado { color: var(--rosa-200); cursor: default; text-decoration: line-through; }
-
-/* DEPOIMENTOS */
-.dep-list { display: flex; flex-direction: column; gap: 14px; }
-.dep-item {
-  background: var(--rosa-100); border-radius: var(--radius-sm);
-  padding: 1rem 1.25rem; border-left: 3px solid var(--malva);
-}
-.dep-texto { font-size: 14px; color: var(--gray-500); line-height: 1.7; margin-bottom: 8px; }
-.dep-autor { font-size: 12px; color: var(--malva); }
-.estrelas { color: var(--lila-300); font-size: 13px; margin-bottom: 4px; }
 
 /* VALOR */
 .valor-badge {
@@ -214,12 +184,16 @@ nav {
   font-family: var(--font-display); color: var(--lila-900);
 }
 .valor-badge .cifrao { font-size: 14px; }
-.valor-badge .numero { font-size: 28px; font-weight: 300; }
+.valor-badge .numero { font-size: 22px; font-weight: 300; }
 .valor-badge .periodo { font-size: 13px; color: var(--gray-500); }
+
+.empty-msg { font-size: 13px; color: var(--gray-500); padding: 12px 0; }
+#msgAgendamento { font-size: 13px; margin-bottom: 10px; min-height: 18px; }
+#msgAgendamento.erro { color: #c0392b; }
+#msgAgendamento.sucesso { color: var(--verde-600); }
 
 @media (max-width: 720px) {
   .grid { grid-template-columns: 1fr; }
-  .esp-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
   nav { padding: 0 1rem; }
@@ -237,7 +211,7 @@ nav {
   </a>
 </nav>
 
-<div class="page">
+<div class="page" id="pageContent">
   <div class="grid">
 
     <!-- SIDEBAR -->
@@ -246,25 +220,15 @@ nav {
       <!-- Perfil -->
       <div class="card profile-card">
         <div class="avatar-wrap">
-          <div class="avatar">AV</div>
+          <div class="avatar" id="avatar">--</div>
           <div class="badge-online" title="Aceita novos pacientes"></div>
         </div>
-        <p class="profile-name">Andreia Vieira</p>
-        <p class="profile-crp">CRP 21/06454</p>
-        <p class="profile-abordagem">Psicanálise Winnicottiana</p>
-        <div class="profile-tags">
-          <span class="tag">Ansiedade</span>
-          <span class="tag">Trauma</span>
-          <span class="tag">Luto</span>
-          <span class="tag-lila">Online</span>
-          <span class="tag-lila">Presencial</span>
-        </div>
+        <p class="profile-name" id="profileNome">Carregando…</p>
+        <p class="profile-crp" id="profileCrp"></p>
+        <p class="profile-abordagem" id="profileAbordagem"></p>
+        <div class="profile-tags" id="profileTags"></div>
         <div class="profile-actions">
-          <button class="btn-wpp">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.864L.063 23.641l5.941-1.559C7.637 23.015 9.756 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.98 0-3.842-.575-5.418-1.57l-.385-.229-3.995 1.048 1.067-3.9-.252-.4A9.933 9.933 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
-            Chamar no WhatsApp
-          </button>
-          <button class="btn-agendar">Agendar sessão</button>
+          <button class="btn-agendar" onclick="document.getElementById('cardAgenda').scrollIntoView({behavior:'smooth'})">Agendar sessão</button>
         </div>
       </div>
 
@@ -276,16 +240,7 @@ nav {
           </div>
           <div>
             <p class="info-label">Localização</p>
-            <p class="info-value">Belo Horizonte, MG</p>
-          </div>
-        </div>
-        <div class="info-row">
-          <div class="info-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-          </div>
-          <div>
-            <p class="info-label">Disponibilidade</p>
-            <p class="info-value">Seg, Qua e Sex</p>
+            <p class="info-value" id="infoCidade">—</p>
           </div>
         </div>
         <div class="info-row">
@@ -303,10 +258,8 @@ nav {
           </div>
           <div>
             <p class="info-label">Valor</p>
-            <div class="valor-badge">
-              <span class="cifrao">R$</span>
-              <span class="numero">180</span>
-              <span class="periodo">/sessão</span>
+            <div class="valor-badge" id="infoValor">
+              <span class="periodo">a combinar</span>
             </div>
           </div>
         </div>
@@ -316,7 +269,7 @@ nav {
           </div>
           <div>
             <p class="info-label">Atendimento</p>
-            <p class="info-value">Online e Presencial</p>
+            <p class="info-value" id="infoModalidade">—</p>
           </div>
         </div>
       </div>
@@ -329,74 +282,21 @@ nav {
       <!-- Bio -->
       <div class="card">
         <h2 class="card-title">Sobre mim</h2>
-        <div class="bio">
-          <p>Sou psicóloga clínica com 12 anos de experiência, especializada na abordagem Winnicottiana. Acredito que cada pessoa carrega em si a capacidade de se transformar — meu papel é criar um espaço seguro e acolhedor para que esse processo aconteça.</p>
-          <p>Atendo adultos com foco em ansiedade, trauma, luto e questões de identidade. Minha prática é orientada pelo cuidado genuíno com o ser humano, onde o ritmo de cada pessoa é sempre respeitado.</p>
-        </div>
-      </div>
-
-      <!-- Especialidades -->
-      <div class="card">
-        <h2 class="card-title">Especialidades</h2>
-        <div class="esp-grid">
-          <div class="esp-item"><div class="esp-dot"></div>Ansiedade e ataques de pânico</div>
-          <div class="esp-item"><div class="esp-dot"></div>Trauma e TEPT</div>
-          <div class="esp-item"><div class="esp-dot"></div>Luto e perdas</div>
-          <div class="esp-item"><div class="esp-dot"></div>Depressão</div>
-          <div class="esp-item"><div class="esp-dot"></div>Questões de identidade</div>
-          <div class="esp-item"><div class="esp-dot"></div>Relacionamentos</div>
-          <div class="esp-item"><div class="esp-dot"></div>Autoestima</div>
-          <div class="esp-item"><div class="esp-dot"></div>Transtornos de humor</div>
-        </div>
-      </div>
-
-      <!-- Formação -->
-      <div class="card">
-        <h2 class="card-title">Formação</h2>
-        <div class="formacao-list">
-          <div class="formacao-item">
-            <div class="formacao-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-            </div>
-            <div>
-              <p class="formacao-titulo">Graduação em Psicologia</p>
-              <p class="formacao-inst">Universidade Federal de Minas Gerais</p>
-              <p class="formacao-ano">2010 – 2015</p>
-            </div>
-          </div>
-          <div class="formacao-item">
-            <div class="formacao-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-            </div>
-            <div>
-              <p class="formacao-titulo">Especialização em Psicanálise Winnicottiana</p>
-              <p class="formacao-inst">Instituto Sedes Sapientiae — São Paulo</p>
-              <p class="formacao-ano">2016 – 2018</p>
-            </div>
-          </div>
-          <div class="formacao-item">
-            <div class="formacao-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-            </div>
-            <div>
-              <p class="formacao-titulo">Formação em Trauma e EMDR</p>
-              <p class="formacao-inst">Instituto EMDR Brasil</p>
-              <p class="formacao-ano">2020</p>
-            </div>
-          </div>
+        <div class="bio" id="profileBio">
+          <p>Este psicólogo ainda não adicionou uma biografia.</p>
         </div>
       </div>
 
       <!-- Agendamento -->
-      <div class="card">
+      <div class="card" id="cardAgenda">
         <h2 class="card-title">Agendar sessão</h2>
         <div class="agenda-header">
-          <span class="agenda-mes">Julho 2026</span>
+          <span class="agenda-mes" id="agendaMes">—</span>
           <div class="agenda-nav">
-            <button>
+            <button id="btnMesAnterior">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
             </button>
-            <button>
+            <button id="btnMesProximo">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
@@ -410,58 +310,11 @@ nav {
           <span class="dia-label">Sex</span>
           <span class="dia-label">Sáb</span>
         </div>
-        <div class="calendario">
-          <div class="dia inativo"></div>
-          <div class="dia disponivel" onclick="selecionarDia(this)">7</div>
-          <div class="dia inativo">8</div>
-          <div class="dia disponivel" onclick="selecionarDia(this)">9</div>
-          <div class="dia inativo">10</div>
-          <div class="dia disponivel" onclick="selecionarDia(this)">11</div>
-          <div class="dia inativo">12</div>
-          <div class="dia inativo">13</div>
-          <div class="dia disponivel" onclick="selecionarDia(this)">14</div>
-          <div class="dia inativo">15</div>
-          <div class="dia disponivel hoje" onclick="selecionarDia(this)">16</div>
-          <div class="dia inativo">17</div>
-          <div class="dia disponivel" onclick="selecionarDia(this)">18</div>
-          <div class="dia inativo">19</div>
-          <div class="dia inativo">20</div>
-          <div class="dia disponivel" onclick="selecionarDia(this)">21</div>
-          <div class="dia inativo">22</div>
-          <div class="dia disponivel" onclick="selecionarDia(this)">23</div>
-          <div class="dia inativo">24</div>
-          <div class="dia disponivel" onclick="selecionarDia(this)">25</div>
-          <div class="dia inativo">26</div>
-        </div>
-        <p style="font-size:13px; color:var(--malva); margin-bottom:0.75rem;">Horários disponíveis — Seg 14 de julho</p>
-        <div class="horarios">
-          <div class="horario ocupado">08:00</div>
-          <div class="horario" onclick="selecionarHorario(this)">09:00</div>
-          <div class="horario ocupado">10:00</div>
-          <div class="horario" onclick="selecionarHorario(this)">11:00</div>
-          <div class="horario" onclick="selecionarHorario(this)">14:00</div>
-          <div class="horario ocupado">15:00</div>
-          <div class="horario" onclick="selecionarHorario(this)">16:00</div>
-          <div class="horario" onclick="selecionarHorario(this)">17:00</div>
-        </div>
-        <button class="btn btn-lila" style="width:100%; justify-content:center; padding:12px;">Confirmar agendamento</button>
-      </div>
-
-      <!-- Depoimentos -->
-      <div class="card">
-        <h2 class="card-title">O que pacientes dizem</h2>
-        <div class="dep-list">
-          <div class="dep-item">
-            <div class="estrelas">★★★★★</div>
-            <p class="dep-texto">A Andreia tem um jeito muito acolhedor de conduzir as sessões. Me sinto segura para falar de coisas que nunca falei pra ninguém. Em 6 meses já percebi mudanças reais na minha vida.</p>
-            <p class="dep-autor">Paciente anônima · 6 meses de acompanhamento</p>
-          </div>
-          <div class="dep-item">
-            <div class="estrelas">★★★★★</div>
-            <p class="dep-texto">Cheguei num momento de muita ansiedade e com medo de não conseguir ajuda. A abordagem dela foi transformadora. Recomendo de coração.</p>
-            <p class="dep-autor">Paciente anônimo · 1 ano de acompanhamento</p>
-          </div>
-        </div>
+        <div class="calendario" id="calendario"></div>
+        <p style="font-size:13px; color:var(--malva); margin-bottom:0.75rem;" id="horariosLabel">Selecione um dia disponível</p>
+        <div class="horarios" id="horarios"></div>
+        <div id="msgAgendamento"></div>
+        <button class="btn btn-lila" id="btnConfirmar" style="width:100%; justify-content:center; padding:12px;" disabled>Confirmar agendamento</button>
       </div>
 
     </main>
@@ -469,14 +322,252 @@ nav {
 </div>
 
 <script>
-function selecionarDia(el) {
-  document.querySelectorAll('.dia.selecionado').forEach(d => d.classList.remove('selecionado'));
-  el.classList.add('selecionado');
-}
-function selecionarHorario(el) {
-  document.querySelectorAll('.horario.selecionado').forEach(h => h.classList.remove('selecionado'));
-  el.classList.add('selecionado');
-}
+  const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
+  const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+
+  const params = new URLSearchParams(window.location.search);
+  const psicologoId = params.get('id');
+
+  let disponibilidade = {};   // { 'YYYY-MM-DD': [{id, hora}, ...] }
+  let mesAtual = new Date();  // controla o mês exibido no calendário
+  let diaSelecionado = null;
+  let consultaSelecionadaId = null;
+
+  const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+
+  async function init() {
+    if (!psicologoId) {
+      document.getElementById('pageContent').innerHTML = '<p style="padding:2rem;">Psicólogo não especificado. Volte para a busca e escolha um perfil.</p>';
+      return;
+    }
+    await carregarPsicologo();
+    await carregarDisponibilidade();
+    renderCalendario();
+
+    document.getElementById('btnMesAnterior').addEventListener('click', () => {
+      mesAtual.setMonth(mesAtual.getMonth() - 1);
+      diaSelecionado = null;
+      renderCalendario();
+    });
+    document.getElementById('btnMesProximo').addEventListener('click', () => {
+      mesAtual.setMonth(mesAtual.getMonth() + 1);
+      diaSelecionado = null;
+      renderCalendario();
+    });
+    document.getElementById('btnConfirmar').addEventListener('click', confirmarAgendamento);
+  }
+
+  async function carregarPsicologo() {
+    const { data: p, error } = await sb
+      .from('psicologos')
+      .select('id, nome, crp, bio, especialidade, abordagem, modalidade, cidade, preco_faixa, foto_url')
+      .eq('id', psicologoId)
+      .single();
+
+    if (error || !p) {
+      document.getElementById('pageContent').innerHTML = '<p style="padding:2rem;">Psicólogo não encontrado.</p>';
+      throw new Error('psicologo nao encontrado');
+    }
+
+    document.title = (p.nome ?? 'Psicólogo') + ' — MeuPsi';
+    document.getElementById('profileNome').textContent = p.nome ?? 'Psicólogo';
+    document.getElementById('profileCrp').textContent = p.crp ? 'CRP ' + p.crp : '';
+    document.getElementById('profileAbordagem').textContent = p.abordagem ?? '';
+
+    const avatar = document.getElementById('avatar');
+    if (p.foto_url) {
+      avatar.innerHTML = `<img src="${p.foto_url}" alt="${p.nome ?? ''}">`;
+    } else {
+      const iniciais = (p.nome ?? 'P').trim().split(' ').filter(Boolean).slice(0,2).map(w => w[0].toUpperCase()).join('');
+      avatar.textContent = iniciais || 'P';
+    }
+
+    const tagsEl = document.getElementById('profileTags');
+    const tags = [];
+    if (p.especialidade) tags.push(`<span class="tag">${p.especialidade}</span>`);
+    if (p.modalidade) tags.push(`<span class="tag-lila">${p.modalidade}</span>`);
+    tagsEl.innerHTML = tags.join('');
+
+    document.getElementById('infoCidade').textContent = p.cidade ?? '—';
+    document.getElementById('infoModalidade').textContent = p.modalidade ?? '—';
+
+    const valorEl = document.getElementById('infoValor');
+    valorEl.innerHTML = p.preco_faixa
+      ? `<span class="numero" style="font-size:16px;">${p.preco_faixa}</span>`
+      : `<span class="periodo">a combinar</span>`;
+
+    document.getElementById('profileBio').innerHTML = p.bio
+      ? `<p>${p.bio}</p>`
+      : '<p>Este psicólogo ainda não adicionou uma biografia.</p>';
+  }
+
+  async function carregarDisponibilidade() {
+    const hoje = new Date().toISOString().slice(0, 10);
+    const { data, error } = await sb
+      .from('consultas')
+      .select('id, data, hora')
+      .eq('psicologo_id', psicologoId)
+      .eq('status', 'disponivel')
+      .gte('data', hoje)
+      .order('data')
+      .order('hora');
+
+    disponibilidade = {};
+    if (!error && data) {
+      data.forEach(c => {
+        if (!disponibilidade[c.data]) disponibilidade[c.data] = [];
+        disponibilidade[c.data].push({ id: c.id, hora: c.hora.slice(0,5) });
+      });
+    }
+  }
+
+  function renderCalendario() {
+    const ano = mesAtual.getFullYear();
+    const mes = mesAtual.getMonth();
+    document.getElementById('agendaMes').textContent = `${MESES[mes]} ${ano}`;
+
+    const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
+    const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+    const hojeStr = new Date().toISOString().slice(0, 10);
+
+    const cal = document.getElementById('calendario');
+    cal.innerHTML = '';
+
+    for (let i = 0; i < primeiroDiaSemana; i++) {
+      cal.innerHTML += '<div class="dia inativo"></div>';
+    }
+
+    for (let d = 1; d <= diasNoMes; d++) {
+      const dataStr = `${ano}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const temHorarios = !!disponibilidade[dataStr]?.length;
+      const classes = ['dia'];
+      if (temHorarios) classes.push('disponivel'); else classes.push('inativo');
+      if (dataStr === hojeStr) classes.push('hoje');
+      if (dataStr === diaSelecionado) classes.push('selecionado');
+
+      const el = document.createElement('div');
+      el.className = classes.join(' ');
+      el.textContent = d;
+      if (temHorarios) {
+        el.addEventListener('click', () => selecionarDia(dataStr));
+      }
+      cal.appendChild(el);
+    }
+
+    if (diaSelecionado && disponibilidade[diaSelecionado]) {
+      renderHorarios(diaSelecionado);
+    } else {
+      document.getElementById('horariosLabel').textContent = 'Selecione um dia disponível';
+      document.getElementById('horarios').innerHTML = '';
+      resetSelecaoHorario();
+    }
+  }
+
+  function selecionarDia(dataStr) {
+    diaSelecionado = dataStr;
+    consultaSelecionadaId = null;
+    renderCalendario();
+  }
+
+  function renderHorarios(dataStr) {
+    const [ano, mes, dia] = dataStr.split('-');
+    document.getElementById('horariosLabel').textContent =
+      `Horários disponíveis — ${dia}/${mes}/${ano}`;
+
+    const horariosEl = document.getElementById('horarios');
+    horariosEl.innerHTML = disponibilidade[dataStr].map(h => `
+      <div class="horario" data-id="${h.id}">${h.hora}</div>
+    `).join('');
+
+    horariosEl.querySelectorAll('.horario').forEach(el => {
+      el.addEventListener('click', () => {
+        horariosEl.querySelectorAll('.horario').forEach(h => h.classList.remove('selecionado'));
+        el.classList.add('selecionado');
+        consultaSelecionadaId = el.dataset.id;
+        document.getElementById('btnConfirmar').disabled = false;
+      });
+    });
+
+    resetSelecaoHorario();
+  }
+
+  function resetSelecaoHorario() {
+    consultaSelecionadaId = null;
+    document.getElementById('btnConfirmar').disabled = true;
+  }
+
+  async function confirmarAgendamento() {
+    const msg = document.getElementById('msgAgendamento');
+    msg.className = '';
+    msg.textContent = '';
+
+    if (!consultaSelecionadaId) {
+      msg.textContent = 'Selecione um horário.';
+      msg.className = 'erro';
+      return;
+    }
+
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+      return;
+    }
+
+    const pacienteId = session.user.id;
+    const btn = document.getElementById('btnConfirmar');
+    btn.disabled = true;
+    btn.textContent = 'Agendando…';
+
+    // garante que existe um registro do paciente vinculado a este psicólogo
+    const { error: erroUpsert } = await sb
+      .from('pacientes')
+      .upsert({ id: pacienteId, psicologo_id: psicologoId, status: 'pendente' }, { onConflict: 'id' });
+
+    if (erroUpsert) {
+      msg.textContent = 'Erro ao vincular paciente: ' + erroUpsert.message;
+      msg.className = 'erro';
+      btn.disabled = false;
+      btn.textContent = 'Confirmar agendamento';
+      return;
+    }
+
+    // reserva o horário, só se ele ainda estiver disponível
+    const { data: atualizado, error: erroConsulta } = await sb
+      .from('consultas')
+      .update({ paciente_id: pacienteId, status: 'agendado' })
+      .eq('id', consultaSelecionadaId)
+      .eq('status', 'disponivel')
+      .select();
+
+    if (erroConsulta) {
+      msg.textContent = 'Erro ao agendar: ' + erroConsulta.message;
+      msg.className = 'erro';
+      btn.disabled = false;
+      btn.textContent = 'Confirmar agendamento';
+      return;
+    }
+
+    if (!atualizado || atualizado.length === 0) {
+      msg.textContent = 'Esse horário acabou de ser reservado por outra pessoa. Escolha outro.';
+      msg.className = 'erro';
+      btn.disabled = false;
+      btn.textContent = 'Confirmar agendamento';
+      await carregarDisponibilidade();
+      renderCalendario();
+      return;
+    }
+
+    msg.textContent = 'Sessão agendada com sucesso!';
+    msg.className = 'sucesso';
+    btn.textContent = 'Agendado ✓';
+
+    await carregarDisponibilidade();
+    diaSelecionado = null;
+    renderCalendario();
+  }
+
+  init();
 </script>
 </body>
 </html>
