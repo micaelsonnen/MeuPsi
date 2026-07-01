@@ -144,7 +144,7 @@
       .eq('id', data.user.id)
       .single();
 
-    if (perfil?.papel === 'psicologo') {
+    if (perfil?.papel === 'psicologo' || perfil?.papel === 'admin') {
       window.location.href = 'dashboard-psicologo.html';
     } else {
       window.location.href = 'dashboard-paciente.html';
