@@ -37,11 +37,20 @@
       display: flex; align-items: center; justify-content: center;
       color: #14532d; font-size: 22px; font-weight: 700;
       margin-bottom: 14px;
+      overflow: hidden;
     }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
     .card-name { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 4px; }
     .card-crp { font-size: 12px; color: #6b7280; margin-bottom: 10px; }
-    .card-bio { font-size: 13px; color: #4b5563; line-height: 1.5; margin-bottom: 16px; }
+    .card-bio { font-size: 13px; color: #4b5563; line-height: 1.5; margin-bottom: 12px; }
+
+    .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .tag {
+      font-size: 11px; font-weight: 500;
+      background: #ede9fe; color: #6d28d9;
+      padding: 3px 8px; border-radius: 999px;
+    }
 
     .btn-escolher {
       display: block; width: 100%;
@@ -84,9 +93,9 @@
 
   async function carregarPsicologos() {
     const { data, error } = await sb
-      .from('usuarios')
-      .select('id, nome, crp, bio')
-      .eq('papel', 'psicologo')
+      .from('psicologos')
+      .select('id, nome, crp, bio, especialidade, cidade, modalidade, preco_faixa, foto_url')
+      .eq('ativo', true)
       .order('nome');
 
     const grid = document.getElementById('grid');
@@ -98,10 +107,20 @@
 
     grid.innerHTML = data.map(p => `
       <div class="card">
-        <div class="avatar">${(p.nome ?? 'P')[0].toUpperCase()}</div>
+        <div class="avatar">
+          ${p.foto_url
+            ? `<img src="${p.foto_url}" alt="${p.nome ?? 'Psicólogo'}">`
+            : (p.nome ?? 'P')[0].toUpperCase()}
+        </div>
         <div class="card-name">${p.nome ?? 'Psicólogo'}</div>
         <div class="card-crp">${p.crp ? 'CRP ' + p.crp : ''}</div>
         <div class="card-bio">${p.bio ?? 'Psicólogo cadastrado na plataforma MeuPsi.'}</div>
+        <div class="card-tags">
+          ${p.especialidade ? `<span class="tag">${p.especialidade}</span>` : ''}
+          ${p.modalidade ? `<span class="tag">${p.modalidade}</span>` : ''}
+          ${p.cidade ? `<span class="tag">${p.cidade}</span>` : ''}
+          ${p.preco_faixa ? `<span class="tag">${p.preco_faixa}</span>` : ''}
+        </div>
         <button class="btn-escolher" data-id="${p.id}">Escolher</button>
       </div>
     `).join('');
