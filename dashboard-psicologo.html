@@ -44,6 +44,9 @@
     .page-header h1 { font-size: 22px; font-weight: 700; color: #111827; }
     .page-header p { font-size: 14px; color: #6b7280; margin-top: 4px; }
 
+    .section { display: none; }
+    .section.active { display: block; }
+
     /* ── Cards de métricas ── */
     .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
     .metric-card {
@@ -53,7 +56,7 @@
     .metric-label { font-size: 12px; color: #6b7280; font-weight: 500; margin-bottom: 8px; }
     .metric-value { font-size: 28px; font-weight: 700; color: #111827; }
 
-    /* ── Tabela de pacientes ── */
+    /* ── Tabela genérica ── */
     .section-card {
       background: #fdf4f8; border-radius: 12px;
       padding: 24px; box-shadow: 0 1px 6px rgba(236,72,153,0.08);
@@ -71,6 +74,13 @@
     }
     .btn-primary:hover { background: #4ade80; }
 
+    .btn-danger-ghost {
+      padding: 6px 12px; background: none; color: #ef4444;
+      border: 1.5px solid #fecaca; border-radius: 8px; font-size: 12px;
+      font-weight: 500; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-danger-ghost:hover { background: #fef2f2; }
+
     table { width: 100%; border-collapse: collapse; }
     th { text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; padding: 0 12px 10px; }
     td { font-size: 14px; color: #6b21a8; padding: 12px; border-top: 1px solid #f3f4f6; }
@@ -80,11 +90,22 @@
       display: inline-block; padding: 2px 10px;
       border-radius: 99px; font-size: 11px; font-weight: 600;
     }
-    .badge-ativo { background: #d1fae5; color: #065f46; }
-    .badge-pendente { background: #fef3c7; color: #92400e; }
-    .badge-inativo { background: #f3f4f6; color: #6b7280; }
+    .badge-ativo, .badge-agendado { background: #d1fae5; color: #065f46; }
+    .badge-pendente, .badge-disponivel { background: #fef3c7; color: #92400e; }
+    .badge-inativo, .badge-cancelado { background: #f3f4f6; color: #6b7280; }
+    .badge-concluido { background: #dbeafe; color: #1e40af; }
 
     .empty { text-align: center; padding: 40px; color: #9ca3af; font-size: 14px; }
+
+    /* Filtro de agenda */
+    .agenda-filtros { display: flex; gap: 8px; margin-bottom: 16px; }
+    .filtro-btn {
+      padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 500;
+      border: 1.5px solid #e5e7eb; background: #fff; color: #6b7280; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filtro-btn:hover { border-color: #c4b5fd; }
+    .filtro-btn.active { background: #7c3aed; border-color: #7c3aed; color: #fff; }
 
     /* Modal */
     .modal-overlay {
@@ -113,7 +134,7 @@
       border: 1.5px solid #e5e7eb; border-radius: 8px;
       font-size: 14px; color: #6b7280; cursor: pointer;
     }
-    #msgModal { font-size: 13px; color: #ef4444; margin-bottom: 8px; }
+    #msgModal, #msgModalHorario { font-size: 13px; color: #ef4444; margin-bottom: 8px; }
   </style>
 </head>
 <body>
@@ -121,15 +142,15 @@
 <!-- Sidebar -->
 <nav class="sidebar">
   <div class="logo">MeuPsi</div>
-  <a class="nav-item active" href="dashboard-psicologo.html">
+  <a class="nav-item active" data-section="secInicio" href="#">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
     Início
   </a>
-  <a class="nav-item" href="#">
+  <a class="nav-item" data-section="secAgenda" href="#">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
     Agenda
   </a>
-  <a class="nav-item" href="#">
+  <a class="nav-item" data-section="secPacientes" href="#">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
     Pacientes
   </a>
@@ -140,48 +161,101 @@
 
 <!-- Main -->
 <main class="main">
-  <div class="page-header">
-    <h1>Olá, <span id="nomePsi">Psicólogo</span> 👋</h1>
-    <p>Aqui está o resumo de hoje.</p>
-  </div>
 
-  <!-- Métricas -->
-  <div class="metrics">
-    <div class="metric-card">
-      <div class="metric-label">Total de Pacientes</div>
-      <div class="metric-value" id="totalPacientes">—</div>
+  <!-- ========== SEÇÃO: INÍCIO ========== -->
+  <section class="section active" id="secInicio">
+    <div class="page-header">
+      <h1>Olá, <span id="nomePsi">Psicólogo</span> 👋</h1>
+      <p>Aqui está o resumo de hoje.</p>
     </div>
-    <div class="metric-card">
-      <div class="metric-label">Ativos</div>
-      <div class="metric-value" id="totalAtivos">—</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">Pendentes</div>
-      <div class="metric-value" id="totalPendentes">—</div>
-    </div>
-  </div>
 
-  <!-- Tabela de Pacientes -->
-  <div class="section-card">
-    <div class="section-title">
-      Meus Pacientes
-      <button class="btn-primary" id="btnAddPaciente">+ Adicionar Paciente</button>
+    <div class="metrics">
+      <div class="metric-card">
+        <div class="metric-label">Total de Pacientes</div>
+        <div class="metric-value" id="totalPacientes">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Ativos</div>
+        <div class="metric-value" id="totalAtivos">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Pendentes</div>
+        <div class="metric-value" id="totalPendentes">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Próximas sessões</div>
+        <div class="metric-value" id="totalProximas">—</div>
+      </div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>E-mail</th>
-          <th>Telefone</th>
-          <th>Status</th>
-          <th>Desde</th>
-        </tr>
-      </thead>
-      <tbody id="tabelaPacientes">
-        <tr><td colspan="5" class="empty">Carregando…</td></tr>
-      </tbody>
-    </table>
-  </div>
+  </section>
+
+  <!-- ========== SEÇÃO: AGENDA ========== -->
+  <section class="section" id="secAgenda">
+    <div class="page-header">
+      <h1>Agenda</h1>
+      <p>Gerencie seus horários disponíveis e sessões agendadas.</p>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">
+        Meus horários
+        <button class="btn-primary" id="btnAddHorario">+ Novo horário</button>
+      </div>
+
+      <div class="agenda-filtros">
+        <button class="filtro-btn active" data-filtro="todos">Todos</button>
+        <button class="filtro-btn" data-filtro="disponivel">Disponíveis</button>
+        <button class="filtro-btn" data-filtro="agendado">Agendados</button>
+        <button class="filtro-btn" data-filtro="concluido">Concluídos</button>
+        <button class="filtro-btn" data-filtro="cancelado">Cancelados</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Hora</th>
+            <th>Paciente</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaAgenda">
+          <tr><td colspan="5" class="empty">Carregando…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ========== SEÇÃO: PACIENTES ========== -->
+  <section class="section" id="secPacientes">
+    <div class="page-header">
+      <h1>Pacientes</h1>
+      <p>Gerencie seus pacientes.</p>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">
+        Meus Pacientes
+        <button class="btn-primary" id="btnAddPaciente">+ Adicionar Paciente</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>Telefone</th>
+            <th>Status</th>
+            <th>Desde</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaPacientes">
+          <tr><td colspan="5" class="empty">Carregando…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
 </main>
 
 <!-- Modal: Adicionar Paciente -->
@@ -208,31 +282,62 @@
   </div>
 </div>
 
+<!-- Modal: Novo Horário -->
+<div class="modal-overlay" id="modalAddHorario">
+  <div class="modal">
+    <h2>Novo horário disponível</h2>
+    <label>Data</label>
+    <input type="date" id="hData" />
+    <label>Hora</label>
+    <input type="time" id="hHora" />
+    <label>Observações (opcional)</label>
+    <textarea id="hObs" rows="2" placeholder="Ex: sessão online"></textarea>
+    <div id="msgModalHorario"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="btnCancelarHorario">Cancelar</button>
+      <button class="btn-primary" id="btnSalvarHorario">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
   const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
 
   const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
   let psiId = null;
+  let filtroAtual = 'todos';
 
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'login.html'; return; }
     psiId = session.user.id;
 
-    // Nome do psicólogo
     const { data: perfil } = await sb.from('usuarios').select('nome').eq('id', psiId).single();
     if (perfil?.nome) document.getElementById('nomePsi').textContent = perfil.nome.split(' ')[0];
 
     await carregarPacientes();
+    await carregarAgenda();
+
+    // Navegação entre seções
+    document.querySelectorAll('.nav-item[data-section]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        link.classList.add('active');
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(link.dataset.section).classList.add('active');
+      });
+    });
   }
 
+  /* ========== PACIENTES ========== */
   async function carregarPacientes() {
     const { data: pacientes, error } = await sb
-      .from('pacientes')           // ← tabela correta
+      .from('pacientes')
       .select('*')
       .eq('psicologo_id', psiId)
-      .order('created_at', { ascending: false });
+      .order('criado_em', { ascending: false });
 
     const tbody = document.getElementById('tabelaPacientes');
 
@@ -254,12 +359,11 @@
         <td>${p.email ?? '—'}</td>
         <td>${p.telefone ?? '—'}</td>
         <td><span class="badge badge-${p.status ?? 'inativo'}">${p.status ?? 'inativo'}</span></td>
-        <td>${p.created_at ? new Date(p.created_at).toLocaleDateString('pt-BR') : '—'}</td>
+        <td>${p.criado_em ? new Date(p.criado_em).toLocaleDateString('pt-BR') : '—'}</td>
       </tr>
     `).join('');
   }
 
-  // Modal
   document.getElementById('btnAddPaciente').addEventListener('click', () => {
     document.getElementById('modalAddPaciente').classList.add('open');
   });
@@ -288,6 +392,111 @@
     document.getElementById('mEmail').value = '';
     document.getElementById('mTelefone').value = '';
     await carregarPacientes();
+  });
+
+  /* ========== AGENDA ========== */
+  async function carregarAgenda() {
+    let query = sb
+      .from('consultas')
+      .select('id, data, hora, status, observacoes, pacientes(nome)')
+      .eq('psicologo_id', psiId)
+      .order('data', { ascending: true })
+      .order('hora', { ascending: true });
+
+    if (filtroAtual !== 'todos') {
+      query = query.eq('status', filtroAtual);
+    }
+
+    const { data: consultas, error } = await query;
+    const tbody = document.getElementById('tabelaAgenda');
+
+    if (error || !consultas?.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhum horário encontrado.</td></tr>';
+      atualizarProximas([]);
+      return;
+    }
+
+    tbody.innerHTML = consultas.map(c => `
+      <tr>
+        <td>${new Date(c.data + 'T00:00:00').toLocaleDateString('pt-BR')}</td>
+        <td>${c.hora?.slice(0,5) ?? '—'}</td>
+        <td>${c.pacientes?.nome ?? '—'}</td>
+        <td><span class="badge badge-${c.status}">${c.status}</span></td>
+        <td>
+          ${c.status !== 'cancelado' && c.status !== 'concluido'
+            ? `<button class="btn-danger-ghost" data-id="${c.id}" onclick="cancelarHorario('${c.id}')">Cancelar</button>`
+            : ''}
+        </td>
+      </tr>
+    `).join('');
+
+    // Recarrega todos (sem filtro) só para calcular a métrica de próximas sessões
+    if (filtroAtual === 'todos') {
+      atualizarProximas(consultas);
+    } else {
+      const { data: todos } = await sb
+        .from('consultas')
+        .select('data, status')
+        .eq('psicologo_id', psiId);
+      atualizarProximas(todos || []);
+    }
+  }
+
+  function atualizarProximas(lista) {
+    const hoje = new Date().toISOString().slice(0, 10);
+    const proximas = lista.filter(c => c.status === 'agendado' && c.data >= hoje);
+    document.getElementById('totalProximas').textContent = proximas.length;
+  }
+
+  async function cancelarHorario(id) {
+    if (!confirm('Cancelar este horário?')) return;
+    const { error } = await sb.from('consultas').update({ status: 'cancelado' }).eq('id', id);
+    if (error) { alert('Erro ao cancelar: ' + error.message); return; }
+    await carregarAgenda();
+  }
+  window.cancelarHorario = cancelarHorario;
+
+  document.querySelectorAll('.filtro-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filtroAtual = btn.dataset.filtro;
+      carregarAgenda();
+    });
+  });
+
+  document.getElementById('btnAddHorario').addEventListener('click', () => {
+    document.getElementById('modalAddHorario').classList.add('open');
+  });
+  document.getElementById('btnCancelarHorario').addEventListener('click', () => {
+    document.getElementById('modalAddHorario').classList.remove('open');
+  });
+
+  document.getElementById('btnSalvarHorario').addEventListener('click', async () => {
+    const data = document.getElementById('hData').value;
+    const hora = document.getElementById('hHora').value;
+    const observacoes = document.getElementById('hObs').value.trim();
+    const msg = document.getElementById('msgModalHorario');
+
+    if (!data || !hora) { msg.textContent = 'Data e hora são obrigatórias.'; return; }
+    msg.textContent = '';
+
+    const { error } = await sb.from('consultas').insert({
+      psicologo_id: psiId, data, hora, status: 'disponivel', observacoes: observacoes || null
+    });
+
+    if (error) {
+      msg.textContent = error.code === '23505'
+        ? 'Já existe um horário cadastrado nesta data e hora.'
+        : 'Erro ao salvar: ' + error.message;
+      return;
+    }
+
+    document.getElementById('modalAddHorario').classList.remove('open');
+    document.getElementById('hData').value = '';
+    document.getElementById('hHora').value = '';
+    document.getElementById('hObs').value = '';
+    await carregarAgenda();
   });
 
   document.getElementById('btnSair').addEventListener('click', async () => {
