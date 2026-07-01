@@ -111,34 +111,37 @@
       return;
     }
 
-    // Supabase pode retornar user null se e-mail já cadastrado ou confirmação pendente
     const uid = data.user?.id;
-
     if (!uid) {
-      // Provavelmente e-mail já existe — tenta logar direto
-      const { data: loginData, error: loginErr } = await sb.auth.signInWithPassword({ email, password: senha });
-      if (loginErr) {
-        msg.textContent = 'Conta já existe ou aguarda confirmação de e-mail.';
-        btn.disabled = false;
-        btn.textContent = 'Criar conta';
-        return;
-      }
-      // Salvou perfil antes, só redireciona
-      window.location.href = 'escolher-psicologo.html';
+      msg.textContent = 'Erro inesperado: tente novamente.';
+      btn.disabled = false;
+      btn.textContent = 'Criar conta';
       return;
     }
 
-    // Salvar perfil na tabela usuarios
+    // Login automático para garantir sessão ativa antes de salvar o perfil
+    const { error: loginErr } = await sb.auth.signInWithPassword({ email, password: senha });
+    if (loginErr) {
+      msg.textContent = 'Conta criada mas erro ao autenticar: ' + loginErr.message;
+      btn.disabled = false;
+      btn.textContent = 'Criar conta';
+      return;
+    }
+
+    // Salvar perfil na tabela usuarios (agora com sessão ativa)
     const { error: upsertErr } = await sb.from('usuarios').upsert({
       id: uid, nome, email, telefone: telefone || null, papel: 'paciente'
     }, { onConflict: 'id' });
 
     if (upsertErr) {
-      msg.textContent = 'Conta criada mas erro ao salvar perfil: ' + upsertErr.message;
-    } else {
-      msg.className = 'msg ok';
-      msg.textContent = 'Conta criada! Redirecionando…';
+      msg.textContent = 'Erro ao salvar perfil: ' + upsertErr.message;
+      btn.disabled = false;
+      btn.textContent = 'Criar conta';
+      return;
     }
+
+    msg.className = 'msg ok';
+    msg.textContent = 'Conta criada! Redirecionando…';
     setTimeout(() => { window.location.href = 'escolher-psicologo.html'; }, 1800);
   });
 </script>
