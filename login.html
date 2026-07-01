@@ -111,7 +111,7 @@
   const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
   const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
 
-  const supabase = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
   document.getElementById('btnLogin').addEventListener('click', async () => {
     const email = document.getElementById('email').value.trim();
@@ -128,7 +128,7 @@
     btn.textContent = 'Entrando…';
     msg.textContent = '';
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha });
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: senha });
 
     if (error) {
       msg.textContent = 'E-mail ou senha inválidos.';
@@ -138,7 +138,7 @@
     }
 
     // Redireciona conforme o papel do usuário
-    const { data: perfil } = await supabase
+    const { data: perfil } = await sb
       .from('usuarios')
       .select('papel')
       .eq('id', data.user.id)
