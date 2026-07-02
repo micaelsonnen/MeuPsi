@@ -348,7 +348,6 @@
     <div class="section-card">
       <div class="section-title">
         Meus Pacientes
-        <button class="btn-primary" id="btnAddPaciente">+ Adicionar Paciente</button>
       </div>
       <table>
         <thead>
@@ -598,30 +597,6 @@
 
 </main>
 
-<!-- Modal: Adicionar Paciente -->
-<div class="modal-overlay" id="modalAddPaciente">
-  <div class="modal">
-    <h2>Novo Paciente</h2>
-    <label>Nome completo</label>
-    <input type="text" id="mNome" placeholder="Maria da Silva" />
-    <label>E-mail</label>
-    <input type="email" id="mEmail" placeholder="maria@email.com" />
-    <label>Telefone</label>
-    <input type="text" id="mTelefone" placeholder="(11) 99999-9999" />
-    <label>Status</label>
-    <select id="mStatus">
-      <option value="ativo">Ativo</option>
-      <option value="pendente">Pendente</option>
-      <option value="inativo">Inativo</option>
-    </select>
-    <div id="msgModal"></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" id="btnCancelar">Cancelar</button>
-      <button class="btn-primary" id="btnSalvar">Salvar</button>
-    </div>
-  </div>
-</div>
-
 <!-- Modal: Novo Horário -->
 <div class="modal-overlay" id="modalAddHorario">
   <div class="modal">
@@ -737,6 +712,14 @@
 
     const { data: perfil } = await sb.from('usuarios').select('nome').eq('id', psiId).single();
     if (perfil?.nome) document.getElementById('nomePsi').textContent = perfil.nome.split(' ')[0];
+
+    // psicologos.id é diferente do uid de login (psiId) — precisa resolver antes de tudo
+    const { data: psiRow } = await sb.from('psicologos').select('id').eq('user_id', psiId).maybeSingle();
+    psicologoAtualId = psiRow?.id || null;
+    if (!psicologoAtualId) {
+      document.querySelector('.main').innerHTML = '<div class="empty" style="margin:60px auto;max-width:480px;">Não encontramos seu perfil de psicólogo vinculado a esta conta. Se você acabou de se cadastrar, tente novamente em alguns instantes.</div>';
+      return;
+    }
 
     await carregarPacientes();
     await carregarAgenda();
@@ -916,7 +899,7 @@
     const { data: pacientes, error } = await sb
       .from('pacientes')
       .select('*')
-      .eq('psicologo_id', psiId)
+      .eq('psicologo_id', psicologoAtualId)
       .order('criado_em', { ascending: false });
 
     const tbody = document.getElementById('tabelaPacientes');
@@ -950,36 +933,6 @@
     `).join('');
   }
   let pacientesCache = [];
-
-  document.getElementById('btnAddPaciente').addEventListener('click', () => {
-    document.getElementById('modalAddPaciente').classList.add('open');
-  });
-  document.getElementById('btnCancelar').addEventListener('click', () => {
-    document.getElementById('modalAddPaciente').classList.remove('open');
-  });
-
-  document.getElementById('btnSalvar').addEventListener('click', async () => {
-    const nome = document.getElementById('mNome').value.trim();
-    const email = document.getElementById('mEmail').value.trim();
-    const telefone = document.getElementById('mTelefone').value.trim();
-    const status = document.getElementById('mStatus').value;
-    const msg = document.getElementById('msgModal');
-
-    if (!nome || !email) { msg.textContent = 'Nome e e-mail são obrigatórios.'; return; }
-    msg.textContent = '';
-
-    const { error } = await sb.from('pacientes').insert({
-      nome, email, telefone, status, psicologo_id: psiId
-    });
-
-    if (error) { msg.textContent = 'Erro ao salvar: ' + error.message; return; }
-
-    document.getElementById('modalAddPaciente').classList.remove('open');
-    document.getElementById('mNome').value = '';
-    document.getElementById('mEmail').value = '';
-    document.getElementById('mTelefone').value = '';
-    await carregarPacientes();
-  });
 
   /* ========== PRONTUÁRIO ========== */
   let pacienteAtualId = null;
@@ -1256,7 +1209,7 @@
     const status = document.getElementById('sStatus').value;
 
     const payload = {
-      psicologo_id: psiId,
+      psicologo_id: psicologoAtualId,
       paciente_id: pacienteAtualId,
       data_hora: dataHora,
       status,
@@ -1293,7 +1246,7 @@
     let query = sb
       .from('consultas')
       .select('id, data, hora, status, observacoes, pacientes(nome)')
-      .eq('psicologo_id', psiId)
+      .eq('psicologo_id', psicologoAtualId)
       .order('data', { ascending: true })
       .order('hora', { ascending: true });
 
@@ -1331,7 +1284,7 @@
       const { data: todos } = await sb
         .from('consultas')
         .select('data, status')
-        .eq('psicologo_id', psiId);
+        .eq('psicologo_id', psicologoAtualId);
       atualizarProximas(todos || []);
     }
   }
@@ -1376,7 +1329,7 @@
     msg.textContent = '';
 
     const { error } = await sb.from('consultas').insert({
-      psicologo_id: psiId, data, hora, status: 'disponivel', observacoes: observacoes || null
+      psicologo_id: psicologoAtualId, data, hora, status: 'disponivel', observacoes: observacoes || null
     });
 
     if (error) {
