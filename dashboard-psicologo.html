@@ -257,6 +257,10 @@
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
     Pacientes
   </a>
+  <a class="nav-item" id="navProntuario" href="#">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+    Prontuário
+  </a>
   <a class="nav-item" data-section="secPerfil" href="#">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
     Meu Perfil
@@ -366,6 +370,11 @@
 
   <!-- ========== SEÇÃO: PRONTUÁRIO ========== -->
   <section class="section" id="secProntuario">
+    <div class="empty" id="prontuarioVazio" style="display:none;">
+      Selecione um paciente na aba <strong>Pacientes</strong> e clique em "Ver ficha" para abrir o prontuário dele aqui.
+    </div>
+
+    <div id="prontuarioConteudo">
     <a class="link-voltar" onclick="voltarPacientes()">← Voltar para Pacientes</a>
 
     <div class="prontuario-header">
@@ -382,6 +391,7 @@
       <button class="prontuario-tab-btn" data-ptab="pSessoes">Sessões</button>
       <button class="prontuario-tab-btn" data-ptab="pAnamnese">Anamnese</button>
     </div>
+
 
     <!-- Aba: Visão Geral -->
     <div class="prontuario-pane active" id="pVisao">
@@ -452,6 +462,7 @@
           <p class="empty">Carregando dados…</p>
         </div>
       </div>
+    </div>
     </div>
   </section>
 
@@ -741,6 +752,22 @@
         document.getElementById(link.dataset.section).classList.add('active');
       });
     });
+
+    // Prontuário (não tem data-section fixo — depende de haver paciente selecionado)
+    document.getElementById('navProntuario').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('navProntuario').classList.add('active');
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById('secProntuario').classList.add('active');
+      if (pacienteAtualId) {
+        document.getElementById('prontuarioVazio').style.display = 'none';
+        document.getElementById('prontuarioConteudo').style.display = 'block';
+      } else {
+        document.getElementById('prontuarioVazio').style.display = 'block';
+        document.getElementById('prontuarioConteudo').style.display = 'none';
+      }
+    });
   }
 
   /* ========== MEU PERFIL ========== */
@@ -990,6 +1017,10 @@
 
     renderAnamnese(p);
 
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('navProntuario').classList.add('active');
+    document.getElementById('prontuarioVazio').style.display = 'none';
+    document.getElementById('prontuarioConteudo').style.display = 'block';
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById('secProntuario').classList.add('active');
     document.querySelectorAll('.prontuario-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1011,6 +1042,8 @@
   function voltarPacientes() {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById('secPacientes').classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelector('.nav-item[data-section="secPacientes"]').classList.add('active');
   }
   window.voltarPacientes = voltarPacientes;
 
