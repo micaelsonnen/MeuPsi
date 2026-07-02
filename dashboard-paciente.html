@@ -50,6 +50,17 @@
     .info-row { display: flex; gap: 8px; margin-bottom: 10px; font-size: 14px; }
     .info-label { color: #6b7280; font-weight: 500; min-width: 120px; }
     .info-value { color: #111827; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 13px; color: #6b7280; font-weight: 500; margin-bottom: 4px; }
+    .form-group input {
+      width: 100%; max-width: 320px; padding: 8px 12px;
+      border: 1.5px solid #e5e7eb; border-radius: 8px;
+      font-size: 14px; color: #111827; outline: none; font-family: inherit;
+    }
+    .form-group input:focus { border-color: #7c3aed; }
+    #msgDados { font-size: 13px; margin-top: 8px; }
+    #msgDados.ok { color: #065f46; }
+    #msgDados.erro { color: #ef4444; }
 
     .badge {
       display: inline-block; padding: 2px 10px;
@@ -158,10 +169,18 @@
   <!-- Meus dados -->
   <div class="section-card">
     <div class="section-title">Meus dados</div>
-    <div class="info-row"><span class="info-label">Nome</span><span class="info-value" id="infoNome">—</span></div>
+    <div class="form-group">
+      <label class="info-label" for="editNome">Nome</label>
+      <input type="text" id="editNome" />
+    </div>
     <div class="info-row"><span class="info-label">E-mail</span><span class="info-value" id="infoEmail">—</span></div>
-    <div class="info-row"><span class="info-label">Telefone</span><span class="info-value" id="infoTelefone">—</span></div>
+    <div class="form-group">
+      <label class="info-label" for="editTelefone">Telefone</label>
+      <input type="text" id="editTelefone" />
+    </div>
     <div class="info-row"><span class="info-label">Status</span><span class="info-value" id="infoStatus">—</span></div>
+    <button class="btn-primary" id="btnSalvarDados" style="margin-top:12px">Salvar alterações</button>
+    <div id="msgDados"></div>
   </div>
   </section>
 
@@ -242,9 +261,9 @@
     if (perfil) {
       const primeiroNome = (perfil.nome ?? '').split(' ')[0] || 'Paciente';
       document.getElementById('nomePaciente').textContent = primeiroNome;
-      document.getElementById('infoNome').textContent = perfil.nome ?? '—';
+      document.getElementById('editNome').value = perfil.nome ?? '';
       document.getElementById('infoEmail').textContent = perfil.email ?? session.user.email ?? '—';
-      document.getElementById('infoTelefone').textContent = perfil.telefone ?? '—';
+      document.getElementById('editTelefone').value = perfil.telefone ?? '';
     }
 
     // Busca vínculo com psicólogo
@@ -409,6 +428,46 @@
       options: { responsive: true, scales: { y: { min: 0, max: 10 } } }
     });
   }
+
+  document.getElementById('btnSalvarDados').addEventListener('click', async () => {
+    const btn = document.getElementById('btnSalvarDados');
+    const msg = document.getElementById('msgDados');
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const uid = session.user.id;
+
+    const nome = document.getElementById('editNome').value.trim();
+    const telefone = document.getElementById('editTelefone').value.trim();
+
+    if (!nome) {
+      msg.textContent = 'O nome não pode ficar vazio.';
+      msg.className = 'erro';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Salvando...';
+    msg.textContent = '';
+    msg.className = '';
+
+    const { error } = await sb.from('usuarios').update({ nome, telefone }).eq('id', uid);
+
+    // Mantém pacientes.nome/telefone em sincronia, se já existir vínculo
+    await sb.from('pacientes').update({ nome, telefone }).eq('id', uid);
+
+    btn.disabled = false;
+    btn.textContent = 'Salvar alterações';
+
+    if (error) {
+      msg.textContent = 'Erro ao salvar: ' + error.message;
+      msg.className = 'erro';
+      return;
+    }
+
+    msg.textContent = 'Dados atualizados!';
+    msg.className = 'ok';
+    document.getElementById('nomePaciente').textContent = nome.split(' ')[0] || 'Paciente';
+  });
 
   document.getElementById('btnSair').addEventListener('click', async () => {
     await sb.auth.signOut();
