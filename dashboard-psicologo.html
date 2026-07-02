@@ -590,7 +590,10 @@
         <td>${p.telefone ?? '—'}</td>
         <td><span class="badge badge-${p.status ?? 'inativo'}">${p.status ?? 'inativo'}</span></td>
         <td>${p.criado_em ? new Date(p.criado_em).toLocaleDateString('pt-BR') : '—'}</td>
-        <td><button class="btn-danger-ghost" style="color:#7c3aed;border-color:#ddd6fe" onclick="abrirProntuario('${p.id}')">Ver ficha</button></td>
+        <td>
+          ${p.status === 'pendente' ? `<button class="btn-primary" style="margin-right:6px" onclick="aceitarPaciente('${p.id}')">Aceitar</button>` : ''}
+          <button class="btn-danger-ghost" style="color:#7c3aed;border-color:#ddd6fe" onclick="abrirProntuario('${p.id}')">Ver ficha</button>
+        </td>
       </tr>
     `).join('');
   }
@@ -671,6 +674,13 @@
     await carregarSessoesPaciente(pacienteId);
   }
   window.abrirProntuario = abrirProntuario;
+
+  async function aceitarPaciente(pacienteId) {
+    const { error } = await sb.from('pacientes').update({ status: 'ativo' }).eq('id', pacienteId);
+    if (error) { alert('Erro ao aceitar paciente: ' + error.message); return; }
+    await carregarPacientes();
+  }
+  window.aceitarPaciente = aceitarPaciente;
 
   function voltarPacientes() {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
