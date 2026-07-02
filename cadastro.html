@@ -632,10 +632,18 @@ async function enviarCadastro() {
     // 2. Insere na tabela psicologos
     const user = authData.user;
     if (user) {
-      const especialidades = [...document.querySelectorAll('.tag-check:checked')]
-        .map(el => el.nextElementSibling.textContent).join(', ');
+      const especialidadesArr = [...document.querySelectorAll('.tag-check:checked')]
+        .map(el => el.nextElementSibling.textContent.trim());
+      const especialidades = especialidadesArr.join(', ');
 
-      const { error: dbError } = await db.from('psicologos').insert({
+      const atendeOnline = document.getElementById('modalOnline').checked;
+      const atendePresencial = document.getElementById('modalPresencial').checked;
+      const modalidade = (atendeOnline && atendePresencial) ? 'ambos' : (atendeOnline ? 'online' : 'presencial');
+
+      const duracaoTexto = document.getElementById('duracao').value; // ex: "50 minutos"
+      const duracaoNum = parseInt(duracaoTexto, 10) || 50;
+
+      const { data: novoPsi, error: dbError } = await db.from('psicologos').insert({
         user_id: user.id,
         email: email,
         nome: nome,
@@ -645,18 +653,28 @@ async function enviarCadastro() {
         estado: document.getElementById('estado').value,
         abordagem: document.getElementById('abordagem').value,
         especialidade: especialidades,
+        especialidades: especialidadesArr,
         bio: document.getElementById('bio').value.trim(),
-        formacao: document.getElementById('formacao').value.trim(),
         site: document.getElementById('site').value.trim(),
-        valor_sessao: document.getElementById('valor').value || null,
-        duracao_sessao: document.getElementById('duracao').value,
-        atende_online: document.getElementById('modalOnline').checked,
-        atende_presencial: document.getElementById('modalPresencial').checked,
+        preco_exato: Number(document.getElementById('valor').value) || null,
+        duracao_sessao: duracaoNum,
+        modalidade: modalidade,
         agenda_aberta: document.getElementById('agendaAberta').checked,
         ativo: false // fica inativo até verificação do CRP
-      });
+      }).select().single();
 
       if (dbError) throw dbError;
+
+      // 3. Formação (campo livre do cadastro vira uma linha na tabela formacoes)
+      const formacaoTexto = document.getElementById('formacao').value.trim();
+      if (formacaoTexto && novoPsi) {
+        await db.from('formacoes').insert({
+          psicologo_id: novoPsi.id,
+          titulo: formacaoTexto,
+          ordem: 1
+        });
+        // Erro aqui não interrompe o cadastro — a conta e o perfil já foram criados com sucesso.
+      }
     }
 
     // Sucesso!

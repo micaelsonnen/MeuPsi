@@ -430,16 +430,16 @@ async function carregarPsicologos(resetar) {
   try {
     let query = sb
       .from('psicologos')
-      .select('id, nome, crp, abordagem, especialidades, telefone, foto_url, modalidade_online, aceita_pacientes')
-      .eq('status', 'aprovado')
-      .order('created_at', { ascending: false })
+      .select('id, nome, crp, abordagem, especialidades, telefone, foto_url, modalidade, agenda_aberta')
+      .eq('ativo', true)
+      .order('criado_em', { ascending: false })
       .range(pagina * POR_PAGINA, pagina * POR_PAGINA + POR_PAGINA - 1)
 
     if (buscaAtiva) {
       query = query.or(`nome.ilike.%${buscaAtiva}%,abordagem.ilike.%${buscaAtiva}%`)
     }
     if (filtroAtivo === 'Online') {
-      query = query.eq('modalidade_online', true)
+      query = query.in('modalidade', ['online', 'ambos'])
     } else if (filtroAtivo !== 'Todos') {
       query = query.contains('especialidades', [filtroAtivo])
     }
@@ -497,7 +497,7 @@ function renderizar(lista, resetar) {
       </div>
       <div class="psi-tags">
         ${tags.map(t => `<span class="tag">${t}</span>`).join('')}
-        ${p.modalidade_online ? '<span class="tag">Online</span>' : ''}
+        ${(p.modalidade === 'online' || p.modalidade === 'ambos') ? '<span class="tag">Online</span>' : ''}
       </div>
       <div class="psi-actions">
         ${wpp
@@ -510,8 +510,6 @@ function renderizar(lista, resetar) {
   })
 
   btnMais.style.display = lista.length === POR_PAGINA ? 'block' : 'none'
-}
-
 }
 
 function mostrarSkeletons() {
