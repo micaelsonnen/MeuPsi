@@ -234,7 +234,7 @@ select.form-control { cursor: pointer; }
 
 <div class="hero">
   <h1>Anamnese do paciente</h1>
-  <p>Preencha as informações clínicas para iniciar o acompanhamento.</p>
+  <p>Complete ou edite as informações clínicas deste paciente.</p>
 </div>
 
 <div class="progress-wrap">
@@ -767,15 +767,9 @@ async function salvar() {
   const fb  = document.getElementById('feedbackSalvar');
   btn.disabled = true; btn.textContent = 'Salvando...';
 
-  const { data: { user } } = await db.auth.getUser();
-  if (!user) { location.href = 'cadastro.html'; return; }
-
-  const { data: psi } = await db.from('psicologos').select('id').eq('user_id', user.id).single();
-
   dados.obs_clinicas = document.getElementById('obsClinicas').value.trim();
 
   const payload = {
-    psicologo_id:       psi?.id || null,
     nome:               dados.nome,
     data_nascimento:    dados.nascimento || null,
     genero:             dados.genero || null,
@@ -802,10 +796,13 @@ async function salvar() {
     eventos_vida:       dados.eventos_vida || [],
     historia_obs:       dados.hist_obs || null,
     obs_clinicas:       dados.obs_clinicas || null,
-    criado_em:          new Date().toISOString(),
+    atualizado_em:      new Date().toISOString(),
   };
 
-  const { error } = await db.from('pacientes').insert(payload);
+  const { error } = await db.from('pacientes')
+    .update(payload)
+    .eq('id', pacienteId)
+    .eq('psicologo_id', psicologoId);
 
   btn.disabled = false; btn.textContent = 'Salvar anamnese';
   fb.style.display = 'block';
@@ -822,13 +819,103 @@ function novaAnamnese() {
   location.reload();
 }
 
+// ── CARREGAR PACIENTE EXISTENTE E PRÉ-PREENCHER ──
+let pacienteId = null;
+let psicologoId = null;
+
+function selecionarRadioPorValor(name, valor) {
+  if (!valor) return;
+  const el = document.querySelector(`input[name="${name}"][value="${valor}"]`);
+  if (el) { el.checked = true; el.closest('.radio-card').classList.add('sel'); }
+}
+
+function marcarChips(containerId, valores) {
+  if (!valores || !valores.length) return;
+  document.querySelectorAll(`#${containerId} .chip`).forEach(chip => {
+    if (valores.includes(chip.textContent.trim())) chip.classList.add('sel');
+  });
+}
+
+function selecionarEscala(valor) {
+  if (valor == null) return;
+  document.querySelectorAll('.escala .escala-btn').forEach(btn => {
+    if (btn.textContent.trim() === String(valor)) {
+      btn.classList.add('sel');
+      escalas.saudeFisica = valor;
+    }
+  });
+}
+
+function preencherComDadosExistentes(p) {
+  document.getElementById('nome').value = p.nome || '';
+  document.getElementById('nascimento').value = p.data_nascimento || '';
+  document.getElementById('genero').value = p.genero || '';
+  document.getElementById('estadoCivil').value = p.estado_civil || '';
+  document.getElementById('telefone').value = p.telefone || '';
+  document.getElementById('email').value = p.email || '';
+  document.getElementById('profissao').value = p.profissao || '';
+  document.getElementById('escolaridade').value = p.escolaridade || '';
+
+  document.getElementById('queixa').value = p.queixa_principal || '';
+  selecionarRadioPorValor('tempoQueixa', p.tempo_queixa);
+  marcarChips('chips-areas', p.areas_impacto);
+  selecionarRadioPorValor('terapiaAntes', p.terapia_anterior);
+  document.getElementById('terapiaDetalhes').value = p.terapia_detalhes || '';
+  if (p.terapia_anterior === 'sim') toggleCondicional('condTerapia', true);
+
+  marcarChips('chips-diag', p.diagnosticos);
+  document.getElementById('diagOutros').value = p.diagnosticos_obs || '';
+  selecionarRadioPorValor('medicacao', p.medicacao);
+  document.getElementById('medicacaoDetalhe').value = p.medicacao_detalhe || '';
+  if (p.medicacao === 'sim') toggleCondicional('condMed', true);
+  selecionarEscala(p.saude_fisica_nota);
+  selecionarRadioPorValor('internacao', p.internacao);
+  document.getElementById('internacaoDetalhe').value = p.internacao_detalhe || '';
+  if (p.internacao === 'sim') toggleCondicional('condInternacao', true);
+  marcarChips('chips-substancias', p.substancias);
+
+  document.getElementById('familiaAtual').value = p.familia_atual || '';
+  marcarChips('chips-histFam', p.historico_familiar);
+  marcarChips('chips-eventos', p.eventos_vida);
+  document.getElementById('histObs').value = p.historia_obs || '';
+
+  document.getElementById('obsClinicas').value = p.obs_clinicas || '';
+}
+
 // INIT
 renderSteps();
 
-// verifica auth
-db.auth.getUser().then(({ data: { user } }) => {
-  if (!user) location.href = 'cadastro.html';
-});
+async function iniciar() {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { location.href = 'cadastro.html'; return; }
+
+  const { data: psi } = await db.from('psicologos').select('id').eq('user_id', user.id).single();
+  if (!psi) { location.href = 'dashboard-psicologo.html'; return; }
+  psicologoId = psi.id;
+
+  const params = new URLSearchParams(location.search);
+  pacienteId = params.get('paciente_id');
+
+  if (!pacienteId) {
+    document.querySelector('.page').innerHTML = '<div class="card"><p>Nenhum paciente selecionado. Volte à ficha do paciente e clique em "Preencher anamnese".</p></div>';
+    return;
+  }
+
+  const { data: paciente, error } = await db.from('pacientes')
+    .select('*')
+    .eq('id', pacienteId)
+    .eq('psicologo_id', psicologoId)
+    .maybeSingle();
+
+  if (error || !paciente) {
+    document.querySelector('.page').innerHTML = '<div class="card"><p>Paciente não encontrado ou você não tem acesso a ele.</p></div>';
+    return;
+  }
+
+  preencherComDadosExistentes(paciente);
+}
+
+iniciar();
 </script>
 </body>
 </html>

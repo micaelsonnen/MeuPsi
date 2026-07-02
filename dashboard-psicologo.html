@@ -395,6 +395,10 @@
     <!-- Aba: Anamnese -->
     <div class="prontuario-pane" id="pAnamnese">
       <div class="section-card">
+        <div class="section-title">
+          Anamnese
+          <a class="btn-primary" id="linkAnamneseCompleta" href="#" style="text-decoration:none; display:inline-block;">Preencher / editar anamnese completa</a>
+        </div>
         <div class="anamnese-grid" id="anamneseGrid">
           <p class="empty">Carregando dados…</p>
         </div>
@@ -661,6 +665,7 @@
     statusEl.textContent = p.status ?? 'inativo';
     statusEl.className = 'badge badge-' + (p.status ?? 'inativo');
     document.getElementById('pQueixa').textContent = p.queixa_principal || 'Não informado.';
+    document.getElementById('linkAnamneseCompleta').href = 'anamnese.html?paciente_id=' + encodeURIComponent(pacienteId);
 
     renderAnamnese(p);
 

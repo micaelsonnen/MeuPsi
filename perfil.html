@@ -585,6 +585,21 @@ nav {
     }
 
     const pacienteId = session.user.id;
+
+    // Verifica se o paciente já está vinculado a outro psicólogo — não deixa trocar sem avisar
+    const { data: vinculoAtual } = await sb
+      .from('pacientes')
+      .select('psicologo_id, status')
+      .eq('id', pacienteId)
+      .maybeSingle();
+
+    if (vinculoAtual?.psicologo_id && vinculoAtual.psicologo_id !== psicologoId && vinculoAtual.status !== 'inativo') {
+      const confirmarTroca = confirm(
+        'Você já está em acompanhamento com outro psicólogo. Agendar com um profissional diferente vai substituir esse vínculo. Deseja continuar?'
+      );
+      if (!confirmarTroca) return;
+    }
+
     const btn = document.getElementById('btnConfirmar');
     btn.disabled = true;
     btn.textContent = 'Agendando…';
