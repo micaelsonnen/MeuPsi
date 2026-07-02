@@ -236,6 +236,10 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
         Psicólogos
       </div>
+      <div class="nav-item" onclick="irPara('pacientes')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Pacientes
+      </div>
       <div class="nav-item" onclick="irPara('pendentes')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
         Pendentes
@@ -320,6 +324,39 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
               </tr>
             </thead>
             <tbody id="tabelaPsi">
+              <tr><td colspan="6" class="empty-state">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PACIENTES -->
+    <div class="pagina" id="pagPacientes">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Pacientes</h1>
+          <p class="page-sub">Todos os pacientes cadastrados na plataforma</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>Lista completa</h3>
+          <input type="text" class="search-input" placeholder="Buscar por nome ou e-mail…" oninput="filtrarTabelaPacientes(this.value)" />
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Paciente</th>
+                <th>Telefone</th>
+                <th>Psicólogo vinculado</th>
+                <th>Status</th>
+                <th>Desde</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaPacientesAdmin">
               <tr><td colspan="6" class="empty-state">Carregando…</td></tr>
             </tbody>
           </table>
@@ -553,6 +590,47 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   </div>
 </div>
 
+<!-- MODAL PACIENTE -->
+<div class="modal-overlay" id="modalPaciente">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h2 class="modal-title">Editar paciente</h2>
+      <button class="modal-close" onclick="fecharModalPaciente()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pacEditandoId" />
+      <p class="field-section" style="margin-top:0">Dados de identificação</p>
+      <div class="field">
+        <label>Nome</label>
+        <input type="text" id="pfaNome" />
+      </div>
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" id="pfaEmail" />
+      </div>
+      <div class="field">
+        <label>Telefone</label>
+        <input type="text" id="pfaTelefone" />
+      </div>
+      <div class="field">
+        <label>Status do vínculo</label>
+        <select id="pfaStatus">
+          <option value="pendente">Pendente</option>
+          <option value="ativo">Ativo</option>
+          <option value="inativo">Inativo</option>
+        </select>
+      </div>
+      <p style="font-size:12px;color:var(--malva);margin-top:12px">
+        A anamnese e o histórico clínico deste paciente ficam sob sigilo do psicólogo responsável e não são editáveis por aqui.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModalPaciente()">Cancelar</button>
+      <button class="btn btn-lila" onclick="salvarPaciente()" id="btnSalvarPaciente">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -617,6 +695,7 @@ function irPara(pag) {
   document.getElementById('pag' + pag.charAt(0).toUpperCase() + pag.slice(1)).classList.add('ativa')
   event.currentTarget.classList.add('ativo')
   if (pag === 'psicologos') renderTabela(psicologos)
+  if (pag === 'pacientes') carregarPacientesAdmin()
   if (pag === 'pendentes') renderPendentes()
   if (pag === 'agendamentos') carregarAgendamentos()
 }
@@ -624,10 +703,10 @@ function irPara(pag) {
 // ── DADOS ───────────────────────────────────────────────────
 async function carregarTudo() {
   const { data: todos } = await sb.from('psicologos').select('id, ativo')
-  psicologos = (await sb.from('psicologos').select('*').order('created_at', { ascending: false })).data || []
+  psicologos = (await sb.from('psicologos').select('*').order('criado_em', { ascending: false })).data || []
   const aprovados = todos?.filter(p => p.ativo !== false).length || 0
   const pendentes = todos?.filter(p => p.ativo === false).length || 0
-  const { count: agends } = await sb.from('sessoes').select('id', { count: 'exact', head: true })
+  const { count: agends } = await sb.from('consultas').select('id', { count: 'exact', head: true })
   document.getElementById('statTotal').textContent = todos?.length || 0
   document.getElementById('statAprovados').textContent = aprovados
   document.getElementById('statPendentes').textContent = pendentes
@@ -667,7 +746,7 @@ function renderTabela(lista) {
       </td>
       <td>${p.abordagem || '—'}</td>
       <td>${p.cidade ? `${p.cidade} / ${p.estado}` : '—'}</td>
-      <td>${p.valor_sessao ? `R$ ${Number(p.valor_sessao).toFixed(0)}` : '—'}</td>
+      <td>${p.preco_exato ? `R$ ${Number(p.preco_exato).toFixed(0)}` : '—'}</td>
       <td><span class="badge badge-${statusDe(p)}">${statusDe(p)}</span></td>
       <td>
         <div class="acoes">
@@ -676,6 +755,7 @@ function renderTabela(lista) {
             ? `<button class="btn btn-primary btn-sm" onclick="mudarStatus('${p.id}','aprovado')">Aprovar</button>`
             : ``
           }
+          <button class="btn btn-ghost btn-sm" style="color:var(--vermelho)" onclick="excluirPsicologo('${p.id}','${p.nome.replace(/'/g, "\\'")}')">Excluir</button>
         </div>
       </td>
     </tr>`).join('')
@@ -687,6 +767,119 @@ function filtrarTabela(busca) {
     p.crp.includes(busca)
   )
   renderTabela(filtrado)
+}
+
+async function excluirPsicologo(id, nome) {
+  if (!confirm(`Excluir "${nome}" permanentemente? Isso não pode ser desfeito. Se houver pacientes ou sessões vinculadas a esse psicólogo, a exclusão pode falhar até esses vínculos serem resolvidos.`)) return
+  const { error } = await sb.from('psicologos').delete().eq('id', id)
+  if (error) {
+    alert('Não foi possível excluir: ' + error.message)
+    return
+  }
+  await carregarTudo()
+  renderPendentes()
+}
+
+// ── PACIENTES (admin) ──────────────────────────────────────
+// Apenas dados de identificação/vínculo. A anamnese/prontuário clínico
+// fica sob sigilo do psicólogo e não é editável nem visível por aqui.
+let pacientesAdmin = []
+
+async function carregarPacientesAdmin() {
+  const { data, error } = await sb
+    .from('pacientes')
+    .select('id, nome, email, telefone, status, criado_em, psicologo:psicologos(nome)')
+    .order('criado_em', { ascending: false })
+  pacientesAdmin = (!error && data) ? data : []
+  renderTabelaPacientes(pacientesAdmin)
+}
+
+function renderTabelaPacientes(lista) {
+  const tbody = document.getElementById('tabelaPacientesAdmin')
+  if (!lista.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Nenhum paciente cadastrado</td></tr>'
+    return
+  }
+  tbody.innerHTML = lista.map(p => `
+    <tr>
+      <td>
+        <div class="psi-mini">
+          <div class="avatar-sm">${iniciais(p.nome || '?')}</div>
+          <div>
+            <p class="psi-mini-nome">${p.nome || '(sem nome)'}</p>
+            <p class="psi-mini-crp">${p.email || '—'}</p>
+          </div>
+        </div>
+      </td>
+      <td>${p.telefone || '—'}</td>
+      <td>${p.psicologo?.nome || '—'}</td>
+      <td><span class="badge badge-${p.status === 'ativo' ? 'aprovado' : 'pendente'}">${p.status || 'pendente'}</span></td>
+      <td>${p.criado_em ? new Date(p.criado_em).toLocaleDateString('pt-BR') : '—'}</td>
+      <td>
+        <div class="acoes">
+          <button class="btn btn-ghost btn-sm" onclick="abrirModalPaciente('${p.id}')">Editar</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--vermelho)" onclick="excluirPaciente('${p.id}','${(p.nome || 'paciente').replace(/'/g, "\\'")}')">Excluir</button>
+        </div>
+      </td>
+    </tr>`).join('')
+}
+
+function filtrarTabelaPacientes(busca) {
+  const filtrado = pacientesAdmin.filter(p =>
+    (p.nome || '').toLowerCase().includes(busca.toLowerCase()) ||
+    (p.email || '').toLowerCase().includes(busca.toLowerCase())
+  )
+  renderTabelaPacientes(filtrado)
+}
+
+function abrirModalPaciente(id) {
+  const p = pacientesAdmin.find(x => x.id === id)
+  if (!p) return
+  document.getElementById('pacEditandoId').value = id
+  document.getElementById('pfaNome').value = p.nome || ''
+  document.getElementById('pfaEmail').value = p.email || ''
+  document.getElementById('pfaTelefone').value = p.telefone || ''
+  document.getElementById('pfaStatus').value = p.status || 'pendente'
+  document.getElementById('modalPaciente').classList.add('aberto')
+}
+
+function fecharModalPaciente() {
+  document.getElementById('modalPaciente').classList.remove('aberto')
+}
+
+async function salvarPaciente() {
+  const id = document.getElementById('pacEditandoId').value
+  const dados = {
+    nome: document.getElementById('pfaNome').value.trim(),
+    email: document.getElementById('pfaEmail').value.trim(),
+    telefone: document.getElementById('pfaTelefone').value.trim(),
+    status: document.getElementById('pfaStatus').value,
+  }
+  const btn = document.getElementById('btnSalvarPaciente')
+  btn.disabled = true
+  btn.textContent = 'Salvando...'
+
+  const { error } = await sb.from('pacientes').update(dados).eq('id', id)
+
+  btn.disabled = false
+  btn.textContent = 'Salvar'
+
+  if (error) {
+    alert('Erro ao salvar: ' + error.message)
+    return
+  }
+  fecharModalPaciente()
+  await carregarPacientesAdmin()
+}
+
+async function excluirPaciente(id, nome) {
+  if (!confirm(`Excluir o vínculo/registro de "${nome}" permanentemente? Isso não apaga a conta de login dele, só o registro de paciente (dados, anamnese, vínculo com psicólogo). Não pode ser desfeito.`)) return
+  const { error } = await sb.from('pacientes').delete().eq('id', id)
+  if (error) {
+    alert('Não foi possível excluir: ' + error.message)
+    return
+  }
+  await carregarPacientesAdmin()
 }
 
 // ── PENDENTES ───────────────────────────────────────────────
@@ -710,11 +903,12 @@ function renderPendentes() {
       </td>
       <td><strong>${p.crp}</strong></td>
       <td>${p.cidade ? `${p.cidade} / ${p.estado}` : '—'}</td>
-      <td>${new Date(p.created_at).toLocaleDateString('pt-BR')}</td>
+      <td>${p.criado_em ? new Date(p.criado_em).toLocaleDateString('pt-BR') : '—'}</td>
       <td>
         <div class="acoes">
           <button class="btn btn-primary btn-sm" onclick="mudarStatus('${p.id}','aprovado')">Aprovar</button>
           <button class="btn btn-ghost btn-sm" onclick="abrirModalEditar('${p.id}')">Ver</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--vermelho)" onclick="excluirPsicologo('${p.id}','${p.nome.replace(/'/g, "\\'")}')">Excluir</button>
         </div>
       </td>
     </tr>`).join('')
