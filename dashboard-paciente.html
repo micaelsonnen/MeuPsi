@@ -52,12 +52,12 @@
     .info-value { color: #111827; }
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; font-size: 13px; color: #6b7280; font-weight: 500; margin-bottom: 4px; }
-    .form-group input {
+    .form-group input, .form-group select {
       width: 100%; max-width: 320px; padding: 8px 12px;
       border: 1.5px solid #e5e7eb; border-radius: 8px;
       font-size: 14px; color: #111827; outline: none; font-family: inherit;
     }
-    .form-group input:focus { border-color: #7c3aed; }
+    .form-group input:focus, .form-group select:focus { border-color: #7c3aed; }
     #msgDados { font-size: 13px; margin-top: 8px; }
     #msgDados.ok { color: #065f46; }
     #msgDados.erro { color: #ef4444; }
@@ -168,7 +168,7 @@
 
   <!-- Meus dados -->
   <div class="section-card">
-    <div class="section-title">Meus dados</div>
+    <div class="section-title">Meu Perfil</div>
     <div class="form-group">
       <label class="info-label" for="editNome">Nome</label>
       <input type="text" id="editNome" />
@@ -178,9 +178,53 @@
       <label class="info-label" for="editTelefone">Telefone</label>
       <input type="text" id="editTelefone" />
     </div>
+    <div class="form-group">
+      <label class="info-label" for="editNascimento">Data de nascimento</label>
+      <input type="date" id="editNascimento" />
+    </div>
+    <div class="form-group">
+      <label class="info-label" for="editGenero">Gênero</label>
+      <select id="editGenero">
+        <option value="">Selecione</option>
+        <option value="Feminino">Feminino</option>
+        <option value="Masculino">Masculino</option>
+        <option value="Não-binário">Não-binário</option>
+        <option value="Prefiro não informar">Prefiro não informar</option>
+        <option value="Outro">Outro</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="info-label" for="editEstadoCivil">Estado civil</label>
+      <select id="editEstadoCivil">
+        <option value="">Selecione</option>
+        <option value="Solteiro(a)">Solteiro(a)</option>
+        <option value="Casado(a)">Casado(a)</option>
+        <option value="União estável">União estável</option>
+        <option value="Divorciado(a)">Divorciado(a)</option>
+        <option value="Viúvo(a)">Viúvo(a)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="info-label" for="editProfissao">Profissão</label>
+      <input type="text" id="editProfissao" />
+    </div>
+    <div class="form-group">
+      <label class="info-label" for="editEscolaridade">Escolaridade</label>
+      <select id="editEscolaridade">
+        <option value="">Selecione</option>
+        <option value="Ensino fundamental">Ensino fundamental</option>
+        <option value="Ensino médio">Ensino médio</option>
+        <option value="Ensino superior incompleto">Ensino superior incompleto</option>
+        <option value="Ensino superior completo">Ensino superior completo</option>
+        <option value="Pós-graduação">Pós-graduação</option>
+      </select>
+    </div>
     <div class="info-row"><span class="info-label">Status</span><span class="info-value" id="infoStatus">—</span></div>
     <button class="btn-primary" id="btnSalvarDados" style="margin-top:12px">Salvar alterações</button>
     <div id="msgDados"></div>
+    <p style="font-size:12px;color:#9ca3af;margin-top:10px">
+      Esses são seus dados pessoais. O histórico clínico e a anamnese ficam com seu psicólogo.
+    </p>
   </div>
   </section>
 
@@ -266,35 +310,41 @@
       document.getElementById('editTelefone').value = perfil.telefone ?? '';
     }
 
-    // Busca vínculo com psicólogo
+    // Busca vínculo com psicólogo + dados demográficos
     const { data: paciente } = await sb
       .from('pacientes')
-      .select('psicologo_id, status')
+      .select('psicologo_id, status, data_nascimento, genero, estado_civil, profissao, escolaridade')
       .eq('id', uid)
-      .single();
+      .maybeSingle();
+
+    if (paciente) {
+      document.getElementById('editNascimento').value = paciente.data_nascimento || '';
+      document.getElementById('editGenero').value = paciente.genero || '';
+      document.getElementById('editEstadoCivil').value = paciente.estado_civil || '';
+      document.getElementById('editProfissao').value = paciente.profissao || '';
+      document.getElementById('editEscolaridade').value = paciente.escolaridade || '';
+    }
 
     if (!paciente?.psicologo_id) {
       document.getElementById('alertSemPsi').style.display = 'block';
       document.getElementById('infoStatus').innerHTML = '<span class="badge badge-pendente">sem psicólogo</span>';
-      return;
-    }
+    } else {
+      const s = paciente.status ?? 'pendente';
+      document.getElementById('infoStatus').innerHTML = `<span class="badge badge-${s}">${s}</span>`;
 
-    // Status
-    const s = paciente.status ?? 'pendente';
-    document.getElementById('infoStatus').innerHTML = `<span class="badge badge-${s}">${s}</span>`;
+      // Dados do psicólogo (pacientes.psicologo_id referencia psicologos.id, não usuarios.id)
+      const { data: psi } = await sb
+        .from('psicologos')
+        .select('nome, crp')
+        .eq('id', paciente.psicologo_id)
+        .single();
 
-    // Dados do psicólogo (pacientes.psicologo_id referencia psicologos.id, não usuarios.id)
-    const { data: psi } = await sb
-      .from('psicologos')
-      .select('nome, crp')
-      .eq('id', paciente.psicologo_id)
-      .single();
-
-    if (psi) {
-      document.getElementById('cardPsi').style.display = 'block';
-      document.getElementById('psiNome').textContent = psi.nome ?? 'Psicólogo';
-      document.getElementById('psiCrp').textContent = psi.crp ? 'CRP ' + psi.crp : '';
-      document.getElementById('psiAvatar').textContent = (psi.nome ?? 'P')[0].toUpperCase();
+      if (psi) {
+        document.getElementById('cardPsi').style.display = 'block';
+        document.getElementById('psiNome').textContent = psi.nome ?? 'Psicólogo';
+        document.getElementById('psiCrp').textContent = psi.crp ? 'CRP ' + psi.crp : '';
+        document.getElementById('psiAvatar').textContent = (psi.nome ?? 'P')[0].toUpperCase();
+      }
     }
 
     await carregarCheckinHoje(uid);
@@ -438,6 +488,16 @@
 
     const nome = document.getElementById('editNome').value.trim();
     const telefone = document.getElementById('editTelefone').value.trim();
+    const dadosPaciente = {
+      id: uid,
+      nome,
+      telefone,
+      data_nascimento: document.getElementById('editNascimento').value || null,
+      genero: document.getElementById('editGenero').value || null,
+      estado_civil: document.getElementById('editEstadoCivil').value || null,
+      profissao: document.getElementById('editProfissao').value.trim() || null,
+      escolaridade: document.getElementById('editEscolaridade').value || null,
+    };
 
     if (!nome) {
       msg.textContent = 'O nome não pode ficar vazio.';
@@ -452,14 +512,21 @@
 
     const { error } = await sb.from('usuarios').update({ nome, telefone }).eq('id', uid);
 
-    // Mantém pacientes.nome/telefone em sincronia, se já existir vínculo
-    await sb.from('pacientes').update({ nome, telefone }).eq('id', uid);
+    // Cria ou atualiza a linha de pacientes com os dados demográficos
+    // (upsert porque o paciente pode ainda não ter escolhido um psicólogo)
+    const { error: erroPaciente } = await sb.from('pacientes').upsert(dadosPaciente, { onConflict: 'id' });
 
     btn.disabled = false;
     btn.textContent = 'Salvar alterações';
 
     if (error) {
       msg.textContent = 'Erro ao salvar: ' + error.message;
+      msg.className = 'erro';
+      return;
+    }
+
+    if (erroPaciente) {
+      msg.textContent = 'Nome e telefone salvos, mas houve um erro nos demais dados: ' + erroPaciente.message;
       msg.className = 'erro';
       return;
     }
