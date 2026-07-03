@@ -83,11 +83,20 @@
 
   const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
   let pacienteId = null;
+  let pacienteNome = null;
+  let pacienteEmail = null;
+  let pacienteTelefone = null;
 
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'login.html'; return; }
     pacienteId = session.user.id;
+
+    const { data: usuario } = await sb.from('usuarios').select('nome, email, telefone').eq('id', pacienteId).single();
+    pacienteNome = usuario?.nome || session.user.email || 'Paciente';
+    pacienteEmail = usuario?.email || session.user.email || null;
+    pacienteTelefone = usuario?.telefone || null;
+
     await carregarPsicologos();
   }
 
@@ -136,7 +145,14 @@
 
     const { error } = await sb
       .from('pacientes')
-      .upsert({ id: pacienteId, psicologo_id: psicologoId, status: 'pendente' }, { onConflict: 'id' });
+      .upsert({
+        id: pacienteId,
+        psicologo_id: psicologoId,
+        status: 'pendente',
+        nome: pacienteNome,
+        email: pacienteEmail,
+        telefone: pacienteTelefone,
+      }, { onConflict: 'id' });
 
     const msg = document.getElementById('msgTopo');
     if (error) {

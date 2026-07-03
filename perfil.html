@@ -600,6 +600,11 @@ nav {
       if (!confirmarTroca) return;
     }
 
+    const { data: usuario } = await sb.from('usuarios').select('nome, email, telefone').eq('id', pacienteId).single();
+    const pacienteNome = usuario?.nome || session.user.email || 'Paciente';
+    const pacienteEmail = usuario?.email || session.user.email || null;
+    const pacienteTelefone = usuario?.telefone || null;
+
     const btn = document.getElementById('btnConfirmar');
     btn.disabled = true;
     btn.textContent = 'Agendando…';
@@ -607,7 +612,14 @@ nav {
     // garante que existe um registro do paciente vinculado a este psicólogo
     const { error: erroUpsert } = await sb
       .from('pacientes')
-      .upsert({ id: pacienteId, psicologo_id: psicologoId, status: 'pendente' }, { onConflict: 'id' });
+      .upsert({
+        id: pacienteId,
+        psicologo_id: psicologoId,
+        status: 'pendente',
+        nome: pacienteNome,
+        email: pacienteEmail,
+        telefone: pacienteTelefone,
+      }, { onConflict: 'id' });
 
     if (erroUpsert) {
       msg.textContent = 'Erro ao vincular paciente: ' + erroUpsert.message;
