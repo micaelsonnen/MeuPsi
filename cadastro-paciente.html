@@ -62,6 +62,11 @@
   <label>Senha</label>
   <input type="password" id="senha" placeholder="Mínimo 6 caracteres" />
 
+  <label style="display:flex;align-items:flex-start;gap:8px;font-weight:400;cursor:pointer;margin-bottom:16px;">
+    <input type="checkbox" id="aceiteTermos" style="width:auto;margin:2px 0 0;" />
+    <span>Li e concordo com os <a href="termos.html" target="_blank" style="color:#7c3aed;">Termos de Uso</a> e a <a href="privacidade.html" target="_blank" style="color:#7c3aed;">Política de Privacidade</a>.</span>
+  </label>
+
   <button class="btn" id="btnCadastrar">Criar conta</button>
   <div class="msg" id="msg"></div>
 
@@ -87,6 +92,9 @@
     }
     if (senha.length < 6) {
       msg.textContent = 'Senha precisa ter ao menos 6 caracteres.'; return;
+    }
+    if (!document.getElementById('aceiteTermos').checked) {
+      msg.textContent = 'É necessário aceitar os Termos de Uso e a Política de Privacidade.'; return;
     }
 
     btn.disabled = true;
@@ -139,6 +147,19 @@
       btn.textContent = 'Criar conta';
       return;
     }
+
+    // Registro formal de consentimento (não bloqueia o cadastro se falhar)
+    try {
+      let ip = null;
+      try {
+        const respIp = await fetch('https://api.ipify.org?format=json');
+        ip = (await respIp.json()).ip || null;
+      } catch (e) {}
+      await sb.from('consentimentos').insert([
+        { user_id: uid, tipo_documento: 'termos_uso', versao_documento: 'v1', ip, user_agent: navigator.userAgent },
+        { user_id: uid, tipo_documento: 'politica_privacidade', versao_documento: 'v1', ip, user_agent: navigator.userAgent },
+      ]);
+    } catch (e) {}
 
     msg.className = 'msg ok';
     msg.textContent = 'Conta criada! Redirecionando…';

@@ -509,7 +509,11 @@ input.invalid, select.invalid { border-color: #F87171; }
       </div>
 
       <div style="margin-top:1.5rem; padding:1rem; background:var(--lila-50); border-radius:var(--radius-sm); font-size:13px; color:var(--gray-500); line-height:1.6;">
-        Ao cadastrar, você concorda com os <a href="#" style="color:var(--lila-700)">Termos de Uso</a> e a <a href="#" style="color:var(--lila-700)">Política de Privacidade</a> do MeuPsi. Seu CRP será verificado em até 48 horas.
+        <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
+          <input type="checkbox" id="aceiteTermos" style="width:auto;margin-top:2px;" />
+          <span>Li e concordo com os <a href="termos.html" target="_blank" style="color:var(--lila-700)">Termos de Uso</a> e a <a href="privacidade.html" target="_blank" style="color:var(--lila-700)">Política de Privacidade</a> do MeuPsi. Meu CRP será verificado em até 48 horas.</span>
+        </label>
+        <span class="field-error" id="err-aceiteTermos" style="display:none;">É necessário aceitar os Termos de Uso e a Política de Privacidade para se cadastrar.</span>
       </div>
     </div>
 
@@ -654,11 +658,37 @@ function irPara(n) {
 }
 
 // ── CORREÇÃO CRÍTICA: enviarCadastro agora usa Supabase ──
+async function capturarIp() {
+  try {
+    const resp = await fetch('https://api.ipify.org?format=json');
+    const data = await resp.json();
+    return data.ip || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function registrarConsentimento(userId) {
+  const ip = await capturarIp();
+  const registros = [
+    { user_id: userId, tipo_documento: 'termos_uso', versao_documento: document.querySelector('a[href="termos.html"]') ? 'v1' : null, ip, user_agent: navigator.userAgent },
+    { user_id: userId, tipo_documento: 'politica_privacidade', versao_documento: 'v1', ip, user_agent: navigator.userAgent },
+  ];
+  await db.from('consentimentos').insert(registros);
+}
+
 async function enviarCadastro() {
   const fb = document.getElementById('feedbackEnvio');
   const btn = document.getElementById('btnEnviar');
 
   fb.style.display = 'none';
+
+  if (!document.getElementById('aceiteTermos').checked) {
+    document.getElementById('err-aceiteTermos').style.display = 'block';
+    return;
+  }
+  document.getElementById('err-aceiteTermos').style.display = 'none';
+
   btn.disabled = true;
   btn.textContent = 'Enviando...';
 
@@ -679,6 +709,9 @@ async function enviarCadastro() {
 
     // 2. Insere na tabela psicologos
     const user = authData.user;
+    if (user) {
+      registrarConsentimento(user.id); // não bloqueia o cadastro se falhar
+    }
     if (user) {
       const especialidadesArr = [...document.querySelectorAll('.tag-check:checked')]
         .map(el => el.nextElementSibling.textContent.trim());
