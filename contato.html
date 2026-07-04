@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contato — MeuPsi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --cream: #FDF6F8; --rose-50: #FAF0F4; --rose-200: #ECC8D8;
+  --lila-300: #C9ADE0; --lila-700: #6B3FA8; --lila-900: #3B1E62;
+  --verde-400: #7DC9A8; --verde-500: #5AB593; --verde-50: #EBF7F2;
+  --gray-700: #4A4048; --gray-500: #8A7A85;
+}
+* { box-sizing: border-box; }
+body { margin:0; background:var(--cream); color:var(--gray-700); font-family:'DM Sans',sans-serif; font-weight:300; }
+.topbar { padding:1.25rem 2rem; background:#fff; border-bottom:1px solid var(--rose-200); display:flex; align-items:center; justify-content:space-between; }
+.logo { font-family:'Fraunces',serif; font-style:italic; font-size:22px; color:var(--lila-900); text-decoration:none; }
+.topbar a.voltar { font-size:13px; color:var(--lila-700); text-decoration:none; }
+.wrap { max-width:600px; margin:0 auto; padding:4rem 1.5rem 6rem; }
+h1 { font-family:'Fraunces',serif; font-weight:300; font-style:italic; font-size:34px; color:var(--lila-900); margin-bottom:0.5rem; text-align:center; }
+.sub { text-align:center; font-size:15px; color:var(--gray-500); margin-bottom:2.5rem; }
+.card-grid { display:grid; gap:1rem; }
+.contato-card {
+  background:#fff; border:1px solid var(--rose-200); border-radius:16px;
+  padding:1.5rem; display:flex; align-items:center; gap:1rem;
+  text-decoration:none; color:var(--gray-700); transition:border-color 0.15s;
+}
+.contato-card:hover { border-color:var(--lila-300); }
+.contato-icon {
+  width:48px; height:48px; border-radius:50%; background:var(--verde-50);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--verde-500);
+}
+.contato-card h3 { margin:0 0 2px; font-size:15px; font-weight:500; color:var(--lila-900); }
+.contato-card p { margin:0; font-size:13.5px; color:var(--gray-500); }
+.placeholder { background:#FFF3CD; color:#7A5C00; padding:0.1rem 0.4rem; border-radius:4px; font-size:0.9em; }
+.aviso { background:var(--verde-50); border:1px solid var(--verde-400); border-radius:12px; padding:1rem 1.25rem; font-size:13.5px; margin-top:2rem; text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="logo" href="index.html">MeuPsi</a>
+  <a class="voltar" href="index.html">← Voltar ao site</a>
+</div>
+
+<div class="wrap">
+  <h1>Fale com a gente</h1>
+  <p class="sub">Dúvidas sobre a plataforma, seu cadastro ou seus dados? Escolha o canal que preferir.</p>
+
+  <div class="card-grid">
+    <a class="contato-card" href="https://wa.me/5532999666946" target="_blank" rel="noopener">
+      <div class="contato-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.48 1.32 5L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm0 18.15c-1.5 0-2.97-.4-4.25-1.16l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 01-1.26-4.37c0-4.54 3.7-8.24 8.25-8.24 4.54 0 8.24 3.7 8.24 8.24 0 4.55-3.7 8.24-8.19 8.24z"/></svg>
+      </div>
+      <div>
+        <h3>WhatsApp</h3>
+        <p>(32) 99966-6946 — resposta mais rápida</p>
+      </div>
+    </a>
+
+    <a class="contato-card" href="mailto:contato@meupsi.com.br">
+      <div class="contato-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+      </div>
+      <div>
+        <h3>E-mail</h3>
+        <p><span class="placeholder">[e-mail de contato a confirmar]</span></p>
+      </div>
+    </a>
+
+    <a class="contato-card" href="privacidade.html">
+      <div class="contato-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div>
+        <h3>Dúvidas sobre seus dados</h3>
+        <p>Direitos LGPD, acesso ou exclusão de dados</p>
+      </div>
+    </a>
+  </div>
+
+  <div class="aviso">
+    Se você está em crise ou risco à vida, ligue agora para o <strong>CVV — 188</strong> ou o <strong>SAMU — 192</strong>. O MeuPsi não é um canal de atendimento de emergência.
+  </div>
+</div>
+
+</body>
+</html>
