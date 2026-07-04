@@ -4,25 +4,73 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Planos para Psicólogos — MeuPsi</title>
+<meta name="description" content="Quanto antes você entrar no MeuPsi, menor a sua mensalidade — para sempre." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
-  --cream: #FDF6F8; --rose-50: #FAF0F4; --rose-200: #ECC8D8;
-  --lila-300: #C9ADE0; --lila-700: #6B3FA8; --lila-900: #3B1E62;
-  --verde-500: #5AB593; --gray-700: #4A4048; --gray-500: #8A7A85;
+  --cream: #FDF6F8; --rose-50: #FAF0F4; --rose-100: #F5E2EA; --rose-200: #ECC8D8;
+  --mauve-300: #D4ABBE; --mauve-500: #B87FA0;
+  --lila-300: #C9ADE0; --lila-500: #9B6FD8; --lila-700: #6B3FA8; --lila-900: #3B1E62;
+  --verde-400: #7DC9A8; --verde-500: #5AB593; --verde-600: #3F9B7A; --verde-50: #EBF7F2;
+  --gray-700: #4A4048; --gray-500: #8A7A85;
 }
 * { box-sizing: border-box; }
-body { margin:0; background:var(--cream); color:var(--gray-700); font-family:'DM Sans',sans-serif; font-weight:300; }
+body { margin:0; background:var(--cream); color:var(--gray-700); font-family:'DM Sans',sans-serif; font-weight:300; line-height:1.6; }
+a { color:var(--lila-700); }
 .topbar { padding:1.25rem 2rem; background:#fff; border-bottom:1px solid var(--rose-200); display:flex; align-items:center; justify-content:space-between; }
 .logo { font-family:'Fraunces',serif; font-style:italic; font-size:22px; color:var(--lila-900); text-decoration:none; }
 .topbar a.voltar { font-size:13px; color:var(--lila-700); text-decoration:none; }
-.wrap { max-width:640px; margin:0 auto; padding:4rem 1.5rem 6rem; text-align:center; }
-h1 { font-family:'Fraunces',serif; font-weight:300; font-style:italic; font-size:32px; color:var(--lila-900); margin-bottom:1rem; }
-p { font-size:15px; line-height:1.7; color:var(--gray-700); }
-.card { background:#fff; border:1px solid var(--rose-200); border-radius:16px; padding:2.5rem; margin-top:2rem; }
-.btn { display:inline-block; margin-top:1.5rem; padding:0.75rem 1.75rem; border-radius:999px; background:var(--verde-500); color:#fff; text-decoration:none; font-weight:500; }
+
+.hero { max-width:680px; margin:0 auto; padding:4rem 1.5rem 1rem; text-align:center; }
+h1 { font-family:'Fraunces',serif; font-weight:300; font-style:italic; font-size:36px; color:var(--lila-900); margin-bottom:0.75rem; }
+.hero p { font-size:16px; color:var(--gray-500); max-width:520px; margin:0 auto; }
+
+.progresso-wrap { max-width:520px; margin:2.5rem auto 0; padding:0 1.5rem; }
+.progresso-label { display:flex; justify-content:space-between; font-size:12.5px; color:var(--gray-500); margin-bottom:6px; }
+.progresso-bar { height:8px; border-radius:999px; background:var(--rose-100); overflow:hidden; }
+.progresso-fill { height:100%; background:var(--verde-500); border-radius:999px; transition:width 0.6s ease; }
+
+.planos-grid {
+  max-width:960px; margin:3rem auto; padding:0 1.5rem;
+  display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem;
+}
+@media (max-width:800px) { .planos-grid { grid-template-columns:1fr; max-width:420px; } }
+
+.plano-card {
+  background:#fff; border:1.5px solid var(--rose-200); border-radius:20px;
+  padding:2rem 1.75rem; text-align:center; position:relative; transition:transform 0.15s, border-color 0.15s;
+}
+.plano-card.atual { border-color:var(--verde-500); box-shadow:0 8px 24px rgba(90,181,147,0.15); transform:translateY(-6px); }
+.plano-card.esgotado { opacity:0.55; }
+.plano-tag {
+  position:absolute; top:-12px; left:50%; transform:translateX(-50%);
+  background:var(--verde-500); color:#fff; font-size:11px; font-weight:500;
+  padding:4px 14px; border-radius:999px; white-space:nowrap;
+}
+.plano-nome { font-family:'Fraunces',serif; font-size:19px; color:var(--lila-900); margin-bottom:0.25rem; }
+.plano-faixa { font-size:12.5px; color:var(--gray-500); margin-bottom:1.25rem; }
+.plano-valor { font-size:38px; color:var(--lila-900); font-weight:400; }
+.plano-valor span { font-size:15px; color:var(--gray-500); font-weight:300; }
+.plano-status { font-size:12.5px; margin-top:0.75rem; font-weight:500; }
+.plano-status.vagas { color:var(--verde-600); }
+.plano-status.cheio { color:var(--mauve-500); }
+
+.como-funciona {
+  max-width:640px; margin:1rem auto 3rem; padding:0 1.5rem; text-align:center;
+}
+.como-funciona p { font-size:14px; color:var(--gray-500); }
+
+.cta-wrap { text-align:center; padding-bottom:5rem; }
+.btn-cta {
+  display:inline-block; padding:0.9rem 2.25rem; border-radius:999px;
+  background:var(--verde-500); color:#fff; text-decoration:none; font-weight:500; font-size:15px;
+}
+.btn-cta:hover { background:var(--verde-600); }
+
+.empty { text-align:center; padding:2rem; color:var(--gray-500); font-size:13px; }
 </style>
 </head>
 <body>
@@ -32,13 +80,89 @@ p { font-size:15px; line-height:1.7; color:var(--gray-700); }
   <a class="voltar" href="index.html">← Voltar ao site</a>
 </div>
 
-<div class="wrap">
-  <h1>Planos em breve</h1>
-  <div class="card">
-    <p>Estamos finalizando os detalhes dos planos para psicólogos. Enquanto isso, você já pode criar seu cadastro — a ativação do perfil não tem custo nesta fase inicial.</p>
-    <a class="btn" href="cadastro.html">Cadastrar meu perfil</a>
-  </div>
+<div class="hero">
+  <h1>Quanto antes você entrar,<br>menor sua mensalidade — pra sempre</h1>
+  <p>O MeuPsi cresce com os psicólogos que acreditam no projeto desde o início. Por isso, o valor que você trava ao entrar é o valor que você paga enquanto estiver ativo na plataforma — não sobe depois.</p>
 </div>
+
+<div class="progresso-wrap" id="progressoWrap" style="display:none">
+  <div class="progresso-label">
+    <span id="progressoTexto">—</span>
+    <span id="progressoContagem">—</span>
+  </div>
+  <div class="progresso-bar"><div class="progresso-fill" id="progressoFill" style="width:0%"></div></div>
+</div>
+
+<div class="planos-grid" id="planosGrid">
+  <div class="empty">Carregando disponibilidade…</div>
+</div>
+
+<div class="como-funciona">
+  <p>A faixa é definida pela ordem de entrada, não pela data de aprovação — o que conta é a sua posição na fila de cadastro. Assim que uma faixa se esgota, os próximos cadastros passam automaticamente para a faixa seguinte.</p>
+</div>
+
+<div class="cta-wrap">
+  <a class="btn-cta" href="cadastro.html">Garantir minha vaga</a>
+</div>
+
+<script>
+  const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
+  const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+
+  const FAIXAS = [
+    { nome: 'Fundador',  de: 1,   ate: 100,      valor: 100 },
+    { nome: 'Pioneiro',  de: 101, ate: 200,      valor: 120 },
+    { nome: 'Padrão',    de: 201, ate: Infinity, valor: 150 },
+  ];
+
+  async function init() {
+    const { count, error } = await sb
+      .from('psicologos')
+      .select('id', { count: 'exact', head: true });
+
+    const totalCadastrados = (!error && count) ? count : 0;
+    renderPlanos(totalCadastrados);
+    renderProgresso(totalCadastrados);
+  }
+
+  function renderProgresso(total) {
+    const faixaAtual = FAIXAS.find(f => total < f.ate) || FAIXAS[FAIXAS.length - 1];
+    if (faixaAtual.ate === Infinity) {
+      document.getElementById('progressoWrap').style.display = 'none';
+      return;
+    }
+    document.getElementById('progressoWrap').style.display = 'block';
+    const pct = Math.min(100, (total / faixaAtual.ate) * 100);
+    document.getElementById('progressoFill').style.width = pct + '%';
+    document.getElementById('progressoTexto').textContent = `Faixa atual: ${faixaAtual.nome}`;
+    document.getElementById('progressoContagem').textContent = `${total} de ${faixaAtual.ate} vagas`;
+  }
+
+  function renderPlanos(total) {
+    const grid = document.getElementById('planosGrid');
+    grid.innerHTML = FAIXAS.map(f => {
+      const cheio = total >= f.ate;
+      const ehAtual = !cheio && total >= (f.de - 1);
+      const restantes = f.ate === Infinity ? null : Math.max(0, f.ate - total);
+      const faixaTexto = f.ate === Infinity ? `A partir da vaga ${f.de}` : `Vagas ${f.de} a ${f.ate}`;
+
+      return `
+        <div class="plano-card ${ehAtual ? 'atual' : ''} ${cheio ? 'esgotado' : ''}">
+          ${ehAtual ? '<span class="plano-tag">Faixa atual</span>' : ''}
+          <p class="plano-nome">${f.nome}</p>
+          <p class="plano-faixa">${faixaTexto}</p>
+          <p class="plano-valor">R$ ${f.valor}<span>/mês</span></p>
+          <p class="plano-status ${cheio ? 'cheio' : 'vagas'}">
+            ${cheio ? 'Faixa esgotada' : (restantes !== null ? `${restantes} vagas restantes nesta faixa` : 'Faixa vigente')}
+          </p>
+        </div>
+      `;
+    }).join('');
+  }
+
+  init();
+</script>
 
 </body>
 </html>
