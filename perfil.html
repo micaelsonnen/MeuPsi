@@ -404,6 +404,13 @@ nav {
       throw new Error('psicologo nao encontrado');
     }
 
+    function esc(str) {
+      if (str === null || str === undefined) return '';
+      const div = document.createElement('div');
+      div.textContent = String(str);
+      return div.innerHTML;
+    }
+
     document.title = (p.nome ?? 'Psicólogo') + ' — MeuPsi';
     document.getElementById('profileNome').textContent = p.nome ?? 'Psicólogo';
     document.getElementById('profileCrp').textContent = p.crp ? 'CRP ' + p.crp : '';
@@ -411,7 +418,7 @@ nav {
 
     const avatar = document.getElementById('avatar');
     if (p.foto_url) {
-      avatar.innerHTML = `<img src="${p.foto_url}" alt="${p.nome ?? ''}">`;
+      avatar.innerHTML = `<img src="${esc(p.foto_url)}" alt="${esc(p.nome ?? '')}">`;
     } else {
       const iniciais = (p.nome ?? 'P').trim().split(' ').filter(Boolean).slice(0,2).map(w => w[0].toUpperCase()).join('');
       avatar.textContent = iniciais || 'P';
@@ -419,8 +426,8 @@ nav {
 
     const tagsEl = document.getElementById('profileTags');
     const tags = [];
-    if (p.especialidade) tags.push(`<span class="tag">${p.especialidade}</span>`);
-    if (p.modalidade) tags.push(`<span class="tag-lila">${p.modalidade}</span>`);
+    if (p.especialidade) tags.push(`<span class="tag">${esc(p.especialidade)}</span>`);
+    if (p.modalidade) tags.push(`<span class="tag-lila">${esc(p.modalidade)}</span>`);
     tagsEl.innerHTML = tags.join('');
 
     document.getElementById('infoCidade').textContent = p.cidade ?? '—';
@@ -428,17 +435,17 @@ nav {
 
     const valorEl = document.getElementById('infoValor');
     valorEl.innerHTML = p.preco_faixa
-      ? `<span class="numero" style="font-size:16px;">${p.preco_faixa}</span>`
+      ? `<span class="numero" style="font-size:16px;">${esc(p.preco_faixa)}</span>`
       : `<span class="periodo">a combinar</span>`;
 
     document.getElementById('profileBio').innerHTML = p.bio
-      ? `<p>${p.bio}</p>`
+      ? `<p>${esc(p.bio)}</p>`
       : '<p>Este psicólogo ainda não adicionou uma biografia.</p>';
 
     if (p.especialidades?.length) {
       document.getElementById('cardEspecialidades').style.display = '';
       document.getElementById('especialidadesGrid').innerHTML = p.especialidades.map(e => `
-        <div class="esp-item"><div class="esp-dot"></div>${e}</div>
+        <div class="esp-item"><div class="esp-dot"></div>${esc(e)}</div>
       `).join('');
     }
   }
@@ -463,9 +470,9 @@ nav {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
           </div>
           <div>
-            <p class="formacao-titulo">${f.titulo}</p>
-            ${f.instituicao ? `<p class="formacao-inst">${f.instituicao}</p>` : ''}
-            ${periodo ? `<p class="formacao-ano">${periodo}</p>` : ''}
+            <p class="formacao-titulo">${esc(f.titulo)}</p>
+            ${f.instituicao ? `<p class="formacao-inst">${esc(f.instituicao)}</p>` : ''}
+            ${periodo ? `<p class="formacao-ano">${esc(periodo)}</p>` : ''}
           </div>
         </div>
       `;

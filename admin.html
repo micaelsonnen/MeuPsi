@@ -640,6 +640,13 @@ const SUPABASE_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8'
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+function esc(str) {
+  if (str === null || str === undefined) return ''
+  const div = document.createElement('div')
+  div.textContent = String(str)
+  return div.innerHTML
+}
+
 // ── ESTADO ──────────────────────────────────────────────────
 let psicologos = []
 let editandoId = null
@@ -736,16 +743,16 @@ function renderTabela(lista) {
       <td>
         <div class="psi-mini">
           <div class="avatar-sm">
-            ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nome}" />` : iniciais(p.nome)}
+            ${p.foto_url ? `<img src="${esc(p.foto_url)}" alt="${esc(p.nome)}" />` : iniciais(p.nome)}
           </div>
           <div>
-            <p class="psi-mini-nome">${p.nome}</p>
-            <p class="psi-mini-crp">CRP ${p.crp}</p>
+            <p class="psi-mini-nome">${esc(p.nome)}</p>
+            <p class="psi-mini-crp">CRP ${esc(p.crp)}</p>
           </div>
         </div>
       </td>
-      <td>${p.abordagem || '—'}</td>
-      <td>${p.cidade ? `${p.cidade} / ${p.estado}` : '—'}</td>
+      <td>${esc(p.abordagem) || '—'}</td>
+      <td>${p.cidade ? `${esc(p.cidade)} / ${esc(p.estado)}` : '—'}</td>
       <td>${p.preco_exato ? `R$ ${Number(p.preco_exato).toFixed(0)}` : '—'}</td>
       <td><span class="badge badge-${statusDe(p)}">${statusDe(p)}</span></td>
       <td>
@@ -806,13 +813,13 @@ function renderTabelaPacientes(lista) {
         <div class="psi-mini">
           <div class="avatar-sm">${iniciais(p.nome || '?')}</div>
           <div>
-            <p class="psi-mini-nome">${p.nome || '(sem nome)'}</p>
-            <p class="psi-mini-crp">${p.email || '—'}</p>
+            <p class="psi-mini-nome">${esc(p.nome) || '(sem nome)'}</p>
+            <p class="psi-mini-crp">${esc(p.email) || '—'}</p>
           </div>
         </div>
       </td>
-      <td>${p.telefone || '—'}</td>
-      <td>${p.psicologo?.nome || '—'}</td>
+      <td>${esc(p.telefone) || '—'}</td>
+      <td>${esc(p.psicologo?.nome) || '—'}</td>
       <td><span class="badge badge-${p.status === 'ativo' ? 'aprovado' : 'pendente'}">${p.status || 'pendente'}</span></td>
       <td>${p.criado_em ? new Date(p.criado_em).toLocaleDateString('pt-BR') : '—'}</td>
       <td>
@@ -896,13 +903,13 @@ function renderPendentes() {
         <div class="psi-mini">
           <div class="avatar-sm">${iniciais(p.nome)}</div>
           <div>
-            <p class="psi-mini-nome">${p.nome}</p>
-            <p class="psi-mini-crp">${p.email}</p>
+            <p class="psi-mini-nome">${esc(p.nome)}</p>
+            <p class="psi-mini-crp">${esc(p.email)}</p>
           </div>
         </div>
       </td>
-      <td><strong>${p.crp}</strong></td>
-      <td>${p.cidade ? `${p.cidade} / ${p.estado}` : '—'}</td>
+      <td><strong>${esc(p.crp)}</strong></td>
+      <td>${p.cidade ? `${esc(p.cidade)} / ${esc(p.estado)}` : '—'}</td>
       <td>${p.criado_em ? new Date(p.criado_em).toLocaleDateString('pt-BR') : '—'}</td>
       <td>
         <div class="acoes">
@@ -930,13 +937,13 @@ async function carregarAgendamentos() {
   tbody.innerHTML = data.map(a => `
     <tr>
       <td>
-        <p style="font-weight:500">${a.paciente?.nome || '—'}</p>
-        <p style="font-size:11px;color:var(--malva)">${a.paciente?.email || ''}</p>
+        <p style="font-weight:500">${esc(a.paciente?.nome) || '—'}</p>
+        <p style="font-size:11px;color:var(--malva)">${esc(a.paciente?.email) || ''}</p>
       </td>
-      <td>${a.psicologo?.nome || '—'}</td>
+      <td>${esc(a.psicologo?.nome) || '—'}</td>
       <td>${a.data ? new Date(a.data + 'T00:00:00').toLocaleDateString('pt-BR') : '—'}</td>
-      <td>${a.hora || '—'}</td>
-      <td>${a.observacoes || '—'}</td>
+      <td>${esc(a.hora) || '—'}</td>
+      <td>${esc(a.observacoes) || '—'}</td>
       <td><span class="badge badge-${a.status}">${a.status}</span></td>
     </tr>`).join('')
 }
@@ -1046,7 +1053,7 @@ function preencherForm(p) {
   // foto
   const preview = document.getElementById('fotoPreview')
   if (p.foto_url) {
-    preview.innerHTML = `<img src="${p.foto_url}" alt="${p.nome}" />`
+    preview.innerHTML = `<img src="${esc(p.foto_url)}" alt="${esc(p.nome)}" />`
   } else {
     preview.innerHTML = `<span style="font-family:var(--font-display);font-size:20px">${iniciais(p.nome)}</span>`
   }

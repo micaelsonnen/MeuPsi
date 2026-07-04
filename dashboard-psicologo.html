@@ -702,6 +702,13 @@
   const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
 
   const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+
+  function esc(str) {
+    if (str === null || str === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+  }
   let psiId = null;
   let filtroAtual = 'todos';
 
@@ -796,7 +803,7 @@
 
     const preview = document.getElementById('perfilFotoPreview');
     if (psi.foto_url) {
-      preview.innerHTML = `<img src="${psi.foto_url}" alt="${psi.nome}" />`;
+      preview.innerHTML = `<img src="${esc(psi.foto_url)}" alt="${esc(psi.nome)}" />`;
     }
 
     const { data: formacoes } = await sb.from('formacoes').select('titulo').eq('psicologo_id', psi.id).order('ordem').limit(1);
@@ -920,9 +927,9 @@
 
     tbody.innerHTML = pacientes.map(p => `
       <tr>
-        <td>${p.nome ?? '—'}</td>
-        <td>${p.email ?? '—'}</td>
-        <td>${p.telefone ?? '—'}</td>
+        <td>${esc(p.nome) || '—'}</td>
+        <td>${esc(p.email) || '—'}</td>
+        <td>${esc(p.telefone) || '—'}</td>
         <td><span class="badge badge-${p.status ?? 'inativo'}">${p.status ?? 'inativo'}</span></td>
         <td>${p.criado_em ? new Date(p.criado_em).toLocaleDateString('pt-BR') : '—'}</td>
         <td>
@@ -1027,16 +1034,16 @@
     const html = campos.map(([label, val]) => `
       <div class="anamnese-item">
         <div class="a-label">${label}</div>
-        <div class="a-val">${(val || val === 0) ? val : '—'}</div>
+        <div class="a-val">${(val || val === 0) ? esc(val) : '—'}</div>
       </div>
     `).join('') + `
       <div class="anamnese-item anamnese-full">
         <div class="a-label">História — observações</div>
-        <div class="a-val">${p.historia_obs || '—'}</div>
+        <div class="a-val">${esc(p.historia_obs) || '—'}</div>
       </div>
       <div class="anamnese-item anamnese-full">
         <div class="a-label">Observações clínicas gerais</div>
-        <div class="a-val">${p.obs_clinicas || '—'}</div>
+        <div class="a-val">${esc(p.obs_clinicas) || '—'}</div>
       </div>
     `;
 
@@ -1070,9 +1077,9 @@
     const ultima = sessoes[sessoes.length - 1];
     ultimaEl.innerHTML = `
       <p style="font-size:13px;color:#374151;line-height:1.6;">
-        <strong>${new Date(ultima.data_hora).toLocaleDateString('pt-BR')}</strong> — ${ultima.resumo_sessao || 'Sem resumo registrado.'}
+        <strong>${new Date(ultima.data_hora).toLocaleDateString('pt-BR')}</strong> — ${esc(ultima.resumo_sessao) || 'Sem resumo registrado.'}
       </p>
-      ${ultima.plano_proxima_sessao ? `<p style="font-size:13px;color:#6b7280;margin-top:8px;"><strong>Plano:</strong> ${ultima.plano_proxima_sessao}</p>` : ''}
+      ${ultima.plano_proxima_sessao ? `<p style="font-size:13px;color:#6b7280;margin-top:8px;"><strong>Plano:</strong> ${esc(ultima.plano_proxima_sessao)}</p>` : ''}
     `;
   }
 
@@ -1090,7 +1097,7 @@
           <span class="badge badge-${s.status === 'realizada' ? 'concluido' : 'cancelado'}">${formatarStatusSessao(s.status)}</span>
           ${s.intercorrencia ? '<span class="badge badge-intercorrencia">Intercorrência</span>' : ''}
         </div>
-        <div class="ti-resumo">${s.resumo_sessao || 'Sem resumo registrado.'}</div>
+        <div class="ti-resumo">${esc(s.resumo_sessao) || 'Sem resumo registrado.'}</div>
         ${s.status === 'realizada' ? `
           <div class="ti-scores">
             ${s.intensidade_ansiedade != null ? `<span class="ti-score">Ansiedade: ${s.intensidade_ansiedade}</span>` : ''}
@@ -1267,7 +1274,7 @@
       <tr>
         <td>${new Date(c.data + 'T00:00:00').toLocaleDateString('pt-BR')}</td>
         <td>${c.hora?.slice(0,5) ?? '—'}</td>
-        <td>${c.pacientes?.nome ?? '—'}</td>
+        <td>${esc(c.pacientes?.nome) || '—'}</td>
         <td><span class="badge badge-${c.status}">${c.status}</span></td>
         <td>
           ${c.status !== 'cancelado' && c.status !== 'concluido'

@@ -457,6 +457,13 @@ async function carregarPsicologos(resetar) {
 }
 
 // ── RENDER ──────────────────────────────────────────────────
+function esc(str) {
+  if (str === null || str === undefined) return ''
+  const div = document.createElement('div')
+  div.textContent = String(str)
+  return div.innerHTML
+}
+
 function renderizar(lista, resetar) {
   const grid = document.getElementById('grid')
   const btnMais = document.getElementById('btnVerMais')
@@ -468,7 +475,7 @@ function renderizar(lista, resetar) {
     grid.innerHTML = `
       <div class="estado-grid">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--mauve-300)" stroke-width="1.5" style="margin:0 auto 1rem"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <p>Nenhum psicólogo encontrado para "<strong>${buscaAtiva || filtroAtivo}</strong>"</p>
+        <p>Nenhum psicólogo encontrado para "<strong>${esc(buscaAtiva || filtroAtivo)}</strong>"</p>
       </div>`
     btnMais.style.display = 'none'
     sub.textContent = 'Nenhum resultado encontrado'
@@ -486,17 +493,17 @@ function renderizar(lista, resetar) {
     card.innerHTML = `
       <div class="psi-avatar">
         ${p.foto_url
-          ? `<img src="${p.foto_url}" alt="${p.nome}" />`
-          : iniciais
+          ? `<img src="${esc(p.foto_url)}" alt="${esc(p.nome)}" />`
+          : esc(iniciais)
         }
       </div>
       <div>
-        <p class="psi-name">${p.nome}</p>
-        <p class="psi-crp">CRP ${p.crp}</p>
-        <p class="psi-abordagem">${p.abordagem || ''}</p>
+        <p class="psi-name">${esc(p.nome)}</p>
+        <p class="psi-crp">CRP ${esc(p.crp)}</p>
+        <p class="psi-abordagem">${esc(p.abordagem) || ''}</p>
       </div>
       <div class="psi-tags">
-        ${tags.map(t => `<span class="tag">${t}</span>`).join('')}
+        ${tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}
         ${(p.modalidade === 'online' || p.modalidade === 'ambos') ? '<span class="tag">Online</span>' : ''}
       </div>
       <div class="psi-actions">
@@ -543,13 +550,13 @@ async function carregarBlogHome() {
 
   grid.innerHTML = data.map(p => `
     <a href="post.html?slug=${encodeURIComponent(p.slug)}" class="blog-card" style="text-decoration:none;color:inherit;display:block;">
-      <div class="blog-thumb" ${p.imagem_capa ? `style="background:url('${p.imagem_capa}') center/cover"` : ''}>
+      <div class="blog-thumb" ${p.imagem_capa ? `style="background:url('${esc(p.imagem_capa)}') center/cover"` : ''}>
         ${!p.imagem_capa ? `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--mauve-500)" stroke-width="1.2"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>` : ''}
       </div>
       <div class="blog-body">
-        <p class="blog-tag">${p.categoria || 'Saúde Mental'}</p>
-        <p class="blog-title">${p.titulo}</p>
-        <p class="blog-author">${p.psicologos?.nome || 'Equipe MeuPsi'}</p>
+        <p class="blog-tag">${esc(p.categoria) || 'Saúde Mental'}</p>
+        <p class="blog-title">${esc(p.titulo)}</p>
+        <p class="blog-author">${esc(p.psicologos?.nome) || 'Equipe MeuPsi'}</p>
       </div>
     </a>`).join('')
 }

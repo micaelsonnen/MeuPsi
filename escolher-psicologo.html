@@ -87,6 +87,13 @@
   let pacienteEmail = null;
   let pacienteTelefone = null;
 
+  function esc(str) {
+    if (str === null || str === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+  }
+
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = 'login.html'; return; }
@@ -118,17 +125,17 @@
       <div class="card">
         <div class="avatar">
           ${p.foto_url
-            ? `<img src="${p.foto_url}" alt="${p.nome ?? 'Psicólogo'}">`
-            : (p.nome ?? 'P')[0].toUpperCase()}
+            ? `<img src="${esc(p.foto_url)}" alt="${esc(p.nome ?? 'Psicólogo')}">`
+            : esc((p.nome ?? 'P')[0].toUpperCase())}
         </div>
-        <div class="card-name">${p.nome ?? 'Psicólogo'}</div>
-        <div class="card-crp">${p.crp ? 'CRP ' + p.crp : ''}</div>
-        <div class="card-bio">${p.bio ?? 'Psicólogo cadastrado na plataforma MeuPsi.'}</div>
+        <div class="card-name">${esc(p.nome ?? 'Psicólogo')}</div>
+        <div class="card-crp">${p.crp ? 'CRP ' + esc(p.crp) : ''}</div>
+        <div class="card-bio">${esc(p.bio ?? 'Psicólogo cadastrado na plataforma MeuPsi.')}</div>
         <div class="card-tags">
-          ${p.especialidade ? `<span class="tag">${p.especialidade}</span>` : ''}
-          ${p.modalidade ? `<span class="tag">${p.modalidade}</span>` : ''}
-          ${p.cidade ? `<span class="tag">${p.cidade}</span>` : ''}
-          ${p.preco_faixa ? `<span class="tag">${p.preco_faixa}</span>` : ''}
+          ${p.especialidade ? `<span class="tag">${esc(p.especialidade)}</span>` : ''}
+          ${p.modalidade ? `<span class="tag">${esc(p.modalidade)}</span>` : ''}
+          ${p.cidade ? `<span class="tag">${esc(p.cidade)}</span>` : ''}
+          ${p.preco_faixa ? `<span class="tag">${esc(p.preco_faixa)}</span>` : ''}
         </div>
         <button class="btn-escolher" data-id="${p.id}">Escolher</button>
       </div>
