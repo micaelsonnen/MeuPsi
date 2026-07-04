@@ -239,6 +239,38 @@ input.invalid, select.invalid { border-color: #F87171; }
 
       <div class="field-row">
         <div class="field">
+          <label for="ePsiLink">Link do seu cadastro no e-Psi *</label>
+          <input type="text" id="ePsiLink" placeholder="https://e-psi.cfp.org.br/..." />
+          <span class="field-error" id="err-ePsiLink">Informe o link do seu cadastro no e-Psi.</span>
+          <span class="field-hint">Obrigatório pela Resolução CFP nº 09/2024 para atendimento por TICs. <a href="https://e-psi.cfp.org.br" target="_blank" rel="noopener">Não tem cadastro ainda?</a></span>
+        </div>
+      </div>
+
+      <h3 style="font-size:15px;margin:24px 0 4px;color:var(--gray-800,#1a1a1a)">Verificação profissional</h3>
+      <p class="field-hint" style="margin-bottom:14px">Anexe os documentos abaixo para agilizar a aprovação do seu perfil. Aceita imagem (.jpg, .png) ou PDF, até 5 MB cada.</p>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="docCrp">Carteira do CRP *</label>
+          <input type="file" id="docCrp" accept="image/*,.pdf" />
+          <span class="field-error" id="err-docCrp">Anexe a foto/scan da sua carteira do CRP.</span>
+        </div>
+        <div class="field">
+          <label for="docCertidao">Certidão de inscrição no CRP</label>
+          <input type="file" id="docCertidao" accept="image/*,.pdf" />
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="docDiploma">Diploma *</label>
+          <input type="file" id="docDiploma" accept="image/*,.pdf" />
+          <span class="field-error" id="err-docDiploma">Anexe seu diploma de Psicologia.</span>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
           <label for="email">E-mail *</label>
           <input type="email" id="email" placeholder="andreia@email.com" />
           <span class="field-error" id="err-email">Informe um e-mail válido.</span>
@@ -534,9 +566,12 @@ function validarStep1() {
   const crp = document.getElementById('crp');
   const email = document.getElementById('email');
   const senha = document.getElementById('senha');
+  const ePsiLink = document.getElementById('ePsiLink');
+  const docCrp = document.getElementById('docCrp');
+  const docDiploma = document.getElementById('docDiploma');
 
   // Limpa erros anteriores
-  [nome, crp, email, senha].forEach(el => {
+  [nome, crp, email, senha, ePsiLink, docCrp, docDiploma].forEach(el => {
     el.classList.remove('invalid');
     document.getElementById('err-' + el.id).style.display = 'none';
   });
@@ -559,6 +594,19 @@ function validarStep1() {
   if (senha.value.length < 8) {
     senha.classList.add('invalid');
     document.getElementById('err-senha').style.display = 'block';
+    valido = false;
+  }
+  if (!ePsiLink.value.trim()) {
+    ePsiLink.classList.add('invalid');
+    document.getElementById('err-ePsiLink').style.display = 'block';
+    valido = false;
+  }
+  if (!docCrp.files.length) {
+    document.getElementById('err-docCrp').style.display = 'block';
+    valido = false;
+  }
+  if (!docDiploma.files.length) {
+    document.getElementById('err-docDiploma').style.display = 'block';
     valido = false;
   }
 
@@ -671,12 +719,38 @@ async function enviarCadastro() {
         agenda_aberta: document.getElementById('agendaAberta').checked,
         plano: plano,
         mensalidade_plataforma: mensalidade,
+        e_psi_link: document.getElementById('ePsiLink').value.trim(),
         ativo: false // fica inativo até verificação do CRP
       }).select().single();
 
       if (dbError) throw dbError;
 
-      // 3. Formação (campo livre do cadastro vira uma linha na tabela formacoes)
+      // 3.1 Upload dos documentos de verificação (bucket privado "documentos")
+      async function uploadDocumento(inputId) {
+        const input = document.getElementById(inputId);
+        const arquivo = input.files[0];
+        if (!arquivo) return null;
+        const ext = arquivo.name.split('.').pop();
+        const path = `${user.id}/${inputId}.${ext}`;
+        const { error: upErr } = await db.storage.from('documentos').upload(path, arquivo, { upsert: true });
+        if (upErr) { console.error(upErr); return null; }
+        return path;
+      }
+
+      const [caminhoCrp, caminhoCertidao, caminhoDiploma] = await Promise.all([
+        uploadDocumento('docCrp'),
+        uploadDocumento('docCertidao'),
+        uploadDocumento('docDiploma'),
+      ]);
+
+      await db.from('psicologos').update({
+        doc_crp_url: caminhoCrp,
+        doc_certidao_url: caminhoCertidao,
+        doc_diploma_url: caminhoDiploma,
+        documentos_enviados_em: new Date().toISOString(),
+      }).eq('id', novoPsi.id);
+
+      // 3.2 Formação (campo livre do cadastro vira uma linha na tabela formacoes)
       const formacaoTexto = document.getElementById('formacao').value.trim();
       if (formacaoTexto && novoPsi) {
         await db.from('formacoes').insert({

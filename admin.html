@@ -539,6 +539,26 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         </div>
       </div>
 
+      <p class="field-section">Verificação profissional</p>
+      <div class="field">
+        <label>Link do e-Psi</label>
+        <input type="text" id="fEPsi" placeholder="https://e-psi.cfp.org.br/..." />
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Carteira do CRP</label>
+          <div id="linkDocCrp" style="font-size:13px;color:var(--malva)">Não enviado</div>
+        </div>
+        <div class="field">
+          <label>Certidão de inscrição</label>
+          <div id="linkDocCertidao" style="font-size:13px;color:var(--malva)">Não enviado</div>
+        </div>
+        <div class="field">
+          <label>Diploma</label>
+          <div id="linkDocDiploma" style="font-size:13px;color:var(--malva)">Não enviado</div>
+        </div>
+      </div>
+
       <p class="field-section">Atendimento</p>
       <div class="toggle-row">
         <div class="toggle-info"><p>Online</p><span>Videochamada</span></div>
@@ -1029,8 +1049,11 @@ function fecharModal() {
 
 function limparForm() {
   formacaoAtualId = null
-  const ids = ['fNome','fCrp','fEmail','fTelefone','fCidade','fBio','fFormacao','fSite','fValor']
+  const ids = ['fNome','fCrp','fEmail','fTelefone','fCidade','fBio','fFormacao','fSite','fValor','fEPsi']
   ids.forEach(id => document.getElementById(id).value = '')
+  document.getElementById('linkDocCrp').textContent = 'Não enviado'
+  document.getElementById('linkDocCertidao').textContent = 'Não enviado'
+  document.getElementById('linkDocDiploma').textContent = 'Não enviado'
   document.getElementById('fEstado').value = ''
   document.getElementById('fAbordagem').value = ''
   document.getElementById('fDuracao').value = '50'
@@ -1043,6 +1066,21 @@ function limparForm() {
   document.querySelectorAll('.tag-check').forEach(c => c.checked = false)
   document.getElementById('inputFoto').value = ''
   document.getElementById('fotoPreview').innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>`
+}
+
+async function carregarLinksDocumentos(p) {
+  const mapa = [
+    ['linkDocCrp', p.doc_crp_url],
+    ['linkDocCertidao', p.doc_certidao_url],
+    ['linkDocDiploma', p.doc_diploma_url],
+  ]
+  for (const [elId, path] of mapa) {
+    const el = document.getElementById(elId)
+    if (!path) { el.textContent = 'Não enviado'; el.removeAttribute('href'); continue }
+    const { data, error } = await sb.storage.from('documentos').createSignedUrl(path, 300) // 5 min
+    if (error || !data) { el.textContent = 'Erro ao gerar link'; continue }
+    el.innerHTML = `<a href="${data.signedUrl}" target="_blank" rel="noopener" style="color:var(--lila-700)">Ver documento ↗</a>`
+  }
 }
 
 function preencherForm(p) {
@@ -1064,6 +1102,8 @@ function preencherForm(p) {
   document.getElementById('fOnline').checked = p.modalidade === 'online' || p.modalidade === 'ambos'
   document.getElementById('fPresencial').checked = p.modalidade === 'presencial' || p.modalidade === 'ambos'
   document.getElementById('fAceita').checked = p.agenda_aberta ?? true
+  document.getElementById('fEPsi').value = p.e_psi_link || ''
+  carregarLinksDocumentos(p)
   document.querySelectorAll('.tag-check').forEach(c => c.checked = false)
   const labels = ['Ansiedade','Depressão','Trauma e TEPT','Luto','Relacionamentos','Autoestima','Burnout','Transtornos alimentares','Dependência química','TDAH','Infância e adolescência','LGBTQIA+','Psicologia do Esporte','Saúde da mulher','Obesidade e Bariátrica']
   ;(p.especialidades || []).forEach(esp => {
@@ -1118,6 +1158,7 @@ async function salvarPsicologo() {
     ativo: document.getElementById('fStatus').value === 'aprovado',
     modalidade: online && presencial ? 'ambos' : (online ? 'online' : 'presencial'),
     agenda_aberta: document.getElementById('fAceita').checked,
+    e_psi_link: document.getElementById('fEPsi').value.trim(),
   }
 
   if (!dados.nome || !dados.crp || !dados.email) {

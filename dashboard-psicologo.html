@@ -588,6 +588,37 @@
         <label class="toggle"><input type="checkbox" id="pfAgendaAberta" /><span class="toggle-slider"></span></label>
       </div>
 
+      <h3 style="font-size:15px;margin:28px 0 4px;color:#111827">Verificação profissional</h3>
+      <div class="form-group">
+        <label>Link do e-Psi</label>
+        <input type="text" id="pfEPsi" placeholder="https://e-psi.cfp.org.br/..." />
+      </div>
+
+      <div class="form-group">
+        <label>Carteira do CRP</label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span id="statusDocCrp" style="font-size:13px;color:#6b7280;">—</span>
+          <button class="btn-secundario" type="button" onclick="document.getElementById('pfDocCrp').click()">Enviar/atualizar</button>
+          <input type="file" id="pfDocCrp" accept="image/*,.pdf" style="display:none" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Certidão de inscrição no CRP</label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span id="statusDocCertidao" style="font-size:13px;color:#6b7280;">—</span>
+          <button class="btn-secundario" type="button" onclick="document.getElementById('pfDocCertidao').click()">Enviar/atualizar</button>
+          <input type="file" id="pfDocCertidao" accept="image/*,.pdf" style="display:none" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Diploma</label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span id="statusDocDiploma" style="font-size:13px;color:#6b7280;">—</span>
+          <button class="btn-secundario" type="button" onclick="document.getElementById('pfDocDiploma').click()">Enviar/atualizar</button>
+          <input type="file" id="pfDocDiploma" accept="image/*,.pdf" style="display:none" />
+        </div>
+      </div>
+
       <div style="margin-top:20px">
         <button class="btn-primary" id="btnSalvarPerfil">Salvar alterações</button>
         <div id="msgPerfil"></div>
@@ -764,6 +795,35 @@
   const ESPECIALIDADES_LABELS = ['Ansiedade','Depressão','Trauma e TEPT','Luto','Relacionamentos','Autoestima','Burnout','Transtornos alimentares','Dependência química','TDAH','Infância e adolescência','LGBTQIA+','Psicologia do Esporte','Saúde da mulher','Obesidade e Bariátrica'];
   let psicologoAtualId = null;
   let fotoArquivoPerfil = null;
+  let docCrpArquivo = null;
+  let docCertidaoArquivo = null;
+  let docDiplomaArquivo = null;
+
+  function atualizarStatusDoc(elId, url) {
+    document.getElementById(elId).textContent = url ? 'Enviado ✓' : 'Não enviado';
+  }
+
+  document.getElementById('pfDocCrp').addEventListener('change', (e) => {
+    docCrpArquivo = e.target.files[0] || null;
+    if (docCrpArquivo) document.getElementById('statusDocCrp').textContent = 'Selecionado — salve para enviar';
+  });
+  document.getElementById('pfDocCertidao').addEventListener('change', (e) => {
+    docCertidaoArquivo = e.target.files[0] || null;
+    if (docCertidaoArquivo) document.getElementById('statusDocCertidao').textContent = 'Selecionado — salve para enviar';
+  });
+  document.getElementById('pfDocDiploma').addEventListener('change', (e) => {
+    docDiplomaArquivo = e.target.files[0] || null;
+    if (docDiplomaArquivo) document.getElementById('statusDocDiploma').textContent = 'Selecionado — salve para enviar';
+  });
+
+  async function uploadDocumentoPerfil(arquivo, nomeCampo) {
+    if (!arquivo) return null;
+    const ext = arquivo.name.split('.').pop();
+    const path = `${psiId}/${nomeCampo}.${ext}`;
+    const { error } = await sb.storage.from('documentos').upload(path, arquivo, { upsert: true });
+    if (error) { console.error(error); return null; }
+    return path;
+  }
 
   function montarTagsEspecialidades() {
     const wrap = document.getElementById('pfEspecialidades');
@@ -795,6 +855,10 @@
     document.getElementById('pfOnline').checked = psi.modalidade === 'online' || psi.modalidade === 'ambos';
     document.getElementById('pfPresencial').checked = psi.modalidade === 'presencial' || psi.modalidade === 'ambos';
     document.getElementById('pfAgendaAberta').checked = psi.agenda_aberta ?? true;
+    document.getElementById('pfEPsi').value = psi.e_psi_link || '';
+    atualizarStatusDoc('statusDocCrp', psi.doc_crp_url);
+    atualizarStatusDoc('statusDocCertidao', psi.doc_certidao_url);
+    atualizarStatusDoc('statusDocDiploma', psi.doc_diploma_url);
 
     (psi.especialidades || []).forEach(esp => {
       const idx = ESPECIALIDADES_LABELS.indexOf(esp);
@@ -865,6 +929,7 @@
       duracao_sessao: Number(document.getElementById('pfDuracao').value),
       modalidade: online && presencial ? 'ambos' : (online ? 'online' : 'presencial'),
       agenda_aberta: document.getElementById('pfAgendaAberta').checked,
+      e_psi_link: document.getElementById('pfEPsi').value.trim(),
     };
 
     const { error } = await sb.from('psicologos').update(dados).eq('user_id', psiId);
@@ -880,6 +945,24 @@
     if (fotoArquivoPerfil && psicologoAtualId) {
       const fotoUrl = await uploadFotoPerfil(psicologoAtualId);
       if (fotoUrl) await sb.from('psicologos').update({ foto_url: fotoUrl }).eq('id', psicologoAtualId);
+    }
+
+    if (docCrpArquivo || docCertidaoArquivo || docDiplomaArquivo) {
+      const [caminhoCrp, caminhoCertidao, caminhoDiploma] = await Promise.all([
+        uploadDocumentoPerfil(docCrpArquivo, 'docCrp'),
+        uploadDocumentoPerfil(docCertidaoArquivo, 'docCertidao'),
+        uploadDocumentoPerfil(docDiplomaArquivo, 'docDiploma'),
+      ]);
+      const atualizacaoDocs = { documentos_enviados_em: new Date().toISOString() };
+      if (caminhoCrp) atualizacaoDocs.doc_crp_url = caminhoCrp;
+      if (caminhoCertidao) atualizacaoDocs.doc_certidao_url = caminhoCertidao;
+      if (caminhoDiploma) atualizacaoDocs.doc_diploma_url = caminhoDiploma;
+      await sb.from('psicologos').update(atualizacaoDocs).eq('user_id', psiId);
+
+      if (caminhoCrp) atualizarStatusDoc('statusDocCrp', caminhoCrp);
+      if (caminhoCertidao) atualizarStatusDoc('statusDocCertidao', caminhoCertidao);
+      if (caminhoDiploma) atualizarStatusDoc('statusDocDiploma', caminhoDiploma);
+      docCrpArquivo = null; docCertidaoArquivo = null; docDiplomaArquivo = null;
     }
 
     const formacaoTexto = document.getElementById('pfFormacao').value.trim();
