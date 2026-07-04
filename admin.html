@@ -567,6 +567,22 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         </div>
       </div>
 
+      <p class="field-section">Plano de parceria</p>
+      <div class="form-row">
+        <div class="field">
+          <label>Faixa</label>
+          <select id="fPlano">
+            <option value="fundador">Fundador (R$100)</option>
+            <option value="pioneiro">Pioneiro (R$120)</option>
+            <option value="padrao">Padrão (R$150)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Mensalidade travada (R$)</label>
+          <input type="number" id="fMensalidade" min="0" />
+        </div>
+      </div>
+
       <p class="field-section">Status</p>
       <div class="field">
         <label>Status do cadastro</label>
@@ -1018,6 +1034,8 @@ function limparForm() {
   document.getElementById('fEstado').value = ''
   document.getElementById('fAbordagem').value = ''
   document.getElementById('fDuracao').value = '50'
+  document.getElementById('fPlano').value = 'fundador'
+  document.getElementById('fMensalidade').value = ''
   document.getElementById('fStatus').value = 'aprovado'
   document.getElementById('fOnline').checked = true
   document.getElementById('fPresencial').checked = false
@@ -1040,6 +1058,8 @@ function preencherForm(p) {
   document.getElementById('fSite').value = p.site || ''
   document.getElementById('fValor').value = p.preco_exato || ''
   document.getElementById('fDuracao').value = p.duracao_sessao || '50'
+  document.getElementById('fPlano').value = p.plano || 'fundador'
+  document.getElementById('fMensalidade').value = p.mensalidade_plataforma ?? ''
   document.getElementById('fStatus').value = statusDe(p)
   document.getElementById('fOnline').checked = p.modalidade === 'online' || p.modalidade === 'ambos'
   document.getElementById('fPresencial').checked = p.modalidade === 'presencial' || p.modalidade === 'ambos'
@@ -1093,6 +1113,8 @@ async function salvarPsicologo() {
     site: document.getElementById('fSite').value.trim(),
     preco_exato: Number(document.getElementById('fValor').value) || null,
     duracao_sessao: Number(document.getElementById('fDuracao').value),
+    plano: document.getElementById('fPlano').value,
+    mensalidade_plataforma: Number(document.getElementById('fMensalidade').value) || null,
     ativo: document.getElementById('fStatus').value === 'aprovado',
     modalidade: online && presencial ? 'ambos' : (online ? 'online' : 'presencial'),
     agenda_aberta: document.getElementById('fAceita').checked,

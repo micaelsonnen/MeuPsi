@@ -643,6 +643,15 @@ async function enviarCadastro() {
       const duracaoTexto = document.getElementById('duracao').value; // ex: "50 minutos"
       const duracaoNum = parseInt(duracaoTexto, 10) || 50;
 
+      // Faixa de mensalidade travada no momento do cadastro — não muda depois,
+      // mesmo que contas de teste sejam apagadas do banco no futuro.
+      const { count: totalAntes } = await db.from('psicologos').select('id', { count: 'exact', head: true });
+      const posicao = (totalAntes || 0) + 1;
+      let plano, mensalidade;
+      if (posicao <= 100)      { plano = 'fundador';  mensalidade = 100; }
+      else if (posicao <= 200) { plano = 'pioneiro';  mensalidade = 120; }
+      else                     { plano = 'padrao';    mensalidade = 150; }
+
       const { data: novoPsi, error: dbError } = await db.from('psicologos').insert({
         user_id: user.id,
         email: email,
@@ -660,6 +669,8 @@ async function enviarCadastro() {
         duracao_sessao: duracaoNum,
         modalidade: modalidade,
         agenda_aberta: document.getElementById('agendaAberta').checked,
+        plano: plano,
+        mensalidade_plataforma: mensalidade,
         ativo: false // fica inativo até verificação do CRP
       }).select().single();
 
