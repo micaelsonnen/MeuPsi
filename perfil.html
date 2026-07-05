@@ -377,6 +377,7 @@ nav {
     await carregarPsicologo();
     await carregarFormacao();
     await carregarDisponibilidade();
+    await verificarCompatibilidadeConvenio();
     renderCalendario();
 
     document.getElementById('btnMesAnterior').addEventListener('click', () => {
@@ -392,10 +393,34 @@ nav {
     document.getElementById('btnConfirmar').addEventListener('click', confirmarAgendamento);
   }
 
+  async function verificarCompatibilidadeConvenio() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return; // visitante não logado — nada a verificar ainda
+
+    const { data: paciente } = await sb
+      .from('pacientes')
+      .select('instituicao:instituicoes(nome, valor_por_consulta)')
+      .eq('id', session.user.id)
+      .maybeSingle();
+
+    const instituicao = paciente?.instituicao;
+    if (!instituicao) return; // paciente particular, sem convênio — nada a avisar
+
+    const compativel = psicologoAtual?.aceita_convenio && psicologoAtual?.valor_minimo_convenio <= instituicao.valor_por_consulta;
+    if (!compativel) {
+      const aviso = document.createElement('div');
+      aviso.style.cssText = 'background:#fef3c7;color:#92400e;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;';
+      aviso.textContent = `Este psicólogo não atende o seu convênio (${instituicao.nome}). Você ainda pode agendar como paciente particular.`;
+      document.getElementById('pageContent').prepend(aviso);
+    }
+  }
+
+  let psicologoAtual = null;
+
   async function carregarPsicologo() {
     const { data: p, error } = await sb
       .from('psicologos')
-      .select('id, nome, crp, bio, especialidade, especialidades, abordagem, modalidade, cidade, preco_faixa, foto_url')
+      .select('id, nome, crp, bio, especialidade, especialidades, abordagem, modalidade, cidade, preco_faixa, foto_url, aceita_convenio, valor_minimo_convenio')
       .eq('id', psicologoId)
       .single();
 
@@ -403,6 +428,8 @@ nav {
       document.getElementById('pageContent').innerHTML = '<p style="padding:2rem;">Psicólogo não encontrado.</p>';
       throw new Error('psicologo nao encontrado');
     }
+
+    psicologoAtual = p;
 
     function esc(str) {
       if (str === null || str === undefined) return '';

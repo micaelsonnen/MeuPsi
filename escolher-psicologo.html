@@ -72,6 +72,7 @@
   <div class="logo">MeuPsi</div>
   <div class="subtitle">Escolha o psicólogo que vai te acompanhar.</div>
   <div id="msgTopo" class="msg-topo" style="display:none"></div>
+  <div id="bannerConvenio" style="display:none;background:#f5f3ff;color:#6b21a8;border-radius:10px;padding:10px 16px;margin-bottom:16px;font-size:13px;font-weight:500;"></div>
   <div class="grid" id="grid">
     <div class="empty">Carregando psicólogos…</div>
   </div>
@@ -84,6 +85,7 @@
   const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
   let pacienteId = null;
   let pacienteNome = null;
+  let instituicaoPaciente = null;
   let pacienteEmail = null;
   let pacienteTelefone = null;
 
@@ -104,20 +106,43 @@
     pacienteEmail = usuario?.email || session.user.email || null;
     pacienteTelefone = usuario?.telefone || null;
 
+    // Verifica se o paciente tem convênio — se tiver, só mostra psicólogos compatíveis
+    const { data: paciente } = await sb
+      .from('pacientes')
+      .select('instituicao:instituicoes(id, nome, valor_por_consulta)')
+      .eq('id', pacienteId)
+      .maybeSingle();
+
+    instituicaoPaciente = paciente?.instituicao || null;
+
+    const banner = document.getElementById('bannerConvenio');
+    if (instituicaoPaciente) {
+      banner.style.display = 'block';
+      banner.textContent = `Mostrando psicólogos que atendem seu convênio: ${instituicaoPaciente.nome}`;
+    }
+
     await carregarPsicologos();
   }
 
   async function carregarPsicologos() {
-    const { data, error } = await sb
+    let query = sb
       .from('psicologos')
-      .select('id, nome, crp, bio, especialidade, cidade, modalidade, preco_faixa, foto_url')
+      .select('id, nome, crp, bio, especialidade, cidade, modalidade, preco_faixa, foto_url, aceita_convenio, valor_minimo_convenio')
       .eq('ativo', true)
       .order('nome');
+
+    if (instituicaoPaciente) {
+      query = query.eq('aceita_convenio', true).lte('valor_minimo_convenio', instituicaoPaciente.valor_por_consulta);
+    }
+
+    const { data, error } = await query;
 
     const grid = document.getElementById('grid');
 
     if (error || !data?.length) {
-      grid.innerHTML = '<div class="empty">Nenhum psicólogo disponível no momento.</div>';
+      grid.innerHTML = instituicaoPaciente
+        ? `<div class="empty">Nenhum psicólogo disponível para o convênio ${esc(instituicaoPaciente.nome)} no momento.</div>`
+        : '<div class="empty">Nenhum psicólogo disponível no momento.</div>';
       return;
     }
 
@@ -135,7 +160,7 @@
           ${p.especialidade ? `<span class="tag">${esc(p.especialidade)}</span>` : ''}
           ${p.modalidade ? `<span class="tag">${esc(p.modalidade)}</span>` : ''}
           ${p.cidade ? `<span class="tag">${esc(p.cidade)}</span>` : ''}
-          ${p.preco_faixa ? `<span class="tag">${esc(p.preco_faixa)}</span>` : ''}
+          ${instituicaoPaciente ? `<span class="tag">Atende seu convênio</span>` : (p.preco_faixa ? `<span class="tag">${esc(p.preco_faixa)}</span>` : '')}
         </div>
         <button class="btn-escolher" data-id="${p.id}">Escolher</button>
       </div>
