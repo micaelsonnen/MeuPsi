@@ -240,6 +240,10 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         Pacientes
       </div>
+      <div class="nav-item" onclick="irPara('instituicoes')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4M9 9v.01M9 12v.01M9 15v.01"/></svg>
+        Instituições
+      </div>
       <div class="nav-item" onclick="irPara('pendentes')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
         Pendentes
@@ -351,13 +355,43 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
                 <th>Paciente</th>
                 <th>Telefone</th>
                 <th>Psicólogo vinculado</th>
+                <th>Convênio</th>
                 <th>Status</th>
                 <th>Desde</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody id="tabelaPacientesAdmin">
-              <tr><td colspan="6" class="empty-state">Carregando…</td></tr>
+              <tr><td colspan="7" class="empty-state">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSTITUIÇÕES -->
+    <div class="pagina" id="pagInstituicoes">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Instituições</h1>
+          <p class="page-sub">Planos de saúde e empresas parceiras para atendimento por convênio</p>
+        </div>
+        <button class="btn btn-lila" onclick="abrirModalInstituicao()">+ Nova instituição</button>
+      </div>
+      <div class="card">
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Valor por consulta</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaInstituicoes">
+              <tr><td colspan="5" class="empty-state">Carregando…</td></tr>
             </tbody>
           </table>
         </div>
@@ -656,6 +690,12 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
           <option value="inativo">Inativo</option>
         </select>
       </div>
+      <div class="field">
+        <label>Convênio</label>
+        <select id="pfaInstituicao">
+          <option value="">Particular (sem convênio)</option>
+        </select>
+      </div>
       <p style="font-size:12px;color:var(--malva);margin-top:12px">
         A anamnese e o histórico clínico deste paciente ficam sob sigilo do psicólogo responsável e não são editáveis por aqui.
       </p>
@@ -663,6 +703,53 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="fecharModalPaciente()">Cancelar</button>
       <button class="btn btn-lila" onclick="salvarPaciente()" id="btnSalvarPaciente">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INSTITUIÇÃO -->
+<div class="modal-overlay" id="modalInstituicao">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h2 class="modal-title" id="tituloModalInstituicao">Nova instituição</h2>
+      <button class="modal-close" onclick="fecharModalInstituicao()">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="instEditandoId" />
+      <div class="field">
+        <label>Nome *</label>
+        <input type="text" id="instNome" placeholder="Bradesco Saúde" />
+      </div>
+      <div class="field">
+        <label>Tipo</label>
+        <select id="instTipo">
+          <option value="plano_saude">Plano de saúde</option>
+          <option value="empresa">Empresa parceira</option>
+          <option value="clinica">Clínica</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>CNPJ</label>
+        <input type="text" id="instCnpj" placeholder="00.000.000/0001-00" />
+      </div>
+      <div class="field">
+        <label>Valor pago por consulta (R$) *</label>
+        <input type="number" id="instValor" min="0" placeholder="50" />
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select id="instAtivo">
+          <option value="true">Ativa</option>
+          <option value="false">Inativa</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="modal-footer-left">
+        <button class="btn btn-danger" id="btnExcluirInstituicao" onclick="excluirInstituicao()" style="display:none">Excluir</button>
+      </div>
+      <button class="btn btn-ghost" onclick="fecharModalInstituicao()">Cancelar</button>
+      <button class="btn btn-lila" onclick="salvarInstituicao()" id="btnSalvarInstituicao">Salvar</button>
     </div>
   </div>
 </div>
@@ -739,6 +826,7 @@ function irPara(pag) {
   event.currentTarget.classList.add('ativo')
   if (pag === 'psicologos') renderTabela(psicologos)
   if (pag === 'pacientes') carregarPacientesAdmin()
+  if (pag === 'instituicoes') carregarInstituicoes()
   if (pag === 'pendentes') renderPendentes()
   if (pag === 'agendamentos') carregarAgendamentos()
 }
@@ -831,7 +919,7 @@ let pacientesAdmin = []
 async function carregarPacientesAdmin() {
   const { data, error } = await sb
     .from('pacientes')
-    .select('id, nome, email, telefone, status, criado_em, psicologo:psicologos(nome)')
+    .select('id, nome, email, telefone, status, criado_em, instituicao_id, psicologo:psicologos(nome), instituicao:instituicoes(nome)')
     .order('criado_em', { ascending: false })
   pacientesAdmin = (!error && data) ? data : []
   renderTabelaPacientes(pacientesAdmin)
@@ -840,7 +928,7 @@ async function carregarPacientesAdmin() {
 function renderTabelaPacientes(lista) {
   const tbody = document.getElementById('tabelaPacientesAdmin')
   if (!lista.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Nenhum paciente cadastrado</td></tr>'
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Nenhum paciente cadastrado</td></tr>'
     return
   }
   tbody.innerHTML = lista.map(p => `
@@ -856,6 +944,7 @@ function renderTabelaPacientes(lista) {
       </td>
       <td>${esc(p.telefone) || '—'}</td>
       <td>${esc(p.psicologo?.nome) || '—'}</td>
+      <td>${esc(p.instituicao?.nome) || 'Particular'}</td>
       <td><span class="badge badge-${p.status === 'ativo' ? 'aprovado' : 'pendente'}">${p.status || 'pendente'}</span></td>
       <td>${p.criado_em ? new Date(p.criado_em).toLocaleDateString('pt-BR') : '—'}</td>
       <td>
@@ -875,14 +964,21 @@ function filtrarTabelaPacientes(busca) {
   renderTabelaPacientes(filtrado)
 }
 
-function abrirModalPaciente(id) {
+async function abrirModalPaciente(id) {
   const p = pacientesAdmin.find(x => x.id === id)
   if (!p) return
+  if (!instituicoes.length) await carregarInstituicoes()
   document.getElementById('pacEditandoId').value = id
   document.getElementById('pfaNome').value = p.nome || ''
   document.getElementById('pfaEmail').value = p.email || ''
   document.getElementById('pfaTelefone').value = p.telefone || ''
   document.getElementById('pfaStatus').value = p.status || 'pendente'
+
+  const selInst = document.getElementById('pfaInstituicao')
+  selInst.innerHTML = '<option value="">Particular (sem convênio)</option>' +
+    instituicoes.map(i => `<option value="${i.id}">${i.nome}</option>`).join('')
+  selInst.value = p.instituicao_id || ''
+
   document.getElementById('modalPaciente').classList.add('aberto')
 }
 
@@ -897,6 +993,7 @@ async function salvarPaciente() {
     email: document.getElementById('pfaEmail').value.trim(),
     telefone: document.getElementById('pfaTelefone').value.trim(),
     status: document.getElementById('pfaStatus').value,
+    instituicao_id: document.getElementById('pfaInstituicao').value || null,
   }
   const btn = document.getElementById('btnSalvarPaciente')
   btn.disabled = true
@@ -923,6 +1020,113 @@ async function excluirPaciente(id, nome) {
     return
   }
   await carregarPacientesAdmin()
+}
+
+// ── INSTITUIÇÕES (convênio) ─────────────────────────────────
+let instituicoes = []
+
+async function carregarInstituicoes() {
+  const { data, error } = await sb.from('instituicoes').select('*').order('nome')
+  instituicoes = (!error && data) ? data : []
+  renderTabelaInstituicoes(instituicoes)
+}
+
+function renderTabelaInstituicoes(lista) {
+  const tbody = document.getElementById('tabelaInstituicoes')
+  if (!lista.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhuma instituição cadastrada</td></tr>'
+    return
+  }
+  const tipoLabel = { plano_saude: 'Plano de saúde', empresa: 'Empresa parceira', clinica: 'Clínica' }
+  tbody.innerHTML = lista.map(i => `
+    <tr>
+      <td><strong>${i.nome}</strong></td>
+      <td>${tipoLabel[i.tipo] || i.tipo}</td>
+      <td>R$ ${Number(i.valor_por_consulta).toFixed(2)}</td>
+      <td><span class="badge badge-${i.ativo ? 'aprovado' : 'pendente'}">${i.ativo ? 'Ativa' : 'Inativa'}</span></td>
+      <td>
+        <div class="acoes">
+          <button class="btn btn-ghost btn-sm" onclick="abrirModalInstituicao('${i.id}')">Editar</button>
+        </div>
+      </td>
+    </tr>`).join('')
+}
+
+function abrirModalInstituicao(id) {
+  document.getElementById('instEditandoId').value = id || ''
+  document.getElementById('btnExcluirInstituicao').style.display = id ? 'inline-flex' : 'none'
+  document.getElementById('tituloModalInstituicao').textContent = id ? 'Editar instituição' : 'Nova instituição'
+
+  if (id) {
+    const inst = instituicoes.find(x => x.id === id)
+    document.getElementById('instNome').value = inst?.nome || ''
+    document.getElementById('instTipo').value = inst?.tipo || 'plano_saude'
+    document.getElementById('instCnpj').value = inst?.cnpj || ''
+    document.getElementById('instValor').value = inst?.valor_por_consulta || ''
+    document.getElementById('instAtivo').value = String(inst?.ativo ?? true)
+  } else {
+    document.getElementById('instNome').value = ''
+    document.getElementById('instTipo').value = 'plano_saude'
+    document.getElementById('instCnpj').value = ''
+    document.getElementById('instValor').value = ''
+    document.getElementById('instAtivo').value = 'true'
+  }
+  document.getElementById('modalInstituicao').classList.add('aberto')
+}
+
+function fecharModalInstituicao() {
+  document.getElementById('modalInstituicao').classList.remove('aberto')
+}
+
+async function salvarInstituicao() {
+  const id = document.getElementById('instEditandoId').value
+  const nome = document.getElementById('instNome').value.trim()
+  const valor = Number(document.getElementById('instValor').value)
+
+  if (!nome || !valor) {
+    alert('Nome e valor por consulta são obrigatórios.')
+    return
+  }
+
+  const dados = {
+    nome,
+    tipo: document.getElementById('instTipo').value,
+    cnpj: document.getElementById('instCnpj').value.trim() || null,
+    valor_por_consulta: valor,
+    ativo: document.getElementById('instAtivo').value === 'true',
+  }
+
+  const btn = document.getElementById('btnSalvarInstituicao')
+  btn.disabled = true
+  btn.textContent = 'Salvando...'
+
+  const { error } = id
+    ? await sb.from('instituicoes').update(dados).eq('id', id)
+    : await sb.from('instituicoes').insert(dados)
+
+  btn.disabled = false
+  btn.textContent = 'Salvar'
+
+  if (error) {
+    alert('Erro ao salvar: ' + error.message)
+    return
+  }
+  fecharModalInstituicao()
+  await carregarInstituicoes()
+}
+
+async function excluirInstituicao() {
+  const id = document.getElementById('instEditandoId').value
+  if (!id) return
+  if (!confirm('Excluir esta instituição permanentemente? Pacientes vinculados a ela ficarão sem convênio definido. Não pode ser desfeito.')) return
+
+  const { error } = await sb.from('instituicoes').delete().eq('id', id)
+  if (error) {
+    alert('Não foi possível excluir: ' + error.message)
+    return
+  }
+  fecharModalInstituicao()
+  await carregarInstituicoes()
 }
 
 // ── PENDENTES ───────────────────────────────────────────────

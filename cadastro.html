@@ -463,6 +463,18 @@ input.invalid, select.invalid { border-color: #F87171; }
           <label class="toggle"><input type="checkbox" id="agendaAberta" checked /><span class="toggle-slider"></span></label>
         </div>
       </div>
+
+      <div class="field">
+        <label>Atende convênio/plano de saúde?</label>
+        <div class="toggle-row">
+          <div class="toggle-info"><p>Aceito pacientes de convênio</p><span>A plataforma só encaminha pacientes de convênios que paguem o valor mínimo abaixo</span></div>
+          <label class="toggle"><input type="checkbox" id="aceitaConvenio" /><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+      <div class="field" id="campoValorMinimo" style="display:none">
+        <label>Valor mínimo por consulta de convênio (R$)</label>
+        <input type="number" id="valorMinimoConvenio" min="0" placeholder="50" />
+      </div>
     </div>
 
     <div class="form-nav">
@@ -551,6 +563,10 @@ input.invalid, select.invalid { border-color: #F87171; }
 const SUPA_URL = 'https://ipjdmdjlrnfqtnqfnydn.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
 const db = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+document.getElementById('aceitaConvenio').addEventListener('change', (e) => {
+  document.getElementById('campoValorMinimo').style.display = e.target.checked ? 'block' : 'none';
+});
 
 let stepAtual = 1;
 
@@ -753,6 +769,10 @@ async function enviarCadastro() {
         plano: plano,
         mensalidade_plataforma: mensalidade,
         e_psi_link: document.getElementById('ePsiLink').value.trim(),
+        aceita_convenio: document.getElementById('aceitaConvenio').checked,
+        valor_minimo_convenio: document.getElementById('aceitaConvenio').checked
+          ? (Number(document.getElementById('valorMinimoConvenio').value) || null)
+          : null,
         ativo: false // fica inativo até verificação do CRP
       }).select().single();
 

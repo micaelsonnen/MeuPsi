@@ -587,6 +587,14 @@
         <p>Aceita novos pacientes</p>
         <label class="toggle"><input type="checkbox" id="pfAgendaAberta" /><span class="toggle-slider"></span></label>
       </div>
+      <div class="toggle-row">
+        <p>Atende convênio/plano de saúde</p>
+        <label class="toggle"><input type="checkbox" id="pfAceitaConvenio" /><span class="toggle-slider"></span></label>
+      </div>
+      <div class="form-group" id="campoValorMinimoPerfil" style="display:none">
+        <label>Valor mínimo por consulta de convênio (R$)</label>
+        <input type="number" id="pfValorMinimoConvenio" min="0" />
+      </div>
 
       <h3 style="font-size:15px;margin:28px 0 4px;color:#111827">Verificação profissional</h3>
       <div class="form-group">
@@ -855,6 +863,9 @@
     document.getElementById('pfOnline').checked = psi.modalidade === 'online' || psi.modalidade === 'ambos';
     document.getElementById('pfPresencial').checked = psi.modalidade === 'presencial' || psi.modalidade === 'ambos';
     document.getElementById('pfAgendaAberta').checked = psi.agenda_aberta ?? true;
+    document.getElementById('pfAceitaConvenio').checked = psi.aceita_convenio ?? false;
+    document.getElementById('pfValorMinimoConvenio').value = psi.valor_minimo_convenio ?? '';
+    document.getElementById('campoValorMinimoPerfil').style.display = psi.aceita_convenio ? 'block' : 'none';
     document.getElementById('pfEPsi').value = psi.e_psi_link || '';
     atualizarStatusDoc('statusDocCrp', psi.doc_crp_url);
     atualizarStatusDoc('statusDocCertidao', psi.doc_certidao_url);
@@ -875,6 +886,10 @@
       document.getElementById('pfFormacao').value = formacoes[0].titulo || '';
     }
   }
+
+  document.getElementById('pfAceitaConvenio').addEventListener('change', (e) => {
+    document.getElementById('campoValorMinimoPerfil').style.display = e.target.checked ? 'block' : 'none';
+  });
 
   document.getElementById('btnEscolherFoto').addEventListener('click', () => {
     document.getElementById('inputFotoPerfil').click();
@@ -930,6 +945,10 @@
       modalidade: online && presencial ? 'ambos' : (online ? 'online' : 'presencial'),
       agenda_aberta: document.getElementById('pfAgendaAberta').checked,
       e_psi_link: document.getElementById('pfEPsi').value.trim(),
+      aceita_convenio: document.getElementById('pfAceitaConvenio').checked,
+      valor_minimo_convenio: document.getElementById('pfAceitaConvenio').checked
+        ? (Number(document.getElementById('pfValorMinimoConvenio').value) || null)
+        : null,
     };
 
     const { error } = await sb.from('psicologos').update(dados).eq('user_id', psiId);

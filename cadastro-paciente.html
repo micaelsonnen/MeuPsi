@@ -62,6 +62,11 @@
   <label>Senha</label>
   <input type="password" id="senha" placeholder="Mínimo 6 caracteres" />
 
+  <label>Convênio</label>
+  <select id="instituicao">
+    <option value="">Particular (sem convênio)</option>
+  </select>
+
   <label style="display:flex;align-items:flex-start;gap:8px;font-weight:400;cursor:pointer;margin-bottom:16px;">
     <input type="checkbox" id="aceiteTermos" style="width:auto;margin:2px 0 0;" />
     <span>Li e concordo com os <a href="termos.html" target="_blank" style="color:#7c3aed;">Termos de Uso</a> e a <a href="privacidade.html" target="_blank" style="color:#7c3aed;">Política de Privacidade</a>.</span>
@@ -78,6 +83,15 @@
   const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwamRtZGpscm5mcXRucWZueWRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3MDc2MzksImV4cCI6MjA5ODI4MzYzOX0.j6YiDE_s7RO7p2Qy80jiSqSx9M24UIIbLcA9IrNecI8';
 
   const sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+
+  async function carregarInstituicoes() {
+    const { data, error } = await sb.from('instituicoes').select('id, nome').eq('ativo', true).order('nome');
+    if (error || !data) return;
+    const sel = document.getElementById('instituicao');
+    sel.innerHTML = '<option value="">Particular (sem convênio)</option>' +
+      data.map(i => `<option value="${i.id}">${i.nome}</option>`).join('');
+  }
+  carregarInstituicoes();
 
   document.getElementById('btnCadastrar').addEventListener('click', async () => {
     const nome = document.getElementById('nome').value.trim();
@@ -147,6 +161,18 @@
       btn.textContent = 'Criar conta';
       return;
     }
+
+    // Já registra o convênio escolhido (se houver) — o vínculo com
+    // psicólogo é feito depois, em escolher-psicologo.html
+    const instituicaoId = document.getElementById('instituicao').value || null;
+    await sb.from('pacientes').upsert({
+      id: uid,
+      nome,
+      email,
+      telefone: telefone || null,
+      instituicao_id: instituicaoId,
+      status: 'pendente',
+    }, { onConflict: 'id' });
 
     // Registro formal de consentimento (não bloqueia o cadastro se falhar)
     try {
