@@ -261,6 +261,10 @@
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
     Prontuário
   </a>
+  <a class="nav-item" data-section="secFinanceiro" href="#">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 12v-2m9-4a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    Financeiro
+  </a>
   <a class="nav-item" data-section="secPerfil" href="#">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
     Meu Perfil
@@ -462,6 +466,55 @@
         </div>
       </div>
     </div>
+    </div>
+  </section>
+
+  <!-- ========== SEÇÃO: FINANCEIRO ========== -->
+  <section class="section" id="secFinanceiro">
+    <div class="page-header">
+      <h1>Financeiro</h1>
+      <p>Valores das suas sessões, separados por particular e convênio.</p>
+    </div>
+
+    <div class="metrics">
+      <div class="metric-card">
+        <div class="metric-label">A receber — Particular</div>
+        <div class="metric-value" id="finTotalParticular">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">A receber — Convênio</div>
+        <div class="metric-value" id="finTotalConvenio">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Total geral</div>
+        <div class="metric-value" id="finTotalGeral">—</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">
+        Sessões realizadas
+        <select id="finFiltroMes" style="width:auto;padding:6px 10px;font-size:13px;border-radius:8px;border:1.5px solid #e5e7eb;">
+          <option value="todos">Todos os meses</option>
+        </select>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="text-align:left;font-size:12px;color:#6b7280;border-bottom:1px solid #f3f4f6;">
+              <th style="padding:8px 6px;">Data</th>
+              <th style="padding:8px 6px;">Paciente</th>
+              <th style="padding:8px 6px;">Tipo</th>
+              <th style="padding:8px 6px;">Valor</th>
+              <th style="padding:8px 6px;">Pagamento</th>
+              <th style="padding:8px 6px;"></th>
+            </tr>
+          </thead>
+          <tbody id="tabelaFinanceiro">
+            <tr><td colspan="6" class="empty">Carregando…</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </section>
 
@@ -677,22 +730,6 @@
       <option value="falta_nao_avisada">Falta sem aviso</option>
     </select>
 
-    <div id="bannerTipoAtendimento" style="font-size:12.5px;background:#f5f3ff;color:#6b21a8;border-radius:8px;padding:8px 12px;margin:10px 0;"></div>
-
-    <div class="form-row-2">
-      <div>
-        <label>Tipo de atendimento</label>
-        <select id="sTipoAtendimento">
-          <option value="particular">Particular</option>
-          <option value="convenio">Convênio</option>
-        </select>
-      </div>
-      <div>
-        <label>Valor da sessão (R$)</label>
-        <input type="number" id="sValor" min="0" step="0.01" />
-      </div>
-    </div>
-
     <label>Resumo da evolução clínica</label>
     <textarea id="sResumo" rows="3" placeholder="Como foi a sessão, o que foi trabalhado..."></textarea>
 
@@ -786,6 +823,7 @@
     await carregarPacientes();
     await carregarAgenda();
     await carregarPerfil();
+    await carregarFinanceiro();
 
     // Navegação entre seções
     document.querySelectorAll('.nav-item[data-section]').forEach(link => {
@@ -814,6 +852,81 @@
       }
     });
   }
+
+  /* ========== FINANCEIRO ========== */
+  let sessoesFinanceiroCache = [];
+
+  async function carregarFinanceiro() {
+    const { data, error } = await sb
+      .from('sessoes')
+      .select('id, data_hora, valor_psicologo, tipo_atendimento, status, status_pagamento, pacientes(nome)')
+      .eq('psicologo_id', psicologoAtualId)
+      .eq('status', 'realizada')
+      .order('data_hora', { ascending: false });
+
+    sessoesFinanceiroCache = (!error && data) ? data : [];
+    montarFiltroMeses(sessoesFinanceiroCache);
+    renderFinanceiro(sessoesFinanceiroCache);
+  }
+
+  function montarFiltroMeses(sessoes) {
+    const sel = document.getElementById('finFiltroMes');
+    const meses = [...new Set(sessoes.map(s => s.data_hora.slice(0, 7)))].sort().reverse();
+    sel.innerHTML = '<option value="todos">Todos os meses</option>' +
+      meses.map(m => {
+        const [ano, mes] = m.split('-');
+        const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+        return `<option value="${m}">${nomeMes}</option>`;
+      }).join('');
+  }
+
+  document.getElementById('finFiltroMes').addEventListener('change', (e) => {
+    const valor = e.target.value;
+    const filtrado = valor === 'todos'
+      ? sessoesFinanceiroCache
+      : sessoesFinanceiroCache.filter(s => s.data_hora.slice(0, 7) === valor);
+    renderFinanceiro(filtrado);
+  });
+
+  function renderFinanceiro(sessoes) {
+    const particular = sessoes.filter(s => s.tipo_atendimento !== 'convenio');
+    const convenio = sessoes.filter(s => s.tipo_atendimento === 'convenio');
+
+    const somaParticular = particular.reduce((acc, s) => acc + (Number(s.valor_psicologo) || 0), 0);
+    const somaConvenio = convenio.reduce((acc, s) => acc + (Number(s.valor_psicologo) || 0), 0);
+
+    document.getElementById('finTotalParticular').textContent = 'R$ ' + somaParticular.toFixed(2);
+    document.getElementById('finTotalConvenio').textContent = 'R$ ' + somaConvenio.toFixed(2);
+    document.getElementById('finTotalGeral').textContent = 'R$ ' + (somaParticular + somaConvenio).toFixed(2);
+
+    const tbody = document.getElementById('tabelaFinanceiro');
+    if (!sessoes.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhuma sessão realizada neste período.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = sessoes.map(s => `
+      <tr style="border-bottom:1px solid #f9fafb;font-size:13px;">
+        <td style="padding:10px 6px;">${new Date(s.data_hora).toLocaleDateString('pt-BR')}</td>
+        <td style="padding:10px 6px;">${esc(s.pacientes?.nome) || '—'}</td>
+        <td style="padding:10px 6px;">${s.tipo_atendimento === 'convenio' ? 'Convênio' : 'Particular'}</td>
+        <td style="padding:10px 6px;">R$ ${Number(s.valor_psicologo || 0).toFixed(2)}</td>
+        <td style="padding:10px 6px;">
+          <span class="badge badge-${s.status_pagamento === 'pago' ? 'ativo' : 'pendente'}">${s.status_pagamento === 'pago' ? 'Pago' : 'Pendente'}</span>
+        </td>
+        <td style="padding:10px 6px;">
+          ${s.status_pagamento !== 'pago' ? `<button class="btn-secundario" onclick="marcarComoPago('${s.id}')">Marcar como pago</button>` : ''}
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function marcarComoPago(sessaoId) {
+    const { error } = await sb.from('sessoes').update({ status_pagamento: 'pago' }).eq('id', sessaoId);
+    if (error) { alert('Erro ao atualizar: ' + error.message); return; }
+    await carregarFinanceiro();
+  }
+  window.marcarComoPago = marcarComoPago;
 
   /* ========== MEU PERFIL ========== */
   const ESPECIALIDADES_LABELS = ['Ansiedade','Depressão','Trauma e TEPT','Luto','Relacionamentos','Autoestima','Burnout','Transtornos alimentares','Dependência química','TDAH','Infância e adolescência','LGBTQIA+','Psicologia do Esporte','Saúde da mulher','Obesidade e Bariátrica'];
@@ -862,7 +975,6 @@
 
     const { data: psi, error } = await sb.from('psicologos').select('*').eq('user_id', psiId).maybeSingle();
     if (error || !psi) return;
-    psicologoPrecoExato = psi.preco_exato ?? null;
 
     psicologoAtualId = psi.id;
 
@@ -1024,7 +1136,7 @@
   async function carregarPacientes() {
     const { data: pacientes, error } = await sb
       .from('pacientes')
-      .select('*, instituicao:instituicoes(nome, valor_por_consulta)')
+      .select('*')
       .eq('psicologo_id', psicologoAtualId)
       .order('criado_em', { ascending: false });
 
@@ -1062,8 +1174,6 @@
 
   /* ========== PRONTUÁRIO ========== */
   let pacienteAtualId = null;
-  let pacienteAtualObj = null;
-  let psicologoPrecoExato = null;
   let sessoesCache = [];
   let chartSintomas, chartAdesao, chartFuncionamento;
 
@@ -1085,7 +1195,6 @@
     const p = pacientesCache.find(x => x.id === pacienteId);
     if (!p) return;
     pacienteAtualId = pacienteId;
-    pacienteAtualObj = p;
 
     document.getElementById('pHeaderNome').textContent = p.nome ?? '—';
     const idade = p.data_nascimento ? calcularIdade(p.data_nascimento) : null;
@@ -1217,8 +1326,6 @@
         <div class="ti-top">
           <span class="ti-data">${new Date(s.data_hora).toLocaleDateString('pt-BR')} · ${new Date(s.data_hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
           <span class="badge badge-${s.status === 'realizada' ? 'concluido' : 'cancelado'}">${formatarStatusSessao(s.status)}</span>
-          ${s.tipo_atendimento === 'convenio' ? '<span class="badge" style="background:#ede9fe;color:#5b21b6">Convênio</span>' : '<span class="badge" style="background:#f3f4f6;color:#4b5563">Particular</span>'}
-          ${s.valor_psicologo != null ? `<span class="ti-score">R$ ${Number(s.valor_psicologo).toFixed(2)}</span>` : ''}
           ${s.intercorrencia ? '<span class="badge badge-intercorrencia">Intercorrência</span>' : ''}
         </div>
         <div class="ti-resumo">${esc(s.resumo_sessao) || 'Sem resumo registrado.'}</div>
@@ -1323,42 +1430,8 @@
     const agora = new Date();
     document.getElementById('sData').value = agora.toISOString().slice(0, 10);
     document.getElementById('sHora').value = agora.toTimeString().slice(0, 5);
-
-    const temConvenio = !!pacienteAtualObj?.instituicao_id;
-    const tipoSelect = document.getElementById('sTipoAtendimento');
-    tipoSelect.value = temConvenio ? 'convenio' : 'particular';
-
-    const banner = document.getElementById('bannerTipoAtendimento');
-    banner.textContent = temConvenio
-      ? `Paciente vinculado ao convênio ${pacienteAtualObj.instituicao?.nome || ''}. Em caso de falta, o convênio não repassa valor ao psicólogo.`
-      : 'Paciente particular.';
-
-    atualizarValorSessao();
     document.getElementById('modalRegistrarSessao').classList.add('open');
   });
-
-  function atualizarValorSessao() {
-    const tipo = document.getElementById('sTipoAtendimento').value;
-    const status = document.getElementById('sStatus').value;
-    const campoValor = document.getElementById('sValor');
-
-    if (tipo === 'convenio') {
-      if (status !== 'realizada') {
-        campoValor.value = 0;
-        campoValor.disabled = true;
-      } else {
-        campoValor.disabled = false;
-        campoValor.value = pacienteAtualObj?.instituicao?.valor_por_consulta ?? '';
-      }
-    } else {
-      campoValor.disabled = false;
-      if (!campoValor.value) campoValor.value = psicologoPrecoExato ?? '';
-    }
-  }
-
-  document.getElementById('sTipoAtendimento').addEventListener('change', atualizarValorSessao);
-  document.getElementById('sStatus').addEventListener('change', atualizarValorSessao);
-
   document.getElementById('btnCancelarSessao').addEventListener('click', () => {
     document.getElementById('modalRegistrarSessao').classList.remove('open');
   });
@@ -1382,12 +1455,6 @@
       tarefa_casa: document.getElementById('sTarefaCasa').value.trim() || null,
       plano_proxima_sessao: document.getElementById('sPlanoProximo').value.trim() || null,
       intercorrencia: document.getElementById('sIntercorrencia').checked,
-      tipo_atendimento: document.getElementById('sTipoAtendimento').value,
-      instituicao_id: document.getElementById('sTipoAtendimento').value === 'convenio'
-        ? (pacienteAtualObj?.instituicao_id || null)
-        : null,
-      valor_psicologo: document.getElementById('sValor').value !== '' ? Number(document.getElementById('sValor').value) : null,
-      status_pagamento: 'pendente',
     };
 
     if (status === 'realizada') {
@@ -1408,8 +1475,6 @@
     document.getElementById('sTarefaCasa').value = '';
     document.getElementById('sPlanoProximo').value = '';
     document.getElementById('sIntercorrencia').checked = false;
-    document.getElementById('sValor').value = '';
-    document.getElementById('sValor').disabled = false;
 
     await carregarSessoesPaciente(pacienteAtualId);
   });
