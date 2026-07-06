@@ -730,6 +730,20 @@
       <option value="falta_nao_avisada">Falta sem aviso</option>
     </select>
 
+    <div class="form-row-2">
+      <div>
+        <label>Tipo de atendimento</label>
+        <select id="sTipoAtendimento">
+          <option value="particular">Particular</option>
+          <option value="convenio">Convênio</option>
+        </select>
+      </div>
+      <div>
+        <label>Valor da sessão (R$)</label>
+        <input type="number" id="sValor" min="0" step="0.01" />
+      </div>
+    </div>
+
     <label>Resumo da evolução clínica</label>
     <textarea id="sResumo" rows="3" placeholder="Como foi a sessão, o que foi trabalhado..."></textarea>
 
@@ -977,6 +991,9 @@
     if (error || !psi) return;
 
     psicologoAtualId = psi.id;
+    psicologoPrecoExato = psi.preco_exato ?? null;
+    psicologoAceitaConvenio = psi.aceita_convenio ?? false;
+    psicologoValorMinimoConvenio = psi.valor_minimo_convenio ?? null;
 
     document.getElementById('pfNome').value = psi.nome || '';
     document.getElementById('pfCrp').value = psi.crp || '';
@@ -1174,6 +1191,10 @@
 
   /* ========== PRONTUÁRIO ========== */
   let pacienteAtualId = null;
+  let pacienteAtualObj = null;
+  let psicologoPrecoExato = null;
+  let psicologoAceitaConvenio = false;
+  let psicologoValorMinimoConvenio = null;
   let sessoesCache = [];
   let chartSintomas, chartAdesao, chartFuncionamento;
 
@@ -1195,6 +1216,7 @@
     const p = pacientesCache.find(x => x.id === pacienteId);
     if (!p) return;
     pacienteAtualId = pacienteId;
+    pacienteAtualObj = p;
 
     document.getElementById('pHeaderNome').textContent = p.nome ?? '—';
     const idade = p.data_nascimento ? calcularIdade(p.data_nascimento) : null;
@@ -1430,7 +1452,18 @@
     const agora = new Date();
     document.getElementById('sData').value = agora.toISOString().slice(0, 10);
     document.getElementById('sHora').value = agora.toTimeString().slice(0, 5);
+
+    // Auto-detecção: por padrão a sessão é particular, com o valor exato do psicólogo.
+    document.getElementById('sTipoAtendimento').value = 'particular';
+    document.getElementById('sValor').value = psicologoPrecoExato ?? '';
+
     document.getElementById('modalRegistrarSessao').classList.add('open');
+  });
+
+  document.getElementById('sTipoAtendimento').addEventListener('change', (e) => {
+    document.getElementById('sValor').value = e.target.value === 'convenio'
+      ? (psicologoValorMinimoConvenio ?? '')
+      : (psicologoPrecoExato ?? '');
   });
   document.getElementById('btnCancelarSessao').addEventListener('click', () => {
     document.getElementById('modalRegistrarSessao').classList.remove('open');
@@ -1455,6 +1488,8 @@
       tarefa_casa: document.getElementById('sTarefaCasa').value.trim() || null,
       plano_proxima_sessao: document.getElementById('sPlanoProximo').value.trim() || null,
       intercorrencia: document.getElementById('sIntercorrencia').checked,
+      tipo_atendimento: document.getElementById('sTipoAtendimento').value,
+      valor_psicologo: Number(document.getElementById('sValor').value) || null,
     };
 
     if (status === 'realizada') {
@@ -1475,6 +1510,8 @@
     document.getElementById('sTarefaCasa').value = '';
     document.getElementById('sPlanoProximo').value = '';
     document.getElementById('sIntercorrencia').checked = false;
+    document.getElementById('sTipoAtendimento').value = 'particular';
+    document.getElementById('sValor').value = '';
 
     await carregarSessoesPaciente(pacienteAtualId);
   });
