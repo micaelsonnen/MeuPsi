@@ -4,6 +4,14 @@ Plataforma que conecta pacientes a psicólogos para acompanhamento terapêutico.
 
 > Este README documenta decisões de arquitetura e convenções que já causaram bugs reais quando não seguidas. Leia antes de mexer no schema ou nas queries.
 
+## Titularidade e autoria
+
+- **Sistema de propriedade de**: Clínica Sonnen
+- **Ideia original de**: Juliana Myrian
+- **Desenvolvido por**: Micael Faccio, com assistência de Claude (Anthropic)
+
+*(Formalização jurídica — contrato de cessão de direitos patrimoniais, CNAE, regime de bens — em andamento com contador/advogado da família. Este README reflete o entendimento atual do projeto, não substitui o instrumento jurídico definitivo.)*
+
 ---
 
 ## Stack
