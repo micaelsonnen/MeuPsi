@@ -137,14 +137,16 @@
       return;
     }
 
-    // Redireciona conforme o papel do usuário
-    const { data: perfil } = await sb
-      .from('usuarios')
-      .select('papel')
-      .eq('id', data.user.id)
-      .single();
+    // Redireciona conforme o tipo de conta.
+    // Não usamos usuarios.papel para psicólogo porque o cadastro de
+    // psicólogo nunca grava nada em "usuarios" — só em "psicologos".
+    const { data: psi } = await sb
+      .from('psicologos')
+      .select('id')
+      .eq('user_id', data.user.id)
+      .maybeSingle();
 
-    if (perfil?.papel === 'psicologo' || perfil?.papel === 'admin') {
+    if (psi) {
       window.location.href = 'dashboard-psicologo.html';
     } else {
       window.location.href = 'dashboard-paciente.html';

@@ -420,7 +420,7 @@ nav {
   async function carregarPsicologo() {
     const { data: p, error } = await sb
       .from('psicologos')
-      .select('id, nome, crp, bio, especialidade, especialidades, abordagem, modalidade, cidade, preco_faixa, foto_url, aceita_convenio, valor_minimo_convenio')
+      .select('id, nome, crp, bio, especialidade, especialidades, abordagem, modalidade, cidade, preco_exato, foto_url, aceita_convenio, valor_minimo_convenio')
       .eq('id', psicologoId)
       .single();
 
@@ -461,8 +461,8 @@ nav {
     document.getElementById('infoModalidade').textContent = p.modalidade ?? '—';
 
     const valorEl = document.getElementById('infoValor');
-    valorEl.innerHTML = p.preco_faixa
-      ? `<span class="numero" style="font-size:16px;">${esc(p.preco_faixa)}</span>`
+    valorEl.innerHTML = p.preco_exato
+      ? `<span class="numero" style="font-size:16px;">R$ ${Number(p.preco_exato).toFixed(0)}</span>`
       : `<span class="periodo">a combinar</span>`;
 
     document.getElementById('profileBio').innerHTML = p.bio

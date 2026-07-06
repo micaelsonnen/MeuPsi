@@ -127,7 +127,7 @@
   async function carregarPsicologos() {
     let query = sb
       .from('psicologos')
-      .select('id, nome, crp, bio, especialidade, cidade, modalidade, preco_faixa, foto_url, aceita_convenio, valor_minimo_convenio')
+      .select('id, nome, crp, bio, especialidade, cidade, modalidade, preco_exato, foto_url, aceita_convenio, valor_minimo_convenio')
       .eq('ativo', true)
       .order('nome');
 
@@ -160,7 +160,7 @@
           ${p.especialidade ? `<span class="tag">${esc(p.especialidade)}</span>` : ''}
           ${p.modalidade ? `<span class="tag">${esc(p.modalidade)}</span>` : ''}
           ${p.cidade ? `<span class="tag">${esc(p.cidade)}</span>` : ''}
-          ${instituicaoPaciente ? `<span class="tag">Atende seu convênio</span>` : (p.preco_faixa ? `<span class="tag">${esc(p.preco_faixa)}</span>` : '')}
+          ${instituicaoPaciente ? `<span class="tag">Atende seu convênio</span>` : (p.preco_exato ? `<span class="tag">R$ ${Number(p.preco_exato).toFixed(0)}</span>` : '')}
         </div>
         <button class="btn-escolher" data-id="${p.id}">Escolher</button>
       </div>
