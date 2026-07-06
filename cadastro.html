@@ -745,7 +745,7 @@ async function enviarCadastro() {
       const { count: totalAntes } = await db.from('psicologos').select('id', { count: 'exact', head: true });
       const posicao = (totalAntes || 0) + 1;
       let plano, mensalidade;
-      if (posicao <= 100)      { plano = 'fundador';  mensalidade = 100; }
+      if (posicao <= 100)      { plano = 'fundador';  mensalidade = 90; }
       else if (posicao <= 200) { plano = 'pioneiro';  mensalidade = 120; }
       else                     { plano = 'padrao';    mensalidade = 150; }
 
