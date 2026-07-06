@@ -364,6 +364,7 @@
 
   /* ========== CHECK-IN / PROGRESSO ========== */
   let checkinSelecoes = {};
+  let checkinHojeId = null;
   let chartProgresso;
 
   document.querySelectorAll('.emoji-picker').forEach(picker => {
@@ -389,6 +390,7 @@
       .maybeSingle();
 
     if (data) {
+      checkinHojeId = data.id;
       ['ansiedade', 'humor', 'sono'].forEach(campo => {
         const valor = data[campo];
         if (valor == null) return;
@@ -420,13 +422,24 @@
     msg.textContent = '';
     msg.className = '';
 
-    const { error } = await sb.from('checkins_paciente').insert({
-      paciente_id: uid,
-      data: new Date().toISOString().slice(0, 10),
-      ansiedade: checkinSelecoes.ansiedade,
-      humor: checkinSelecoes.humor,
-      sono: checkinSelecoes.sono,
-    });
+    let error;
+    if (checkinHojeId) {
+      ({ error } = await sb.from('checkins_paciente').update({
+        ansiedade: checkinSelecoes.ansiedade,
+        humor: checkinSelecoes.humor,
+        sono: checkinSelecoes.sono,
+      }).eq('id', checkinHojeId));
+    } else {
+      const resultado = await sb.from('checkins_paciente').insert({
+        paciente_id: uid,
+        data: new Date().toISOString().slice(0, 10),
+        ansiedade: checkinSelecoes.ansiedade,
+        humor: checkinSelecoes.humor,
+        sono: checkinSelecoes.sono,
+      }).select().single();
+      error = resultado.error;
+      if (resultado.data) checkinHojeId = resultado.data.id;
+    }
 
     btn.disabled = false;
 
