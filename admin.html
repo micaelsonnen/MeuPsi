@@ -253,6 +253,10 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
         Agendamentos
       </div>
+      <div class="nav-item" onclick="irPara('financeiro')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Financeiro
+      </div>
     </nav>
     <div class="sidebar-footer">
       <button class="btn-logout" onclick="fazerLogout()">Sair</button>
@@ -449,6 +453,55 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
             </thead>
             <tbody id="tabelaAgendamentos">
               <tr><td colspan="6" class="empty-state">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagina" id="pagFinanceiro">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Financeiro</h1>
+          <p class="page-sub">Valores das sessões realizadas em toda a plataforma</p>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <p class="stat-label">Total geral</p>
+          <p class="stat-num" id="finStatTotalGeral">—</p>
+          <p class="stat-desc">sessões realizadas</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Particular</p>
+          <p class="stat-num" id="finStatParticular">—</p>
+          <p class="stat-desc">soma dos valores</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Convênio</p>
+          <p class="stat-num" id="finStatConvenio">—</p>
+          <p class="stat-desc">soma dos valores</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Sessões realizadas</p>
+          <p class="stat-num" id="finStatContagem">—</p>
+          <p class="stat-desc">total no período</p>
+        </div>
+      </div>
+      <div class="card">
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Paciente</th>
+                <th>Psicólogo</th>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaFinanceiro">
+              <tr><td colspan="5" class="empty-state">Carregando…</td></tr>
             </tbody>
           </table>
         </div>
@@ -829,6 +882,7 @@ function irPara(pag) {
   if (pag === 'instituicoes') carregarInstituicoes()
   if (pag === 'pendentes') renderPendentes()
   if (pag === 'agendamentos') carregarAgendamentos()
+  if (pag === 'financeiro') carregarFinanceiro()
 }
 
 // ── DADOS ───────────────────────────────────────────────────
@@ -1185,6 +1239,45 @@ async function carregarAgendamentos() {
       <td>${esc(a.hora) || '—'}</td>
       <td>${esc(a.observacoes) || '—'}</td>
       <td><span class="badge badge-${a.status}">${a.status}</span></td>
+    </tr>`).join('')
+}
+
+async function carregarFinanceiro() {
+  const { data, error } = await sb
+    .from('sessoes')
+    .select('valor_psicologo, tipo_atendimento, data_hora, paciente:pacientes(nome), psicologo:psicologos(nome)')
+    .eq('status', 'realizada')
+    .order('data_hora', { ascending: false })
+    .limit(200)
+
+  const tbody = document.getElementById('tabelaFinanceiro')
+
+  if (error || !data?.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhuma sessão realizada ainda</td></tr>'
+    document.getElementById('finStatTotalGeral').textContent = 'R$ 0,00'
+    document.getElementById('finStatParticular').textContent = 'R$ 0,00'
+    document.getElementById('finStatConvenio').textContent = 'R$ 0,00'
+    document.getElementById('finStatContagem').textContent = 0
+    return
+  }
+
+  const particular = data.filter(s => s.tipo_atendimento !== 'convenio')
+  const convenio = data.filter(s => s.tipo_atendimento === 'convenio')
+  const somaParticular = particular.reduce((acc, s) => acc + (Number(s.valor_psicologo) || 0), 0)
+  const somaConvenio = convenio.reduce((acc, s) => acc + (Number(s.valor_psicologo) || 0), 0)
+
+  document.getElementById('finStatTotalGeral').textContent = 'R$ ' + (somaParticular + somaConvenio).toFixed(2)
+  document.getElementById('finStatParticular').textContent = 'R$ ' + somaParticular.toFixed(2)
+  document.getElementById('finStatConvenio').textContent = 'R$ ' + somaConvenio.toFixed(2)
+  document.getElementById('finStatContagem').textContent = data.length
+
+  tbody.innerHTML = data.map(s => `
+    <tr>
+      <td>${esc(s.paciente?.nome) || '—'}</td>
+      <td>${esc(s.psicologo?.nome) || '—'}</td>
+      <td>${s.data_hora ? new Date(s.data_hora).toLocaleDateString('pt-BR') : '—'}</td>
+      <td>${s.tipo_atendimento === 'convenio' ? 'Convênio' : 'Particular'}</td>
+      <td>R$ ${(Number(s.valor_psicologo) || 0).toFixed(2)}</td>
     </tr>`).join('')
 }
 
