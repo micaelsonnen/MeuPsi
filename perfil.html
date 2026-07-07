@@ -419,7 +419,7 @@ nav {
 
   async function carregarPsicologo() {
     const { data: p, error } = await sb
-      .from('psicologos')
+      .from('psicologos_publico')
       .select('id, nome, crp, bio, especialidade, especialidades, abordagem, modalidade, cidade, preco_exato, foto_url, aceita_convenio, valor_minimo_convenio')
       .eq('id', psicologoId)
       .single();

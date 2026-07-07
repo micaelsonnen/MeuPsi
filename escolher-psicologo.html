@@ -126,9 +126,8 @@
 
   async function carregarPsicologos() {
     let query = sb
-      .from('psicologos')
+      .from('psicologos_publico')
       .select('id, nome, crp, bio, especialidade, cidade, modalidade, preco_exato, foto_url, aceita_convenio, valor_minimo_convenio')
-      .eq('ativo', true)
       .order('nome');
 
     if (instituicaoPaciente) {
