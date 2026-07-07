@@ -244,6 +244,12 @@ input.invalid, select.invalid { border-color: #F87171; }
           <span class="field-error" id="err-ePsiLink">Informe o link do seu cadastro no e-Psi.</span>
           <span class="field-hint">Obrigatório pela Resolução CFP nº 09/2024 para atendimento por TICs. <a href="https://e-psi.cfp.org.br" target="_blank" rel="noopener">Não tem cadastro ainda?</a></span>
         </div>
+        <div class="field">
+          <label for="cpf">CPF *</label>
+          <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" />
+          <span class="field-error" id="err-cpf">Informe um CPF válido.</span>
+          <span class="field-hint">Necessário para receber seus pagamentos pela plataforma</span>
+        </div>
       </div>
 
       <h3 style="font-size:15px;margin:24px 0 4px;color:var(--gray-800,#1a1a1a)">Verificação profissional</h3>
@@ -584,6 +590,7 @@ function validarStep1() {
 
   const nome = document.getElementById('nome');
   const crp = document.getElementById('crp');
+  const cpf = document.getElementById('cpf');
   const email = document.getElementById('email');
   const senha = document.getElementById('senha');
   const ePsiLink = document.getElementById('ePsiLink');
@@ -591,7 +598,7 @@ function validarStep1() {
   const docDiploma = document.getElementById('docDiploma');
 
   // Limpa erros anteriores
-  [nome, crp, email, senha, ePsiLink, docCrp, docDiploma].forEach(el => {
+  [nome, crp, cpf, email, senha, ePsiLink, docCrp, docDiploma].forEach(el => {
     el.classList.remove('invalid');
     document.getElementById('err-' + el.id).style.display = 'none';
   });
@@ -604,6 +611,11 @@ function validarStep1() {
   if (!crp.value.trim()) {
     crp.classList.add('invalid');
     document.getElementById('err-crp').style.display = 'block';
+    valido = false;
+  }
+  if (cpf.value.replace(/\D/g, '').length !== 11) {
+    cpf.classList.add('invalid');
+    document.getElementById('err-cpf').style.display = 'block';
     valido = false;
   }
   if (!email.value.trim() || !email.value.includes('@')) {
@@ -754,6 +766,7 @@ async function enviarCadastro() {
         email: email,
         nome: nome,
         crp: crp,
+        cpf: document.getElementById('cpf').value.replace(/\D/g, ''),
         telefone: document.getElementById('tel').value.trim(),
         cidade: document.getElementById('cidade').value.trim(),
         estado: document.getElementById('estado').value,
