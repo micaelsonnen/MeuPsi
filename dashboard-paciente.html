@@ -226,6 +226,23 @@
       Esses são seus dados pessoais. O histórico clínico e a anamnese ficam com seu psicólogo.
     </p>
   </div>
+
+  <div class="card" id="cardPrivacidade" style="margin-top:16px">
+    <div class="section-title">Meus dados e privacidade</div>
+    <p style="font-size:13px;color:#6b7280;margin-bottom:14px">
+      Você pode baixar uma cópia dos seus dados a qualquer momento, ou solicitar
+      o encerramento da sua conta.
+    </p>
+    <button class="btn-secundario" id="btnExportarDados" type="button">Baixar meus dados</button>
+    <button class="btn-secundario" id="btnSolicitarExclusao" type="button" style="margin-left:8px;color:#b91c1c;border-color:#fecaca">
+      Solicitar exclusão da minha conta
+    </button>
+    <div id="msgPrivacidade" style="margin-top:10px"></div>
+    <p style="font-size:12px;color:#9ca3af;margin-top:10px">
+      A exclusão não é imediata: seu psicólogo e a equipe do MeuPsi precisam revisar o pedido,
+      porque parte do prontuário clínico tem prazo legal de guarda antes de poder ser removido.
+    </p>
+  </div>
   </section>
 
   <!-- ========== SEÇÃO: MEU PROGRESSO ========== -->
@@ -552,6 +569,65 @@
   document.getElementById('btnSair').addEventListener('click', async () => {
     await sb.auth.signOut();
     window.location.href = 'login.html';
+  });
+
+  document.getElementById('btnExportarDados').addEventListener('click', async () => {
+    const btn = document.getElementById('btnExportarDados');
+    const msg = document.getElementById('msgPrivacidade');
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const uid = session.user.id;
+
+    btn.disabled = true;
+    btn.textContent = 'Preparando...';
+
+    const [{ data: usuario }, { data: paciente }, { data: checkins }] = await Promise.all([
+      sb.from('usuarios').select('nome, email, telefone').eq('id', uid).maybeSingle(),
+      sb.from('pacientes').select('*').eq('id', uid).maybeSingle(),
+      sb.from('checkins_paciente').select('data, ansiedade, humor, sono').eq('paciente_id', uid).order('data'),
+    ]);
+
+    const pacote = {
+      exportado_em: new Date().toISOString(),
+      usuario,
+      paciente,
+      checkins: checkins || [],
+      observacao: 'O histórico clínico (sessões, anamnese) fica sob responsabilidade do seu psicólogo e não está incluído aqui.',
+    };
+
+    const blob = new Blob([JSON.stringify(pacote, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'meus-dados-meupsi.json';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    btn.disabled = false;
+    btn.textContent = 'Baixar meus dados';
+    msg.textContent = 'Seus dados foram baixados.';
+    msg.className = 'ok';
+  });
+
+  document.getElementById('btnSolicitarExclusao').addEventListener('click', async () => {
+    const msg = document.getElementById('msgPrivacidade');
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const uid = session.user.id;
+
+    const confirmado = confirm(
+      'Isso vai enviar um pedido de encerramento da sua conta para a equipe do MeuPsi. ' +
+      'Não é imediato — pode levar alguns dias, pois parte do prontuário clínico tem prazo legal de guarda. ' +
+      'Deseja continuar?'
+    );
+    if (!confirmado) return;
+
+    const { error } = await sb.from('solicitacoes_exclusao').insert({ paciente_id: uid, status: 'pendente' });
+
+    msg.textContent = error
+      ? 'Erro ao registrar o pedido: ' + error.message
+      : 'Pedido registrado. A equipe do MeuPsi vai entrar em contato.';
+    msg.className = error ? 'erro' : 'ok';
   });
 
   init();

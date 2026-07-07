@@ -257,6 +257,10 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
         Financeiro
       </div>
+      <div class="nav-item" onclick="irPara('exclusoes')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/></svg>
+        Exclusões
+      </div>
     </nav>
     <div class="sidebar-footer">
       <button class="btn-logout" onclick="fazerLogout()">Sair</button>
@@ -501,6 +505,33 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
               </tr>
             </thead>
             <tbody id="tabelaFinanceiro">
+              <tr><td colspan="5" class="empty-state">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagina" id="pagExclusoes">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Solicitações de exclusão</h1>
+          <p class="page-sub">Pedidos de encerramento de conta feitos por pacientes (LGPD)</p>
+        </div>
+      </div>
+      <div class="card">
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Paciente</th>
+                <th>E-mail</th>
+                <th>Solicitado em</th>
+                <th>Status</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaExclusoes">
               <tr><td colspan="5" class="empty-state">Carregando…</td></tr>
             </tbody>
           </table>
@@ -883,6 +914,7 @@ function irPara(pag) {
   if (pag === 'pendentes') renderPendentes()
   if (pag === 'agendamentos') carregarAgendamentos()
   if (pag === 'financeiro') carregarFinanceiro()
+  if (pag === 'exclusoes') carregarExclusoes()
 }
 
 // ── DADOS ───────────────────────────────────────────────────
@@ -1279,6 +1311,48 @@ async function carregarFinanceiro() {
       <td>${s.tipo_atendimento === 'convenio' ? 'Convênio' : 'Particular'}</td>
       <td>R$ ${(Number(s.valor_psicologo) || 0).toFixed(2)}</td>
     </tr>`).join('')
+}
+
+// ── EXCLUSÕES (LGPD) ────────────────────────────────────────
+async function carregarExclusoes() {
+  const { data, error } = await sb
+    .from('solicitacoes_exclusao')
+    .select('id, status, criado_em, paciente:pacientes(nome, email)')
+    .order('criado_em', { ascending: false })
+
+  const tbody = document.getElementById('tabelaExclusoes')
+
+  if (error || !data?.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhuma solicitação até agora</td></tr>'
+    return
+  }
+
+  tbody.innerHTML = data.map(s => `
+    <tr>
+      <td>${esc(s.paciente?.nome) || '—'}</td>
+      <td>${esc(s.paciente?.email) || '—'}</td>
+      <td>${s.criado_em ? new Date(s.criado_em).toLocaleDateString('pt-BR') : '—'}</td>
+      <td><span class="badge badge-${s.status === 'concluida' ? 'ativo' : s.status === 'recusada' ? 'inativo' : 'pendente'}">${s.status}</span></td>
+      <td>
+        ${s.status === 'pendente' ? `
+          <button class="btn-secundario" onclick="resolverExclusao('${s.id}', 'em_analise')">Marcar em análise</button>
+          <button class="btn-secundario" onclick="resolverExclusao('${s.id}', 'concluida')">Marcar concluída</button>
+        ` : s.status === 'em_analise' ? `
+          <button class="btn-secundario" onclick="resolverExclusao('${s.id}', 'concluida')">Marcar concluída</button>
+        ` : '—'}
+      </td>
+    </tr>`).join('')
+}
+
+async function resolverExclusao(id, novoStatus) {
+  const { error } = await sb
+    .from('solicitacoes_exclusao')
+    .update({ status: novoStatus, resolvido_em: novoStatus === 'concluida' ? new Date().toISOString() : null })
+    .eq('id', id)
+
+  if (error) return toast('Erro ao atualizar solicitação', 'erro')
+  toast('Solicitação atualizada.')
+  await carregarExclusoes()
 }
 
 // ── STATUS ──────────────────────────────────────────────────
