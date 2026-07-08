@@ -218,6 +218,39 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
   </div>
 </div>
 
+<!-- 2FA — MATRÍCULA (primeiro acesso) -->
+<div class="login-wrap" id="telaMfaEnroll" style="display:none">
+  <div class="login-card">
+    <p class="login-logo">MeuPsi</p>
+    <p class="login-sub">Configure a verificação em duas etapas</p>
+    <p style="font-size:13px;color:#6b7280;margin-bottom:12px">
+      Escaneie o QR code abaixo com um app autenticador (Google Authenticator, Authy, etc.)
+      e digite o código de 6 dígitos gerado.
+    </p>
+    <div id="mfaQrCode" style="display:flex;justify-content:center;margin-bottom:12px"></div>
+    <div class="field">
+      <label for="mfaEnrollCodigo">Código do app autenticador</label>
+      <input type="text" id="mfaEnrollCodigo" placeholder="000000" maxlength="6" inputmode="numeric" />
+    </div>
+    <p class="login-erro" id="mfaEnrollErro"></p>
+    <button class="btn btn-lila" style="width:100%;justify-content:center;padding:11px;" onclick="confirmarMatriculaMfa()">Confirmar e ativar</button>
+  </div>
+</div>
+
+<!-- 2FA — VERIFICAÇÃO (acessos seguintes) -->
+<div class="login-wrap" id="telaMfaChallenge" style="display:none">
+  <div class="login-card">
+    <p class="login-logo">MeuPsi</p>
+    <p class="login-sub">Digite o código do seu app autenticador</p>
+    <div class="field">
+      <label for="mfaChallengeCodigo">Código de 6 dígitos</label>
+      <input type="text" id="mfaChallengeCodigo" placeholder="000000" maxlength="6" inputmode="numeric" onkeydown="if(event.key==='Enter')verificarMfa()" />
+    </div>
+    <p class="login-erro" id="mfaChallengeErro"></p>
+    <button class="btn btn-lila" style="width:100%;justify-content:center;padding:11px;" onclick="verificarMfa()">Verificar</button>
+  </div>
+</div>
+
 <!-- APP -->
 <div class="app" id="telaApp">
 
@@ -863,7 +896,7 @@ let formacaoAtualId = null
 // ── INIT ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   const { data: { session } } = await sb.auth.getSession()
-  if (session && await ehAdmin(session.user.id)) mostrarApp()
+  if (session && await ehAdmin(session.user.id)) await roteamentoMfa()
 })
 
 async function ehAdmin(userId) {
@@ -887,6 +920,93 @@ async function fazerLogin() {
     return
   }
 
+  await roteamentoMfa()
+}
+
+// Decide, depois da senha, se precisa: (a) matricular o 2FA pela primeira
+// vez, (b) pedir o código de quem já tem 2FA, ou (c) liberar direto.
+async function roteamentoMfa() {
+  const { data: factors } = await sb.auth.mfa.listFactors()
+  const totpAtivo = factors?.totp?.find(f => f.status === 'verified')
+
+  if (!totpAtivo) {
+    await iniciarMatriculaMfa()
+    return
+  }
+
+  const { data: aal } = await sb.auth.mfa.getAuthenticatorAssuranceLevel()
+  if (aal.currentLevel === 'aal2') {
+    mostrarApp()
+    return
+  }
+
+  document.getElementById('telaLogin').style.display = 'none'
+  document.getElementById('telaMfaChallenge').style.display = 'flex'
+}
+
+let mfaFactorIdPendente = null
+
+async function iniciarMatriculaMfa() {
+  const { data, error } = await sb.auth.mfa.enroll({ factorType: 'totp' })
+  if (error) {
+    document.getElementById('loginErro').textContent = 'Erro ao configurar 2FA: ' + error.message
+    document.getElementById('loginErro').style.display = 'block'
+    return
+  }
+  mfaFactorIdPendente = data.id
+  document.getElementById('mfaQrCode').innerHTML = data.totp.qr_code
+  document.getElementById('telaLogin').style.display = 'none'
+  document.getElementById('telaMfaEnroll').style.display = 'flex'
+}
+
+async function confirmarMatriculaMfa() {
+  const codigo = document.getElementById('mfaEnrollCodigo').value.trim()
+  const erro = document.getElementById('mfaEnrollErro')
+  erro.style.display = 'none'
+
+  const { data: challenge, error: erroChallenge } = await sb.auth.mfa.challenge({ factorId: mfaFactorIdPendente })
+  if (erroChallenge) { erro.textContent = erroChallenge.message; erro.style.display = 'block'; return }
+
+  const { error: erroVerify } = await sb.auth.mfa.verify({
+    factorId: mfaFactorIdPendente,
+    challengeId: challenge.id,
+    code: codigo,
+  })
+
+  if (erroVerify) {
+    erro.textContent = 'Código inválido. Confira o app autenticador e tente de novo.'
+    erro.style.display = 'block'
+    return
+  }
+
+  document.getElementById('telaMfaEnroll').style.display = 'none'
+  mostrarApp()
+}
+
+async function verificarMfa() {
+  const codigo = document.getElementById('mfaChallengeCodigo').value.trim()
+  const erro = document.getElementById('mfaChallengeErro')
+  erro.style.display = 'none'
+
+  const { data: factors } = await sb.auth.mfa.listFactors()
+  const totpAtivo = factors?.totp?.find(f => f.status === 'verified')
+
+  const { data: challenge, error: erroChallenge } = await sb.auth.mfa.challenge({ factorId: totpAtivo.id })
+  if (erroChallenge) { erro.textContent = erroChallenge.message; erro.style.display = 'block'; return }
+
+  const { error: erroVerify } = await sb.auth.mfa.verify({
+    factorId: totpAtivo.id,
+    challengeId: challenge.id,
+    code: codigo,
+  })
+
+  if (erroVerify) {
+    erro.textContent = 'Código inválido ou expirado. Tente novamente.'
+    erro.style.display = 'block'
+    return
+  }
+
+  document.getElementById('telaMfaChallenge').style.display = 'none'
   mostrarApp()
 }
 

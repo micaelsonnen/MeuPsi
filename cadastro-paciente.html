@@ -60,7 +60,7 @@
   <input type="text" id="telefone" placeholder="(11) 99999-9999" />
 
   <label>Senha</label>
-  <input type="password" id="senha" placeholder="Mínimo 6 caracteres" />
+  <input type="password" id="senha" placeholder="Mínimo 8 caracteres, com letra e número" />
 
   <label>Convênio</label>
   <select id="instituicao">
@@ -104,8 +104,8 @@
     if (!nome || !email || !senha) {
       msg.textContent = 'Preencha nome, e-mail e senha.'; return;
     }
-    if (senha.length < 6) {
-      msg.textContent = 'Senha precisa ter ao menos 6 caracteres.'; return;
+    if (senha.length < 8 || !/[a-zA-Z]/.test(senha) || !/[0-9]/.test(senha)) {
+      msg.textContent = 'Senha precisa ter ao menos 8 caracteres, incluindo letra e número.'; return;
     }
     if (!document.getElementById('aceiteTermos').checked) {
       msg.textContent = 'É necessário aceitar os Termos de Uso e a Política de Privacidade.'; return;

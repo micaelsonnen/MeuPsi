@@ -310,8 +310,8 @@ input.invalid, select.invalid { border-color: #F87171; }
       <!-- CORREÇÃO: type="password" em vez de type="text" -->
       <div class="field">
         <label for="senha">Senha de acesso *</label>
-        <input type="password" id="senha" placeholder="Mínimo 8 caracteres" />
-        <span class="field-error" id="err-senha">A senha precisa ter no mínimo 8 caracteres.</span>
+        <input type="password" id="senha" placeholder="Mínimo 8 caracteres, com letra e número" />
+        <span class="field-error" id="err-senha">A senha precisa ter no mínimo 8 caracteres, incluindo letra e número.</span>
       </div>
     </div>
 
@@ -623,7 +623,7 @@ function validarStep1() {
     document.getElementById('err-email').style.display = 'block';
     valido = false;
   }
-  if (senha.value.length < 8) {
+  if (senha.value.length < 8 || !/[a-zA-Z]/.test(senha.value) || !/[0-9]/.test(senha.value)) {
     senha.classList.add('invalid');
     document.getElementById('err-senha').style.display = 'block';
     valido = false;
@@ -843,7 +843,7 @@ async function enviarCadastro() {
     if (e.message && e.message.includes('already registered')) {
       fb.textContent = 'Este e-mail já está cadastrado. Tente fazer login.';
     } else if (e.message && e.message.includes('Password')) {
-      fb.textContent = 'A senha precisa ter no mínimo 6 caracteres.';
+      fb.textContent = 'A senha precisa ter no mínimo 8 caracteres, incluindo letra e número.';
     } else {
       fb.textContent = 'Erro ao enviar cadastro. Tente novamente.';
     }
