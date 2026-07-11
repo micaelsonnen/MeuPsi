@@ -151,7 +151,7 @@ Existe um `contrato_adesao_psicologo.docx` (Termo de Adesão / Prestação de Se
 - **Senha forte** exigida no cadastro (mínimo 8 caracteres, letra + número) — só client-side; **conferir se o mínimo do lado do servidor no painel do Supabase (Authentication → Policies) também está em 8+**, senão dá pra contornar via chamada direta à API.
 - **Escape de HTML** (`esc()`) em todo campo de texto livre renderizado via `innerHTML`. `dashboard-paciente.html` usa `.textContent` em vez de `innerHTML` — também seguro, não precisa de `esc()`.
 - **CSP (Content Security Policy)** aplicada via `<meta>` em `login.html` e `admin.html` (os dois mais críticos). **Ainda não aplicada nos demais ~15 arquivos.** Limitação conhecida: `'unsafe-inline'` é necessário no `script-src` porque toda a lógica fica em `<script>` inline no próprio HTML; `frame-ancestors` não funciona via `<meta>` (precisaria de header HTTP real, o que exige trocar de hospedagem estática por uma que permita configurar headers).
-- **Log de acesso a prontuário** (`logs_acesso_prontuario`) — grava automaticamente toda vez que um psicólogo abre a ficha de um paciente. **Não existe UI pra visualizar esses logs ainda** — só ficam no banco, acessíveis via SQL Editor ou por uma tela futura no admin.
+- **Log de acesso a prontuário** (`logs_acesso_prontuario`) — grava automaticamente toda vez que um psicólogo abre a ficha de um paciente. Visualização disponível na aba "Logs de acesso" do `admin.html`, com busca por nome.
 - **Webhook do Pagar.me autenticado** via HTTP Basic Auth (ver seção Pagamentos).
 - **Botão de mostrar/ocultar senha** em todos os campos de senha do site (`login.html`, `cadastro.html`, `cadastro-paciente.html`, `admin.html`) — usabilidade, não é item de segurança em si.
 
@@ -199,7 +199,6 @@ Existem dois scripts para popular/limpar contas fantasia (2 psicólogos, 3 pacie
 - **Conta Pagar.me** — não criada, aguardando CNPJ da clínica ativo (ver seção Pagamentos).
 - **Plano Supabase** — projeto está no tier Free (sem backup robusto, pausa por inatividade); upgrade pro Pro adiado por decisão consciente até o CNPJ, pelo mesmo motivo fiscal do Pagar.me.
 - **CSP** — aplicada só em `login.html` e `admin.html`; falta nos demais arquivos.
-- **UI de visualização dos logs de acesso a prontuário** — tabela existe, tela no admin não foi construída.
 - **Ambiente de teste separado da produção** — recomendado, não implementado (hoje só existe a branch `main PRODUCTION`).
 - **Confirmação de e-mail obrigatória e rate limiting de login** — depende de toggle no painel do Supabase (Authentication), não verificado nesta revisão.
 - **Prazo de repasse e política de cancelamento/reembolso** — ainda não definidos, placeholders no contrato de adesão e em `termos.html`.
