@@ -308,6 +308,10 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/></svg>
         Exclusões
       </div>
+      <div class="nav-item" onclick="irPara('logsAcesso')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v4l3 3M12 22a10 10 0 100-20 10 10 0 000 20z"/></svg>
+        Logs de acesso
+      </div>
     </nav>
     <div class="sidebar-footer">
       <button class="btn-logout" onclick="fazerLogout()">Sair</button>
@@ -583,6 +587,43 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <div class="pagina" id="pagLogsAcesso">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Logs de acesso ao prontuário</h1>
+          <p class="page-sub">Registro de auditoria: qual psicólogo abriu a ficha de qual paciente, e quando</p>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <input
+          type="text"
+          id="filtroLogsAcesso"
+          placeholder="Filtrar por nome do psicólogo ou do paciente..."
+          style="width:100%;padding:10px 14px;border:1.5px solid var(--rosa-200);border-radius:var(--radius-md);font-size:14px"
+          oninput="renderLogsAcesso()"
+        />
+      </div>
+      <div class="card">
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Psicólogo</th>
+                <th>Paciente</th>
+                <th>Data e hora do acesso</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaLogsAcesso">
+              <tr><td colspan="3" class="empty-state">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:12px;color:var(--malva);margin-top:10px;padding:0 4px">
+          Mostrando os 300 acessos mais recentes.
+        </p>
       </div>
     </div>
 
@@ -1059,6 +1100,7 @@ function irPara(pag) {
   if (pag === 'agendamentos') carregarAgendamentos()
   if (pag === 'financeiro') carregarFinanceiro()
   if (pag === 'exclusoes') carregarExclusoes()
+  if (pag === 'logsAcesso') carregarLogsAcesso()
 }
 
 // ── DADOS ───────────────────────────────────────────────────
@@ -1497,6 +1539,49 @@ async function resolverExclusao(id, novoStatus) {
   if (error) return toast('Erro ao atualizar solicitação', 'erro')
   toast('Solicitação atualizada.')
   await carregarExclusoes()
+}
+
+// ── LOGS DE ACESSO AO PRONTUÁRIO ────────────────────────────
+let logsAcessoCache = []
+
+async function carregarLogsAcesso() {
+  const { data, error } = await sb
+    .from('logs_acesso_prontuario')
+    .select('acessado_em, psicologo:psicologos(nome), paciente:pacientes(nome)')
+    .order('acessado_em', { ascending: false })
+    .limit(300)
+
+  if (error) {
+    document.getElementById('tabelaLogsAcesso').innerHTML =
+      '<tr><td colspan="3" class="empty-state">Erro ao carregar logs</td></tr>'
+    return
+  }
+
+  logsAcessoCache = data || []
+  renderLogsAcesso()
+}
+
+function renderLogsAcesso() {
+  const termo = document.getElementById('filtroLogsAcesso').value.trim().toLowerCase()
+  const tbody = document.getElementById('tabelaLogsAcesso')
+
+  const filtrados = logsAcessoCache.filter(l => {
+    if (!termo) return true
+    return (l.psicologo?.nome || '').toLowerCase().includes(termo)
+        || (l.paciente?.nome || '').toLowerCase().includes(termo)
+  })
+
+  if (!filtrados.length) {
+    tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Nenhum acesso registrado</td></tr>'
+    return
+  }
+
+  tbody.innerHTML = filtrados.map(l => `
+    <tr>
+      <td>${esc(l.psicologo?.nome) || '—'}</td>
+      <td>${esc(l.paciente?.nome) || '—'}</td>
+      <td>${l.acessado_em ? new Date(l.acessado_em).toLocaleString('pt-BR') : '—'}</td>
+    </tr>`).join('')
 }
 
 // ── STATUS ──────────────────────────────────────────────────
